@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import { PasswordSuggestion } from './index'
+import { closeIframe } from '../../iframeApi/closeIframe'
 
 jest.mock('@lingui/react', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -70,6 +71,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
 }))
 
 jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  Close: () => <span data-testid="close-icon" />,
   Key: () => <span data-testid="key-icon" />,
   SyncLock: () => <span data-testid="sync-icon" />
 }))
@@ -82,6 +84,7 @@ describe('PasswordSuggestion', () => {
     postMessageSpy.mockImplementation(() => {})
     mockRefetchVault.mockClear()
     mockNavigate.mockClear()
+    closeIframe.mockClear()
   })
 
   afterEach(() => {
@@ -128,5 +131,14 @@ describe('PasswordSuggestion', () => {
     expect(insertCall.data.iframeId).toBe('iframe-sug-1')
     expect(insertCall.data.iframeType).toBe('suggestion-iframe')
     expect(insertCall.data.password).toBe('SUGGESTED_PASSWORD_24___')
+  })
+
+  it('closes the iframe when the close button is clicked', () => {
+    render(<PasswordSuggestion />)
+    fireEvent.click(screen.getByTestId('passwordsuggestionv2-close'))
+    expect(closeIframe).toHaveBeenCalledWith({
+      iframeId: 'iframe-sug-1',
+      iframeType: 'suggestion-iframe'
+    })
   })
 })

@@ -6,7 +6,7 @@ import { useLingui } from '@lingui/react'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { generatePassword } from '@tetherto/pearpass-utils-password-generator'
 import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Key, SyncLock } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Close, Key, SyncLock } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import { useRouter } from '../../../shared/context/RouterContext'
 import { markHistoryUsed } from '../../../shared/utils/passwordGeneratorHistory'
@@ -37,6 +37,13 @@ export const PasswordSuggestion = () => {
   const isReady = isInitialized && !isLoading
   const hasMatchingRecords = !!filteredRecords?.length
   const shouldShowSuggestion = isReady && !hasMatchingRecords
+
+  const onClose = () => {
+    closeIframe({
+      iframeId: routerState?.iframeId,
+      iframeType: routerState?.iframeType
+    })
+  }
 
   const onPasswordInsert = (value: string) => {
     const hostname = hostnameFromUrl(routerState?.url)
@@ -106,7 +113,7 @@ export const PasswordSuggestion = () => {
       className="border-border-primary bg-surface-primary flex w-[300px] flex-col overflow-hidden rounded-[8px] border"
     >
       <div
-        className="border-border-primary border-b px-[var(--spacing12)] py-[var(--spacing8)]"
+        className="border-border-primary flex items-center justify-between gap-[var(--spacing8)] border-b px-[var(--spacing12)] py-[var(--spacing8)]"
         data-testid="passwordsuggestionv2-title-wrap"
       >
         <Text
@@ -115,6 +122,28 @@ export const PasswordSuggestion = () => {
         >
           <Trans>Password Recommendation</Trans>
         </Text>
+        <div
+          className="flex shrink-0 cursor-pointer items-center"
+          data-testid="passwordsuggestionv2-close"
+          aria-label={i18n._(t`Close`)}
+          role="button"
+          tabIndex={0}
+          onClick={onClose}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onClose()
+            }
+          }}
+        >
+          <span className="inline-flex" aria-hidden>
+            <Close
+              color={theme.colors.colorTextPrimary}
+              width={16}
+              height={16}
+            />
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-row items-center gap-[var(--spacing12)] p-[var(--spacing12)]">
