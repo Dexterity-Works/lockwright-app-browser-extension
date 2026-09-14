@@ -49,7 +49,7 @@ export function useInactivity() {
         `Triggered, user data: ${JSON.stringify(userData)}`
       )
 
-      if (!userData.isLoggedIn) return
+      if (!userData?.isLoggedIn) return
 
       setIsLoading(true)
       closeAllModals()

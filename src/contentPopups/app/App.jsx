@@ -89,7 +89,7 @@ export const App = () => {
 
       const res = await refetchUserData()
 
-      if (!res.isLoggedIn) {
+      if (!res?.isLoggedIn) {
         closeIframe({
           iframeId,
           iframeType
@@ -100,7 +100,7 @@ export const App = () => {
     fetchUser()
   }, [])
 
-  if (!userData.isLoggedIn) {
+  if (!userData?.isLoggedIn) {
     return null
   }
 
