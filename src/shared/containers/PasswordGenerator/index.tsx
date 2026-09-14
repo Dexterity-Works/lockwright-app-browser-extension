@@ -592,27 +592,22 @@ export const PasswordGenerator = ({
                   .join(' ')}
               >
                 <div className="min-w-0 flex-1">
-                  <Text
-                    as="span"
-                    variant="bodyEmphasized"
-                    className="block truncate"
-                  >
+                  <Text as="p" variant="bodyEmphasized" numberOfLines={1}>
                     {entry.value}
                   </Text>
                   <Text
-                    as="span"
+                    as="p"
                     variant="caption"
                     color={theme.colors.colorTextTertiary}
-                    className="block"
                   >
                     {formatHistoryDateTime(entry.createdAt)}
                   </Text>
                   {entry.contextLabel ? (
                     <Text
-                      as="span"
+                      as="p"
                       variant="caption"
                       color={theme.colors.colorTextTertiary}
-                      className="block truncate"
+                      numberOfLines={1}
                     >
                       {entry.contextLabel}
                     </Text>

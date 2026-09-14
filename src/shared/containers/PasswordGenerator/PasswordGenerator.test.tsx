@@ -50,6 +50,7 @@ jest.mock('../../hooks/useCopyToClipboard', () => ({
 
 jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
   const React = require('react')
+  const actual = jest.requireActual('@tetherto/pearpass-lib-ui-kit')
   return {
     useTheme: () => ({
       theme: {
@@ -83,8 +84,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
         },
         children
       ),
-    Text: ({ children }: { children?: React.ReactNode }) =>
-      React.createElement('span', null, children),
+    Text: actual.Text,
     Title: ({ children }: { children?: React.ReactNode }) =>
       React.createElement('h3', null, children),
     PasswordIndicator: () =>
@@ -201,6 +201,22 @@ describe('PasswordGenerator', () => {
     await waitFor(() => {
       expect(mockAppendHistory).toHaveBeenCalledWith('Abcdef1!')
     })
+  })
+
+  it('does not pass className into kit Text on history rows', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(<PasswordGenerator />)
+
+    await waitFor(() => {
+      expect(screen.getByText('example.com')).toBeInTheDocument()
+    })
+
+    const messages = error.mock.calls
+      .map((args) => args.map(String).join(' '))
+      .join('\n')
+    expect(messages).not.toMatch(/invalid prop "className"/)
+    error.mockRestore()
   })
 
   it('shows random-mode charset toggles, all on by default', () => {

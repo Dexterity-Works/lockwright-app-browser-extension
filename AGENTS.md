@@ -131,11 +131,11 @@ The deprecated props still work for now but will be removed.
 
 New UI is styled with **Tailwind utility classes**. The kit ships `@tetherto/pearpass-lib-ui-kit/tailwind.css` (already imported in [src/index.css](src/index.css)), which registers its color tokens with Tailwind v4's `@theme inline`. Standard utilities like `bg-surface-primary`, `text-text-primary`, `border-border-primary` therefore resolve against the design system and follow `data-theme` switches automatically. Tailwind is enabled in every UI build via the `@tailwindcss/vite` plugin in [vite.config.main.js](vite.config.main.js).
 
-**Prefer Tailwind classes for layout and static styling.** Reach for `useTheme()` / `rawTokens` only when a value has to come from JS (e.g. a kit-component prop that takes a number, or a computed style).
+**Prefer Tailwind classes for layout and static styling.** Put them on real DOM (`div`, `span`, `button`). Kit components (`Text`, `Button`, `Title`, …) render `react-strict-dom` `html.*` and reject `className` (console: `invalid prop "className"`). For kit text overflow use `numberOfLines` / `noWrap` / `style`, or wrap the kit node in a DOM element that holds the utilities. Reach for `useTheme()` / `rawTokens` only when a value has to come from JS (e.g. a kit-component prop that takes a number, or a computed style).
 
 ```tsx
 <div className="bg-surface-primary border border-border-primary rounded-[8px] p-[24px] gap-[12px]">
-  <Text className="text-text-primary">…</Text>
+  <Text variant="label">…</Text>
 </div>
 ```
 

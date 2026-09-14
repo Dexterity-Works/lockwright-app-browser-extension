@@ -15,6 +15,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - Password strength label `Safe` is a compiled Lingui message. It no longer warns as uncompiled.
 - Desktop-unavailable `checkAvailability` timeouts and native-host disconnects stay out of the console unless Debug logging is on.
 - Inactivity auto-lock does not throw when vault status refetch returns nothing.
+- Password generator history no longer passes Tailwind `className` into kit `Text` (Strict DOM `invalid prop "className"`).
 
 ## [0.0.24] - 2026-09-14
 
