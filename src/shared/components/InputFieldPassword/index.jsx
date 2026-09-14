@@ -78,7 +78,7 @@ export const InputFieldPassword = ({
       return null
     }
 
-    const { strengthType, strengthText, type, success } =
+    const { strengthType, type, success } =
       passType === 'password'
         ? checkPasswordStrength(value)
         : checkPassphraseStrength(value)
@@ -88,12 +88,18 @@ export const InputFieldPassword = ({
     }
 
     const Icon = PASSWORD_STRENGTH_ICONS[strengthType]
+    const label =
+      type === PASSWORD_STRENGTH.SAFE
+        ? t`Safe`
+        : type === PASSWORD_STRENGTH.WEAK
+          ? t`Weak`
+          : t`Vulnerable`
     return (
       <div
         className={`font-inter flex items-center gap-[5px] text-[8px] font-medium ${getTextColor(type)}`}
       >
         <Icon />
-        {t(strengthText)}
+        {label}
       </div>
     )
   }
