@@ -45,6 +45,24 @@ describe('isExpectedQuietError', () => {
     ).toBe(true)
   })
 
+  it('returns true for checkAvailability request timeout', () => {
+    expect(
+      isExpectedQuietError(new Error('Request timeout: checkAvailability'))
+    ).toBe(true)
+  })
+
+  it('returns true for native host disconnect copy', () => {
+    expect(isExpectedQuietError('Disconnected from native host')).toBe(true)
+  })
+
+  it('returns true for Chrome lastError host-not-found object', () => {
+    expect(
+      isExpectedQuietError({
+        message: 'Specified native messaging host not found.'
+      })
+    ).toBe(true)
+  })
+
   it('returns false for unrelated errors', () => {
     expect(isExpectedQuietError(new Error('boom'))).toBe(false)
   })

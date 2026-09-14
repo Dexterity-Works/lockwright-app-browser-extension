@@ -242,6 +242,30 @@ describe('PearpassVaultClient', () => {
       await expect(client.vaultsGetStatus()).rejects.toThrow('boom')
       expect(logger.error).toHaveBeenCalled()
     })
+
+    it('checkAvailability timeout is quiet and vaultsGetStatus resolves { status: null }', async () => {
+      const client = createMockClient()
+      runtime.sendMessage.mockImplementation((message, callback) => {
+        if (message.type === NATIVE_MESSAGE_TYPES.CONNECT) {
+          callback({ success: true })
+          return
+        }
+        if (
+          message.type === NATIVE_MESSAGE_TYPES.REQUEST &&
+          message.command === 'checkAvailability'
+        ) {
+          callback({
+            success: false,
+            error: 'Request timeout: checkAvailability'
+          })
+          return
+        }
+        callback({ success: true, result: {} })
+      })
+
+      await expect(client.vaultsGetStatus()).resolves.toEqual({ status: null })
+      expect(logger.error).not.toHaveBeenCalled()
+    })
   })
 
   describe('vault file commands', () => {

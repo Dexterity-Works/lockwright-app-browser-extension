@@ -85,6 +85,33 @@ describe('NativeMessaging & integration', () => {
     expect(fakePort.onDisconnect.addListener).toHaveBeenCalled()
   })
 
+  test('disconnect logs lastError.message instead of the lastError object', async () => {
+    const { logger } = require('../shared/utils/logger')
+    const fakePort = {
+      onMessage: { addListener: jest.fn() },
+      onDisconnect: { addListener: jest.fn() }
+    }
+    runtime.connectNative.mockReturnValue(fakePort)
+    await nativeModule.nativeMessaging.connect()
+
+    runtime.lastError = {
+      message: 'Specified native messaging host not found.'
+    }
+    const onDisconnect = fakePort.onDisconnect.addListener.mock.calls[0][0]
+    onDisconnect()
+
+    expect(logger.error).toHaveBeenCalledWith(
+      '[NATIVE] ',
+      'Disconnected from native host',
+      'Specified native messaging host not found.'
+    )
+    expect(logger.error).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      runtime.lastError
+    )
+  })
+
   test('connect() must not open the desktop native host on android', async () => {
     runtime.getPlatformInfo = jest.fn((cb) => cb({ os: 'android' }))
 

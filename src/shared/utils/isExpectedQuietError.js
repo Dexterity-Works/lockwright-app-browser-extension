@@ -1,10 +1,14 @@
+import { isNativeHostNotFoundError } from './nativeHostErrors'
+
 const QUIET_PATTERNS = [
   'masterpasswordrequired',
   'masterpasswordinvalid',
   'favicon not found',
   'invalid_url',
   'unknown method: getmasterpasswordstatus',
-  'unknown_method: getmasterpasswordstatus'
+  'unknown_method: getmasterpasswordstatus',
+  'request timeout: checkavailability',
+  'disconnected from native host'
 ]
 
 /**
@@ -27,6 +31,8 @@ export const isExpectedQuietError = (error) => {
           : String(error)
 
   if (!message) return false
+
+  if (isNativeHostNotFoundError(message)) return true
 
   const lower = message.toLowerCase()
   return QUIET_PATTERNS.some((pattern) => lower.includes(pattern))

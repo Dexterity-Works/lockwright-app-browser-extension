@@ -13,6 +13,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 - Auto Lock timeout menu shows durations (`30 seconds`, `1 Minute`, `Never`) instead of Lingui message ids.
 - Password strength label `Safe` is a compiled Lingui message. It no longer warns as uncompiled.
+- Desktop-unavailable `checkAvailability` timeouts and native-host disconnects stay out of the console unless Debug logging is on.
 
 ## [0.0.24] - 2026-09-14
 

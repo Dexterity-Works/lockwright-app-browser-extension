@@ -222,7 +222,7 @@ class NativeMessagingHandler {
 
   _handleDisconnect() {
     const error = runtime.lastError
-    logError(NATIVE_MESSAGING_ERRORS.DISCONNECTED, error)
+    logError(NATIVE_MESSAGING_ERRORS.DISCONNECTED, error?.message || error)
 
     this._rejectAllPendingRequests(error)
     this._reset()

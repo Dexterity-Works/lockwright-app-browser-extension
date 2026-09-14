@@ -48,6 +48,13 @@ describe('Logger', () => {
       '[VaultClient] Error in getMasterPasswordStatus:',
       new Error('Unknown method: getMasterPasswordStatus')
     )
+    quiet.error(
+      '[VaultClient] Error checking availability',
+      new Error('Request timeout: checkAvailability')
+    )
+    quiet.error('[NativeMessaging]', 'Disconnected from native host', {
+      message: 'Specified native messaging host not found.'
+    })
 
     expect(consoleErrorSpy).not.toHaveBeenCalled()
   })
