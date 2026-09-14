@@ -41,7 +41,7 @@ export const Step3Dialog = () => {
   }
 
   const footer = (
-    <div className="flex w-full flex-col items-end gap-[var(--spacing8)]">
+    <div className="flex w-full min-w-0 flex-col items-stretch gap-[var(--spacing8)] sm:items-end">
       {showToolbarHint ? (
         <Text
           as="p"
@@ -73,15 +73,15 @@ export const Step3Dialog = () => {
       hideCloseButton
       testID="onboarding-step3-dialog"
     >
-      <div className="flex flex-col gap-[var(--spacing24)] px-[var(--spacing8)] py-[var(--spacing24)]">
-        <div className="bg-surface-hover border-border-primary flex h-[200px] items-center justify-center rounded-lg border">
+      <div className="flex min-w-0 flex-col gap-[var(--spacing24)] px-[var(--spacing8)] py-[var(--spacing24)]">
+        <div className="bg-surface-hover border-border-primary flex h-[120px] items-center justify-center rounded-lg border sm:h-[200px]">
           <img
             src="/assets/images/step3.svg"
-            className="block max-h-full"
+            className="block max-h-full max-w-full"
             alt="Step 3"
           />
         </div>
-        <div className="flex flex-col items-center gap-[var(--spacing16)] text-center">
+        <div className="flex min-w-0 flex-col items-center gap-[var(--spacing16)] text-center">
           <Title as="h2">
             <Trans>Lockwright is Ready</Trans>
           </Title>

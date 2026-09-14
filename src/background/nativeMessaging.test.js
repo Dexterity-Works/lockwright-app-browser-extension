@@ -85,6 +85,15 @@ describe('NativeMessaging & integration', () => {
     expect(fakePort.onDisconnect.addListener).toHaveBeenCalled()
   })
 
+  test('connect() must not open the desktop native host on android', async () => {
+    runtime.getPlatformInfo = jest.fn((cb) => cb({ os: 'android' }))
+
+    await expect(nativeModule.nativeMessaging.connect()).rejects.toThrow(
+      /Android/
+    )
+    expect(runtime.connectNative).not.toHaveBeenCalled()
+  })
+
   test('connect() when already connected should resolve immediately without reconnecting', async () => {
     const fakePort = {
       onMessage: { addListener: jest.fn() },

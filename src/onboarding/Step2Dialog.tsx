@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import {
@@ -11,7 +11,10 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit'
 import { ONBOARDING_ICON_SIZE } from './constants'
 import { SyncingFailedModal } from './SyncingFailedModal'
-import { secureChannelMessages } from '../shared/services/messageBridge'
+import {
+  secureChannelMessages,
+  platformMessages
+} from '../shared/services/messageBridge'
 import { pendingPairingStore } from '../shared/services/pendingPairingStore'
 import {
   ContentPaste,
@@ -19,6 +22,7 @@ import {
   SwapVert
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { LockwrightMark } from '../shared/components/LockwrightMark'
+import { isAndroidOs } from '../shared/utils/isAndroidOs'
 
 interface Step2Props {
   onNext: () => void
@@ -31,6 +35,22 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
 
   const [code, setCode] = useState('')
   const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null)
+  const [onAndroid, setOnAndroid] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const platform = await platformMessages.getPlatformInfo()
+        if (!cancelled) setOnAndroid(isAndroidOs(platform?.os))
+      } catch {
+        if (!cancelled) setOnAndroid(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handlePasteClick = useCallback(async () => {
     try {
@@ -80,6 +100,40 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
     }
   }
 
+  if (onAndroid === true) {
+    return (
+      <Panel
+        title={<Trans>Step 2 of 3</Trans>}
+        hideCloseButton
+        testID="onboarding-android-pairing-unavailable"
+      >
+        <div className="flex min-w-0 flex-col gap-[var(--spacing16)] px-[var(--spacing8)] py-[var(--spacing24)] text-center">
+          <Title as="h2">
+            <Trans>This browser cannot pair from Android yet</Trans>
+          </Title>
+          <Text as="p">
+            <Trans>
+              The extension talks to Lockwright through a native host. Only the
+              desktop app installs that host. Android browsers do not provide
+              it, and the Lockwright Android app does not issue a browser pair
+              code yet.
+            </Trans>
+          </Text>
+        </div>
+      </Panel>
+    )
+  }
+
+  if (onAndroid === null) {
+    return (
+      <Panel
+        title={<Trans>Step 2 of 3</Trans>}
+        hideCloseButton
+        testID="onboarding-step2-dialog"
+      />
+    )
+  }
+
   if (syncErrorMessage !== null) {
     return (
       <SyncingFailedModal
@@ -94,7 +148,7 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
     <Panel
       title={<Trans>Step 2 of 3</Trans>}
       footer={
-        <div className="flex w-full items-center justify-end">
+        <div className="flex w-full min-w-0 flex-wrap items-center justify-end">
           <Button
             variant="primary"
             size="medium"
@@ -109,21 +163,21 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
       hideCloseButton
       testID="onboarding-step2-dialog"
     >
-      <div className="flex flex-col gap-[var(--spacing24)] px-[var(--spacing8)] py-[var(--spacing24)]">
-        <div className="bg-surface-hover border-border-primary relative h-[200px] w-full overflow-hidden rounded-lg border">
+      <div className="flex min-w-0 flex-col gap-[var(--spacing24)] px-[var(--spacing8)] py-[var(--spacing24)]">
+        <div className="bg-surface-hover border-border-primary relative h-[120px] w-full overflow-hidden rounded-lg border sm:h-[200px]">
           <img
             src="/assets/images/step2.svg"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain sm:object-cover"
             alt="Step 2"
           />
         </div>
 
-        <div className="flex flex-col gap-[var(--spacing16)]">
-          <div className="flex flex-col items-center gap-[var(--spacing16)] text-center">
+        <div className="flex min-w-0 flex-col gap-[var(--spacing16)]">
+          <div className="flex min-w-0 flex-col items-center gap-[var(--spacing16)] text-center">
             <Title as="h2">
               <Trans>Connect This Browser to Lockwright</Trans>
             </Title>
-            <div className="flex flex-col gap-[var(--spacing12)]">
+            <div className="flex min-w-0 flex-col gap-[var(--spacing12)]">
               <Text as="p">
                 <Trans>
                   Lockwright doesn't use accounts. To connect this browser,
@@ -131,8 +185,8 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
                 </Trans>
               </Text>
               <div className="flex flex-col gap-[var(--spacing8)]">
-                <div className="flex items-center justify-center gap-[var(--spacing4)]">
-                  <Text as="span" noWrap>
+                <div className="flex min-w-0 flex-wrap items-center justify-center gap-[var(--spacing4)]">
+                  <Text as="span">
                     <Trans>1. Open the</Trans>
                   </Text>
                   <LockwrightMark
@@ -141,15 +195,15 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
                     height={ONBOARDING_ICON_SIZE}
                     style={{ flexShrink: 0 }}
                   />
-                  <Text as="span" noWrap>
+                  <Text as="span">
                     <span style={{ color: accentColor }}>
                       <Trans>Lockwright</Trans>
                     </span>{' '}
                     <Trans>app</Trans>
                   </Text>
                 </div>
-                <div className="flex items-center justify-center gap-[var(--spacing4)]">
-                  <Text as="span" noWrap>
+                <div className="flex min-w-0 flex-wrap items-center justify-center gap-[var(--spacing4)]">
+                  <Text as="span">
                     <Trans>2. Go to</Trans>
                   </Text>
                   <Settings
@@ -158,12 +212,12 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
                     height={ONBOARDING_ICON_SIZE}
                     style={{ flexShrink: 0 }}
                   />
-                  <Text as="span" color={accentColor} noWrap>
+                  <Text as="span" color={accentColor}>
                     <Trans>Settings → Syncing → Your Devices</Trans>
                   </Text>
                 </div>
-                <div className="flex items-center justify-center gap-[var(--spacing4)]">
-                  <Text as="span" noWrap>
+                <div className="flex min-w-0 flex-wrap items-center justify-center gap-[var(--spacing4)]">
+                  <Text as="span">
                     <Trans>3. Click on</Trans>
                   </Text>
                   <SwapVert
@@ -172,7 +226,7 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
                     height={ONBOARDING_ICON_SIZE}
                     style={{ flexShrink: 0 }}
                   />
-                  <Text as="span" noWrap>
+                  <Text as="span">
                     <span style={{ color: accentColor }}>
                       <Trans>Generate Pair Code for Browser Extension</Trans>
                     </span>

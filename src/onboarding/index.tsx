@@ -29,8 +29,8 @@ const OnboardingSteps = ({ initialStep }: { initialStep: number }) => {
 
   return (
     <div
-      className="flex flex-col gap-[var(--spacing24)]"
-      style={{ width: ONBOARDING_DIALOG_WIDTH }}
+      className="flex w-full min-w-0 flex-col gap-[var(--spacing24)]"
+      style={{ maxWidth: ONBOARDING_DIALOG_WIDTH }}
     >
       <StepIndicatorBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
@@ -80,7 +80,7 @@ const OnboardingPage = () => {
         }}
       />
       <div
-        className="relative flex h-full w-full flex-col items-center gap-[var(--spacing24)] overflow-y-auto p-[var(--spacing40)]"
+        className="relative flex h-full w-full min-w-0 flex-col items-center gap-[var(--spacing24)] overflow-y-auto px-[var(--spacing16)] py-[var(--spacing24)] sm:p-[var(--spacing40)]"
         style={{ scrollbarWidth: 'auto', msOverflowStyle: 'auto' }}
       >
         <img

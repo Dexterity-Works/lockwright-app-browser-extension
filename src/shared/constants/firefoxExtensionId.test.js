@@ -63,6 +63,18 @@ describe('Firefox extension ID', () => {
     expect(src).not.toMatch(/gap-18/)
   })
 
+  it('onboarding column shrinks below 600px so a phone tab is not clipped', () => {
+    const src = readFileSync(
+      path.resolve(__dirname, '../../onboarding/index.tsx'),
+      'utf8'
+    )
+    expect(src).toMatch(/maxWidth:\s*ONBOARDING_DIALOG_WIDTH/)
+    expect(src).not.toMatch(
+      /style=\{\{\s*width:\s*ONBOARDING_DIALOG_WIDTH\s*\}\}/
+    )
+    expect(src).toMatch(/className="[^"]*w-full[^"]*min-w-0/)
+  })
+
   it('onboarding wordmark is the hatch plate, not PearPass lime', () => {
     const src = readFileSync(
       path.resolve(__dirname, '../../../public/assets/images/logo.svg'),

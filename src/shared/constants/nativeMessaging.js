@@ -132,7 +132,9 @@ export const NATIVE_MESSAGING_ERRORS = {
   DISCONNECTED: 'Disconnected from native host',
   INVALID_MESSAGE_STRUCTURE: 'Invalid message structure',
   LENGTH_MISMATCH: 'Length mismatch',
-  FAILED_TO_UNWRAP: 'Failed to unwrap message'
+  FAILED_TO_UNWRAP: 'Failed to unwrap message',
+  ANDROID_UNSUPPORTED:
+    'Native messaging is not available on Android. This extension talks to the Lockwright desktop app.'
 }
 
 /**

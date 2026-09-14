@@ -18,6 +18,7 @@ import {
   DISCONNECTION_ERROR_MESSAGES,
   DESKTOP_APP_STATUS
 } from '../shared/constants/nativeMessaging'
+import { isAndroidOs } from '../shared/utils/isAndroidOs'
 import { logger } from '../shared/utils/logger'
 import { isNativeHostNotFoundError } from '../shared/utils/nativeHostErrors'
 import { runtime } from '../shared/utils/runtime'
@@ -57,10 +58,31 @@ class NativeMessagingHandler {
     this.connected = false
   }
 
-  connect() {
+  _platformOs() {
+    return new Promise((resolve) => {
+      if (typeof runtime.getPlatformInfo !== 'function') {
+        resolve(undefined)
+        return
+      }
+      try {
+        runtime.getPlatformInfo((info) => {
+          resolve(info?.os)
+        })
+      } catch {
+        resolve(undefined)
+      }
+    })
+  }
+
+  async connect() {
     if (this.connected) {
       log(NATIVE_MESSAGING_ERRORS.ALREADY_CONNECTED)
-      return Promise.resolve()
+      return
+    }
+
+    const os = await this._platformOs()
+    if (isAndroidOs(os)) {
+      throw createError(NATIVE_MESSAGING_ERRORS.ANDROID_UNSUPPORTED)
     }
 
     return new Promise((resolve, reject) => {
