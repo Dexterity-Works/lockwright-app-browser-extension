@@ -9,6 +9,10 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+### Fixed
+
+- Auto Lock timeout menu shows durations (`30 seconds`, `1 Minute`, `Never`) instead of Lingui message ids.
+
 ## [0.0.24] - 2026-09-14
 
 `f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96`

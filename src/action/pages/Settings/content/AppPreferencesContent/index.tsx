@@ -76,20 +76,6 @@ const TIMEOUT_OPTIONS: TimeoutOption[] = Object.entries(
   >
 ).map(([key, option]) => ({ key, label: option.label, value: option.value }))
 
-const TIMEOUT_LABEL_BY_KEY: Record<string, string> = {
-  SECONDS_30: t`30 seconds`,
-  MINUTES_1: t`1 Minute`,
-  MINUTES_3: t`3 Minutes`,
-  MINUTES_5: t`5 Minutes`,
-  MINUTES_10: t`10 Minutes`,
-  MINUTES_15: t`15 minutes`,
-  MINUTES_30: t`30 Minutes`,
-  HOURS_1: t`1 Hour`,
-  HOURS_3: t`3 Hours`,
-  HOURS_4: t`4 hours`,
-  NEVER: t`Never`
-}
-
 export const AppPreferencesContent = () => {
   const { theme } = useTheme()
   const { colors } = theme
@@ -165,14 +151,25 @@ export const AppPreferencesContent = () => {
     [defaultUriMatchType]
   )
 
-  const translatedTimeoutOptions = useMemo(
-    () =>
-      TIMEOUT_OPTIONS.map((option) => ({
-        ...option,
-        label: TIMEOUT_LABEL_BY_KEY[option.key] ?? option.label
-      })),
-    []
-  )
+  const translatedTimeoutOptions = useMemo(() => {
+    const labels: Record<string, string> = {
+      SECONDS_30: t`30 seconds`,
+      MINUTES_1: t`1 Minute`,
+      MINUTES_3: t`3 Minutes`,
+      MINUTES_5: t`5 Minutes`,
+      MINUTES_10: t`10 Minutes`,
+      MINUTES_15: t`15 minutes`,
+      MINUTES_30: t`30 Minutes`,
+      HOURS_1: t`1 Hour`,
+      HOURS_3: t`3 Hours`,
+      HOURS_4: t`4 hours`,
+      NEVER: t`Never`
+    }
+    return TIMEOUT_OPTIONS.map((option) => ({
+      ...option,
+      label: labels[option.key] ?? option.label
+    }))
+  }, [])
 
   const selectedTimeoutOption = useMemo(
     () =>

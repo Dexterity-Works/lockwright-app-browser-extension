@@ -195,10 +195,32 @@ jest.mock(
   })
 )
 
-import { AppPreferencesContent } from './index'
+import { i18n } from '@lingui/core'
+
+import { messages } from '../../../../../locales/en/messages.mjs'
+
+// Chromium action.js compiles t`…` to i18n._({ id }) with no source-message
+// fallback. Drop the babel-plugin `message` field so this file matches that
+// build: a lookup before i18n.load returns the hashed id.
+const origI18nUnderscore = i18n._.bind(i18n)
+i18n._ = (descriptor, values, options) => {
+  if (descriptor && typeof descriptor === 'object' && descriptor.id) {
+    return origI18nUnderscore(descriptor.id, values, options)
+  }
+  return origI18nUnderscore(descriptor, values, options)
+}
+
+// require() after the patch. import is hoisted and would freeze labels first.
+const { AppPreferencesContent } = require('./index') as typeof import('./index')
 
 describe('AppPreferencesContent', () => {
+  afterAll(() => {
+    i18n._ = origI18nUnderscore
+  })
+
   beforeEach(() => {
+    i18n.load('en', messages)
+    i18n.activate('en')
     mockSetTimeoutMs.mockClear()
     mockSetAllowHttp.mockClear()
     mockHandleCopyChange.mockClear()
@@ -319,7 +341,20 @@ describe('AppPreferencesContent', () => {
   it('renders auto-lock timeout labels from compiled messages', () => {
     render(<AppPreferencesContent />)
 
-    expect(screen.getAllByText('30 seconds').length).toBeGreaterThan(0)
+    expect(screen.queryAllByText('OqqecQ')).toHaveLength(0)
+    expect(screen.queryAllByText('qqeAJM')).toHaveLength(0)
+    expect(screen.getByTestId('settings-auto-lock-select')).toHaveTextContent(
+      '30 seconds'
+    )
+    expect(
+      screen.getByTestId('settings-auto-lock-option-seconds_30')
+    ).toHaveTextContent('30 seconds')
+    expect(
+      screen.getByTestId('settings-auto-lock-option-minutes_1')
+    ).toHaveTextContent('1 Minute')
+    expect(
+      screen.getByTestId('settings-auto-lock-option-never')
+    ).toHaveTextContent('Never')
   })
 
   it('toggles debug logging through setDebugLogging', () => {
