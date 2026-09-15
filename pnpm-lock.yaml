@@ -250,6 +250,12 @@ importers:
       '@tetherto/pear-apps-utils-date':
         specifier: git+https://github.com/tetherto/pear-apps-utils-date.git#28242e47629c327ae4c6687f6a883408917fa024
         version: pear-apps-utils-date@https://codeload.github.com/tetherto/pear-apps-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024
+      '@tetherto/pear-apps-utils-generate-unique-id':
+        specifier: git+https://github.com/tetherto/pear-apps-utils-generate-unique-id.git#a2a927374b353f26c05beda7f1052e4e1322027f
+        version: pear-apps-utils-generate-unique-id@https://codeload.github.com/tetherto/pear-apps-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f
+      '@tetherto/pear-apps-utils-pattern-search':
+        specifier: git+https://github.com/tetherto/pear-apps-utils-pattern-search.git#0e593f8fcee9680342e7b4fa4be6a861a5c48f45
+        version: pear-apps-utils-pattern-search@https://codeload.github.com/tetherto/pear-apps-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45
       '@tetherto/pear-apps-utils-qr':
         specifier: git+https://github.com/tetherto/pear-apps-utils-qr.git#0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7
         version: pear-apps-utils-qr@https://codeload.github.com/tetherto/pear-apps-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7
@@ -4524,6 +4530,19 @@ packages:
   pear-apps-utils-date@https://codeload.github.com/tetherto/pear-apps-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024:
     resolution: {gitHosted: true, integrity: sha512-bNAC5ye35xdMK9wJlWmt4Ry20pv+Y9gwouEaamQGtAoli9BCB4JoTRmvsnc50egUyDzbAOBl6YfiDWyNQ5xz9A==, tarball: https://codeload.github.com/tetherto/pear-apps-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024}
     version: 0.0.8
+
+  pear-apps-utils-generate-unique-id@https://codeload.github.com/tetherto/pear-apps-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f:
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/tetherto/pear-apps-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f}
+    version: 0.0.6
+    peerDependencies:
+      expo-crypto: ~13.0.0
+    peerDependenciesMeta:
+      expo-crypto:
+        optional: true
+
+  pear-apps-utils-pattern-search@https://codeload.github.com/tetherto/pear-apps-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45:
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/tetherto/pear-apps-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45}
+    version: 0.0.5
 
   pear-apps-utils-qr@https://codeload.github.com/tetherto/pear-apps-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7:
     resolution: {gitHosted: true, integrity: sha512-zSOIWxy7uCnmeuo8czWv1sByYIJ9GFQX3oQrdsPLBxTkyPzHFiZfl8hGuG3BCCc2IyfmcjJDRRYv6QiPUWEO9A==, tarball: https://codeload.github.com/tetherto/pear-apps-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7}
@@ -10435,6 +10454,10 @@ snapshots:
   pear-apps-utils-avatar-initials@https://codeload.github.com/tetherto/pear-apps-utils-avatar-initials/tar.gz/986772c039e88e519ca9da93837df3223a6f335e: {}
 
   pear-apps-utils-date@https://codeload.github.com/tetherto/pear-apps-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024: {}
+
+  pear-apps-utils-generate-unique-id@https://codeload.github.com/tetherto/pear-apps-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f: {}
+
+  pear-apps-utils-pattern-search@https://codeload.github.com/tetherto/pear-apps-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45: {}
 
   pear-apps-utils-qr@https://codeload.github.com/tetherto/pear-apps-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7:
     dependencies:
