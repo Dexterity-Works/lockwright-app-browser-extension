@@ -13,9 +13,6 @@ jest.mock('../containers/Overlay', () => ({
     </div>
   )
 }))
-jest.mock('@tetherto/pear-apps-utils-generate-unique-id', () => ({
-  generateUniqueId: jest.fn(() => 'unique-id')
-}))
 jest.mock('./LoadingContext', () => ({
   useLoadingContext: jest.fn(() => ({
     setIsLoading: jest.fn()

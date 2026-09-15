@@ -1,4 +1,3 @@
-import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
 import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
 
 /**
@@ -60,7 +59,7 @@ export const appendHistory = async (value) => {
   }
 
   const next = [
-    { id: generateUniqueId(), value, createdAt: Date.now() },
+    { id: crypto.randomUUID(), value, createdAt: Date.now() },
     ...current
   ].slice(0, PASSWORD_GENERATOR_HISTORY_MAX)
 
@@ -97,7 +96,7 @@ export const markHistoryUsed = async (value, context = {}) => {
   if (matchIndex === -1) {
     next = [
       {
-        id: generateUniqueId(),
+        id: crypto.randomUUID(),
         value,
         createdAt: usedAt,
         contextLabel,

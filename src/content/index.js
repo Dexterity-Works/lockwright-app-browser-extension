@@ -1,6 +1,5 @@
 import './utils/contentI18n.js'
 
-import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
 import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 import { IFRAME_TYPES } from './constants/iframe'
@@ -982,12 +981,7 @@ document.querySelectorAll('input').forEach(async (input) => {
 // Iframe management
 
 function showIframe(iframeType, { element, data, styles }) {
-  let id
-  try {
-    id = generateUniqueId()
-  } catch (error) {
-    throw error
-  }
+  const id = crypto.randomUUID()
 
   const iframe = createIframe({
     styles: styles,

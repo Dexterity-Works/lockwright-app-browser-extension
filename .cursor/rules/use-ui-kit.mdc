@@ -203,7 +203,7 @@ Do **not**:
 - Use native `<button>`, `<input>`, or `<dialog>` in production code (tests are fine).
 - Hardcode hex colors, brand radii, or design-system spacing — use `rawTokens` and `theme.colors`. (Feature-specific layout literals like `maxWidth: '500px'` are fine.)
 - Add new SVG files under `src/` when the kit's icons subpath covers them.
-- Introduce `styled-components`. Style with Tailwind utilities (plus `rawTokens` in JS when needed). `styled-components` is still in `package.json` but not used in `src/` — keep it that way.
+- Introduce `styled-components`. Style with Tailwind utilities (plus `rawTokens` in JS when needed).
 
 ## When the kit truly lacks something
 

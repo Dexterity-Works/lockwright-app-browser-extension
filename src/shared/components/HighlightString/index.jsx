@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { twMerge } from 'tailwind-merge'
-
 /**
  * @param {{
  *    text: string
@@ -36,7 +34,9 @@ export const HighlightString = ({ text, className }) => {
 
   return (
     <span
-      className={twMerge('text-white-mode1 whitespace-pre-wrap', className)}
+      className={['text-white-mode1 whitespace-pre-wrap', className]
+        .filter(Boolean)
+        .join(' ')}
     >
       {highlightText(text)}
     </span>

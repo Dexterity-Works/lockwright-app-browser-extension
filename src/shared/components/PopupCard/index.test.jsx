@@ -5,10 +5,6 @@ import { render } from '@testing-library/react'
 import { PopupCard } from './index'
 import '@testing-library/jest-dom'
 
-jest.mock('tailwind-merge', () => ({
-  twMerge: jest.fn((...args) => args.join(' '))
-}))
-
 describe('PopupCard Component', () => {
   it('renders children correctly', () => {
     const { getByText, container } = render(

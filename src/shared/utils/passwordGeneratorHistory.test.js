@@ -18,16 +18,19 @@ jest.mock('@tetherto/pearpass-lib-vault/src/instances', () => ({
   }
 }))
 
-jest.mock('@tetherto/pear-apps-utils-generate-unique-id', () => ({
-  generateUniqueId: () => `id-${++mockIdCounter}`
-}))
-
 describe('passwordGeneratorHistory', () => {
   beforeEach(() => {
     mockIdCounter = 0
     mockGet.mockReset()
     mockAdd.mockReset()
     mockAdd.mockResolvedValue(undefined)
+    jest
+      .spyOn(globalThis.crypto, 'randomUUID')
+      .mockImplementation(() => `id-${++mockIdCounter}`)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   describe('loadHistory', () => {

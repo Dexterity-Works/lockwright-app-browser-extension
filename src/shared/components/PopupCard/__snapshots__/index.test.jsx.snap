@@ -3,7 +3,7 @@
 exports[`PopupCard Component renders children correctly 1`] = `
 <div>
   <div
-    class="border-grey100-mode1 bg-grey500-mode1 overflow-hidden rounded-xl border border-solid p-5 "
+    class="border-grey100-mode1 bg-grey500-mode1 overflow-hidden rounded-xl border border-solid p-5"
   >
     <span>
       Test Child

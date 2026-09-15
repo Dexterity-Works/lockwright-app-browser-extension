@@ -6,8 +6,6 @@ import React, {
   useState
 } from 'react'
 
-import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
-
 import { BASE_TRANSITION_DURATION } from '../constants/transitions'
 import { Overlay } from '../containers/Overlay'
 
@@ -22,7 +20,7 @@ const getDefaultModalParams = () => ({
 
 const createModalConfig = (content, params = {}) => ({
   content,
-  id: generateUniqueId(),
+  id: crypto.randomUUID(),
   isOpen: true,
   params: { ...getDefaultModalParams(), ...params }
 })

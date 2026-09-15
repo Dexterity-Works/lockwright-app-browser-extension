@@ -56,6 +56,9 @@ if (!global.crypto.getRandomValues) {
     return arr
   }
 }
+if (typeof global.crypto.randomUUID !== 'function') {
+  global.crypto.randomUUID = () => '00000000-0000-4000-8000-000000000000'
+}
 
 // Mock crypto.subtle for tests if needed
 if (!global.crypto.subtle) {
