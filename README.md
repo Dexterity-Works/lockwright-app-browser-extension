@@ -35,7 +35,7 @@ Lockwright is an open-source, privacy-first password and identity manager. It en
 
 This extension brings Lockwright into the browser: it autofills saved logins and identities, handles passkey creation and authentication, and communicates with the Lockwright desktop app for vault operations.
 
-Lockwright is also available on [desktop](https://github.com/Thaoh/lockwright-app-desktop) and [mobile](https://github.com/Thaoh/lockwright-app-mobile).
+Lockwright is also available on [desktop](https://github.com/Dexterity-Works/lockwright-app-desktop) and [mobile](https://github.com/Dexterity-Works/lockwright-app-mobile).
 
 ---
 
@@ -177,11 +177,11 @@ pnpm test
 
 | Project | Description |
 | --- | --- |
-| [`lockwright-app-desktop`](https://github.com/Thaoh/lockwright-app-desktop) | Desktop app for Lockwright |
-| [`lockwright-app-mobile`](https://github.com/Thaoh/lockwright-app-mobile) | Mobile app for Lockwright |
-| [`lockwright-lib-vault`](https://github.com/Thaoh/lockwright-lib-vault) | Vault management library |
-| [`lockwright-lib-vault-core`](https://github.com/Thaoh/lockwright-lib-vault-core) | Vault core |
-| [`lockwright-lib-constants`](https://github.com/Thaoh/lockwright-lib-constants) | Shared constants |
+| [`lockwright-app-desktop`](https://github.com/Dexterity-Works/lockwright-app-desktop) | Desktop app for Lockwright |
+| [`lockwright-app-mobile`](https://github.com/Dexterity-Works/lockwright-app-mobile) | Mobile app for Lockwright |
+| [`lockwright-lib-vault`](https://github.com/Dexterity-Works/lockwright-lib-vault) | Vault management library |
+| [`lockwright-lib-vault-core`](https://github.com/Dexterity-Works/lockwright-lib-vault-core) | Vault core |
+| [`lockwright-lib-constants`](https://github.com/Dexterity-Works/lockwright-lib-constants) | Shared constants |
 
 ---
 

@@ -100,13 +100,13 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - Login-detect popup closes after a successful save.
 - Onboarding wordmark capped so the pair step still fits.
 
-[unreleased]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/a6ac296bfb242127aa37ddf37b37b78afc585e32...HEAD
-[0.0.25]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96...a6ac296bfb242127aa37ddf37b37b78afc585e32
-[0.0.24]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/d2faea1c4ce956b6c66f32ced05250b92cc3f8f8...f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96
-[0.0.23]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/3f86daa75d12a76923b369c13d54fa9c5f0be029...d2faea1c4ce956b6c66f32ced05250b92cc3f8f8
-[0.0.22]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/cdabb34b9d54a8220d7f20aa465d0f49016beeb4...3f86daa75d12a76923b369c13d54fa9c5f0be029
-[0.0.21]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/caae17d0182e756e65b20674a56b2df17ba98274...cdabb34b9d54a8220d7f20aa465d0f49016beeb4
-[0.0.20]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/85ff729a2f1079b7f95a1aa8b9e1c7af477d08a9...caae17d0182e756e65b20674a56b2df17ba98274
-[0.0.19]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/644506a6e6ef468f34fb4a859d213ca8d8a5627c...85ff729a2f1079b7f95a1aa8b9e1c7af477d08a9
-[0.0.18]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/b1016b80772725d39d624aaad1cc70001d9b97a6...644506a6e6ef468f34fb4a859d213ca8d8a5627c
-[0.0.17]: https://github.com/Thaoh/lockwright-app-browser-extension/compare/c9bb84cc16c3d05db86da28f4b76f214533350ba...b1016b80772725d39d624aaad1cc70001d9b97a6
+[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/a6ac296bfb242127aa37ddf37b37b78afc585e32...HEAD
+[0.0.25]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96...a6ac296bfb242127aa37ddf37b37b78afc585e32
+[0.0.24]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/d2faea1c4ce956b6c66f32ced05250b92cc3f8f8...f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96
+[0.0.23]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/3f86daa75d12a76923b369c13d54fa9c5f0be029...d2faea1c4ce956b6c66f32ced05250b92cc3f8f8
+[0.0.22]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/cdabb34b9d54a8220d7f20aa465d0f49016beeb4...3f86daa75d12a76923b369c13d54fa9c5f0be029
+[0.0.21]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/caae17d0182e756e65b20674a56b2df17ba98274...cdabb34b9d54a8220d7f20aa465d0f49016beeb4
+[0.0.20]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/85ff729a2f1079b7f95a1aa8b9e1c7af477d08a9...caae17d0182e756e65b20674a56b2df17ba98274
+[0.0.19]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/644506a6e6ef468f34fb4a859d213ca8d8a5627c...85ff729a2f1079b7f95a1aa8b9e1c7af477d08a9
+[0.0.18]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/b1016b80772725d39d624aaad1cc70001d9b97a6...644506a6e6ef468f34fb4a859d213ca8d8a5627c
+[0.0.17]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/c9bb84cc16c3d05db86da28f4b76f214533350ba...b1016b80772725d39d624aaad1cc70001d9b97a6
