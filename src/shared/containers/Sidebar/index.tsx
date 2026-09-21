@@ -408,8 +408,8 @@ export const Sidebar = () => {
         <div style={styles.fadeGradient} aria-hidden="true" />
       </div>
 
-      {AUTHENTICATOR_ENABLED && (
-        <div style={styles.footerSection}>
+      <div style={styles.footerSection}>
+        {AUTHENTICATOR_ENABLED && (
           <NavbarListItem
             testID="sidebar-authenticator"
             label={t`Authenticator`}
@@ -429,10 +429,7 @@ export const Sidebar = () => {
             }
             onClick={handleAuthenticatorClick}
           />
-        </div>
-      )}
-
-      <div style={styles.footerSection}>
+        )}
         <NavbarListItem
           testID="sidebar-generator"
           label={t`Generator`}
