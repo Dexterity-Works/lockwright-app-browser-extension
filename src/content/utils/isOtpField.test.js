@@ -85,4 +85,22 @@ describe('isOtpField', () => {
 
     expect(isOtpField(inputElement)).toBe(true)
   })
+
+  it('returns true for a 2FA form whose code field is _auth_code and labeled OTP', () => {
+    document.body.innerHTML = ''
+    const form = document.createElement('form')
+    form.action = '/2fa_check'
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.name = '_auth_code'
+    input.id = '_auth_code'
+    input.setAttribute('autocomplete', 'off')
+    const label = document.createElement('label')
+    label.htmlFor = '_auth_code'
+    label.textContent = 'OTP*'
+    form.append(input, label)
+    document.body.appendChild(form)
+
+    expect(isOtpField(input)).toBe(true)
+  })
 })

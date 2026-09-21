@@ -11,7 +11,8 @@ const STRONG_OTP_PATTERNS = [
   /\bmfa[\s_-]?code\b/i,
   /\b2fa[\s_-]?code\b/i,
   /\bonetimecode\b/i,
-  /authenticator/i
+  /authenticator/i,
+  /\botp\b/i
 ]
 
 const AMBIGUOUS_OTP_PATTERNS = [
