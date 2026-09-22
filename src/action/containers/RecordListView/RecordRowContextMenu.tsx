@@ -8,12 +8,12 @@ import {
 import { createPortal } from 'react-dom'
 
 import { t } from '@lingui/core/macro'
-import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
+import { UNSUPPORTED } from 'lockwright-lib-constants'
 import {
   NavbarListItem,
   rawTokens,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   CheckBox,
   ContentPaste,
@@ -23,12 +23,8 @@ import {
   Share,
   StarOutlined,
   TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import {
-  useCreateRecord,
-  useRecords,
-  vaultGetFile
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components/icons'
+import { useCreateRecord, useRecords, vaultGetFile } from 'lockwright-lib-vault'
 
 import { useModal } from '../../../shared/context/ModalContext'
 import { DeleteRecordsModalContent } from '../../../shared/containers/DeleteRecordsModalContent'

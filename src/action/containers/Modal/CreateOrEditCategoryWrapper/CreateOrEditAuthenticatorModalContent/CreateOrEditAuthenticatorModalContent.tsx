@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
 import {
   AlertMessage,
   Button,
@@ -12,7 +12,7 @@ import {
   InputField,
   MultiSlotInput,
   PasswordField
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   RECORD_TYPES,
   matchLoginRecords,
@@ -21,7 +21,7 @@ import {
   useFindOtpDuplicates,
   useRecords,
   validateOtpInput
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 
 import { RecordItemIcon } from '../../../../../shared/containers/RecordItemIcon'
 import { useGlobalLoading } from '../../../../../shared/context/LoadingContext'

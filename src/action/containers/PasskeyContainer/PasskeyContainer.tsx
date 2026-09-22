@@ -6,7 +6,7 @@ import {
   useVault,
   useVaults,
   type Vault
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 
 import { PasskeyPopupHeader } from '../PasskeyPopupHeader'
 import { VaultSwitcherDropdown } from '../VaultSwitcherDropdown'

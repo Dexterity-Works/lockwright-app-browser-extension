@@ -33,7 +33,7 @@ jest.mock('../../action/hooks/useCreateOrEditRecord', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useRecords: () => ({
     deleteRecords: mockDeleteRecord,
     updateFavoriteState: mockUpdateFavoriteState

@@ -16,7 +16,7 @@ jest.mock('@lingui/react/macro', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   useTheme: () => ({
     theme: { colors: { colorTextSecondary: '#bdc3ac' } }
   }),

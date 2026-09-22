@@ -1,4 +1,4 @@
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from 'lockwright-lib-vault'
 
 import { useModal } from '../../shared/context/ModalContext'
 import { CreateOrEditCategoryWrapper } from '../containers/Modal/CreateOrEditCategoryWrapper'

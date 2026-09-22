@@ -1,14 +1,14 @@
 import { useEffect, useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
 import {
   InputField,
   MultiSlotInput,
   PasswordField,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 
 import { useCopyToClipboard } from '../../../shared/hooks/useCopyToClipboard'
 

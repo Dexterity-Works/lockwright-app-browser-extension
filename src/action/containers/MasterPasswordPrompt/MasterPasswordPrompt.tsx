@@ -8,8 +8,8 @@ import {
   Button,
   PasswordField,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { KeyboardArrowRightRound } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { KeyboardArrowRightRound } from 'lockwright-lib-ui-react-native-components/icons'
 
 interface MasterPasswordPromptProps {
   onSubmit: (password: string) => Promise<void> | void

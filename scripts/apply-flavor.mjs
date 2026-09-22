@@ -8,7 +8,7 @@
 //
 // Do not run `pnpm test` against a tree this script has touched — the
 // firefoxExtensionId test compares public/manifest.json's gecko.id against
-// FIREFOX_EXTENSION_ID from @tetherto/pearpass-lib-constants and will fail
+// FIREFOX_EXTENSION_ID from lockwright-lib-constants and will fail
 // on a flavored manifest.
 
 import { readFileSync, writeFileSync, existsSync } from 'fs'

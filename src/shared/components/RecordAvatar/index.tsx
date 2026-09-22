@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { useTheme } from 'lockwright-lib-ui-react-native-components'
 
 import { CheckIcon } from '../../../shared/icons/CheckIcon'
 import { StarIcon } from '../../../shared/icons/StarIcon'
-import { useFavicon } from '@tetherto/pearpass-lib-vault'
+import { useFavicon } from 'lockwright-lib-vault'
 import { isFetchableFaviconUrl } from '../../utils/isFetchableFaviconUrl'
 
 interface RecordAvatarProps {

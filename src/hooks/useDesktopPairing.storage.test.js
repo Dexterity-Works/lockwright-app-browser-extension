@@ -6,7 +6,7 @@
 
 import { act, createElement } from 'react'
 
-import { useUserData, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useUserData, useVaults } from 'lockwright-lib-vault'
 import { createRoot } from 'react-dom/client'
 
 import { useDesktopPairing } from './useDesktopPairing.js'
@@ -14,7 +14,7 @@ import { useToast } from '../shared/context/ToastContext'
 import { secureChannelMessages } from '../shared/services/messageBridge'
 import { pendingPairingStore } from '../shared/services/pendingPairingStore'
 
-jest.mock('@tetherto/pearpass-lib-vault')
+jest.mock('lockwright-lib-vault')
 jest.mock('../shared/context/ToastContext')
 jest.mock('../shared/services/messageBridge')
 jest.mock('../shared/services/pendingPairingStore', () => ({

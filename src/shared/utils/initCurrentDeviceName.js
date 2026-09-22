@@ -1,4 +1,4 @@
-import { setCurrentDeviceName } from '@tetherto/pearpass-lib-vault'
+import { setCurrentDeviceName } from 'lockwright-lib-vault'
 
 import { logger } from './logger'
 import { platformMessages } from '../services/messageBridge'

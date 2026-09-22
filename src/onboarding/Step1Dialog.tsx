@@ -5,9 +5,12 @@ import {
   Text,
   Panel,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import { ONBOARDING_ICON_SIZE } from './constants'
-import { Extension, PushPin } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  Extension,
+  PushPin
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 interface Step1Props {
   onNext: () => void

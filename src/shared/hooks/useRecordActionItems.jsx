@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES, useRecords } from 'lockwright-lib-vault'
 
 import { useCreateOrEditRecord } from '../../action/hooks/useCreateOrEditRecord'
 import { useModal } from '../../shared/context/ModalContext'

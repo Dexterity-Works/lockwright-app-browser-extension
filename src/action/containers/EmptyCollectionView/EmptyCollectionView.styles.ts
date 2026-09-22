@@ -1,4 +1,4 @@
-import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
+import { rawTokens } from 'lockwright-lib-ui-react-native-components'
 
 const CONTENT_MAX_WIDTH = 360
 const BUTTONS_MAX_WIDTH = 260

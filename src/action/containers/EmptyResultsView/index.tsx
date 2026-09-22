@@ -1,4 +1,8 @@
-import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  rawTokens,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { t } from '@lingui/core/macro'
 

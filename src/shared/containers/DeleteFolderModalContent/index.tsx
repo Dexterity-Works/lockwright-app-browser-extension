@@ -1,9 +1,13 @@
 import { useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
-import { Button, Dialog, Radio } from '@tetherto/pearpass-lib-ui-kit'
-import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
+import { UNSUPPORTED } from 'lockwright-lib-constants'
+import {
+  Button,
+  Dialog,
+  Radio
+} from 'lockwright-lib-ui-react-native-components'
+import { useFolders, useRecords } from 'lockwright-lib-vault'
 
 import { useModal } from '../../context/ModalContext'
 import { useRouter } from '../../context/RouterContext'

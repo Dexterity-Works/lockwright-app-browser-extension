@@ -1,4 +1,4 @@
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from 'lockwright-lib-vault'
 
 import { isOtpAutofillRecord } from './isOtpAutofillRecord'
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 
-import { useVaults } from '@tetherto/pearpass-lib-vault'
+import { useVaults } from 'lockwright-lib-vault'
 
 import { getClient } from '../shared/client'
 import { VAULT_CLIENT_EVENTS } from '../shared/constants/nativeMessaging'

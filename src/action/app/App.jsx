@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
+import { rawTokens, useTheme } from 'lockwright-lib-ui-react-native-components'
 
 import { useRedirect } from './hooks/useRedirect'
 import { useWindowResize } from './hooks/useWindowResize'

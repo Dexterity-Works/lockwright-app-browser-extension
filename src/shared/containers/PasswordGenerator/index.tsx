@@ -4,11 +4,11 @@ import { t } from '@lingui/core/macro'
 import {
   generatePassphrase,
   generatePassword
-} from '@tetherto/pearpass-utils-password-generator'
+} from 'lockwright-utils-password-generator'
 import {
   checkPassphraseStrength,
   checkPasswordStrength
-} from '@tetherto/pearpass-utils-password-check'
+} from 'lockwright-utils-password-check'
 import {
   Button,
   InputField,
@@ -20,8 +20,8 @@ import {
   Title,
   ToggleSwitch,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { ContentCopy } from 'lockwright-lib-ui-react-native-components/icons'
 
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
 import {

@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
-import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { useCountDown } from 'lockwright-lib-ui-react-hooks'
+import { useTheme } from 'lockwright-lib-ui-react-native-components'
 import {
   authoriseCurrentProtectedVault,
   useInvite,
   useVault
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
+import { generateQRCodeSVG } from 'lockwright-utils-qr'
 
 import { useAutoLockPreferences } from '../../../hooks/useAutoLockPreferences'
 import { ButtonLittle } from '../../../shared/components/ButtonLittle'

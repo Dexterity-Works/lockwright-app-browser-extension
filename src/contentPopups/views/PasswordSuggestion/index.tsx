@@ -3,10 +3,14 @@ import { useEffect, useRef, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useLingui } from '@lingui/react'
-import { useVault } from '@tetherto/pearpass-lib-vault'
-import { generatePassword } from '@tetherto/pearpass-utils-password-generator'
-import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Close, Key, SyncLock } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { useVault } from 'lockwright-lib-vault'
+import { generatePassword } from 'lockwright-utils-password-generator'
+import { Text, useTheme } from 'lockwright-lib-ui-react-native-components'
+import {
+  Close,
+  Key,
+  SyncLock
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { useRouter } from '../../../shared/context/RouterContext'
 import { markHistoryUsed } from '../../../shared/utils/passwordGeneratorHistory'

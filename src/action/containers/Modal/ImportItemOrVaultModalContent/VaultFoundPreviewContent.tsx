@@ -1,8 +1,15 @@
 import { useState } from 'react'
 
 import { plural, t } from '@lingui/core/macro'
-import { ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { ExpandMore, LockOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  ListItem,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import {
+  ExpandMore,
+  LockOutlined
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import type { PreviewRecord } from './types'
 

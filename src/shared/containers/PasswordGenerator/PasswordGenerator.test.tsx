@@ -27,13 +27,13 @@ jest.mock('@lingui/core/macro', () => ({
     typeof strings === 'string' ? strings : strings[0]
 }))
 
-jest.mock('@tetherto/pearpass-utils-password-generator', () => ({
+jest.mock('lockwright-utils-password-generator', () => ({
   generatePassword: (length: number, rules?: Record<string, boolean>) =>
     mockGeneratePassword(length, rules),
   generatePassphrase: () => ['word', 'list', 'here']
 }))
 
-jest.mock('@tetherto/pearpass-utils-password-check', () => ({
+jest.mock('lockwright-utils-password-check', () => ({
   checkPasswordStrength: () => ({ type: 'safe' }),
   checkPassphraseStrength: () => ({ type: 'safe' })
 }))
@@ -48,9 +48,9 @@ jest.mock('../../hooks/useCopyToClipboard', () => ({
   useCopyToClipboard: () => ({ copyToClipboard: mockCopyToClipboard })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+jest.mock('lockwright-lib-ui-react-native-components', () => {
   const React = require('react')
-  const actual = jest.requireActual('@tetherto/pearpass-lib-ui-kit')
+  const actual = jest.requireActual('lockwright-lib-ui-react-native-components')
   return {
     useTheme: () => ({
       theme: {
@@ -167,7 +167,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
   }
 })
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   ContentCopy: () => null
 }))
 

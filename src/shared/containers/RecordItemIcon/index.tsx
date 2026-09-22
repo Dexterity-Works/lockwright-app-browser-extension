@@ -1,6 +1,6 @@
-import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
-import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { useFavicon } from '@tetherto/pearpass-lib-vault'
+import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
+import { Text, useTheme } from 'lockwright-lib-ui-react-native-components'
+import { useFavicon } from 'lockwright-lib-vault'
 
 import { createStyles } from './RecordItemIcon.styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'

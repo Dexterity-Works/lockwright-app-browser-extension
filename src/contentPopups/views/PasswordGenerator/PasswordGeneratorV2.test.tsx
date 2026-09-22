@@ -25,18 +25,18 @@ jest.mock('@lingui/react/macro', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }))
 
-jest.mock('@tetherto/pearpass-utils-password-generator', () => ({
+jest.mock('lockwright-utils-password-generator', () => ({
   generatePassword: () => 'MockedPwd1!aa',
   generatePassphrase: () => ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 }))
 
-jest.mock('@tetherto/pearpass-utils-password-check', () => ({
+jest.mock('lockwright-utils-password-check', () => ({
   checkPasswordStrength: () => ({ type: 'weak' }),
   checkPassphraseStrength: () => ({ type: 'vulnerable' })
 }))
 
 const mockRefetchVault = jest.fn()
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useVault: () => ({ refetch: mockRefetchVault }),
   useRecords: () => ({ data: [] })
 }))
@@ -51,7 +51,7 @@ jest.mock('../../../shared/context/RouterContext', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+jest.mock('lockwright-lib-ui-react-native-components', () => {
   const R = require('react')
   return {
     useTheme: () => ({

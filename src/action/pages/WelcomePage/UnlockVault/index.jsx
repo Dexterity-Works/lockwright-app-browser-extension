@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { useVault, useVaults } from 'lockwright-lib-vault'
+import { Validator } from 'lockwright-utils-validator'
 
 import { ButtonPrimary } from '../../../../shared/components/ButtonPrimary'
 import { ButtonSecondary } from '../../../../shared/components/ButtonSecondary'

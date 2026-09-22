@@ -1,5 +1,5 @@
 import { t } from '@lingui/core/macro'
-import { PageHeader } from '@tetherto/pearpass-lib-ui-kit'
+import { PageHeader } from 'lockwright-lib-ui-react-native-components'
 
 import { PasswordGenerator } from '../../../shared/containers/PasswordGenerator'
 

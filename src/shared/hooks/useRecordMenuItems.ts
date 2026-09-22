@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { ComponentType, SVGProps } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from 'lockwright-lib-vault'
 import {
   AccountCircleFilled,
   AccountCircleOutlined,
@@ -14,7 +14,7 @@ import {
   Layers,
   Note,
   WiFi
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>
 

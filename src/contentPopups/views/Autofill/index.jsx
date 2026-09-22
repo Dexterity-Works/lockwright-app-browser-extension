@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { CreditCard } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { CreditCard } from 'lockwright-lib-ui-react-native-components/icons'
 import {
   generateOtpCodesByIds,
   RECORD_TYPES,
   useVault
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 
 import { isPasswordAutofillRecord } from './isPasswordAutofillRecord'
 import { PopupCard } from '../../../shared/components/PopupCard'

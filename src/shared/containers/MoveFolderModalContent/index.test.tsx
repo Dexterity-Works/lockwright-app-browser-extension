@@ -20,7 +20,7 @@ jest.mock('../../context/LoadingContext', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   __esModule: true,
   useRecords: () => ({
     updateFolder: mockUpdateFolder
@@ -41,7 +41,7 @@ jest.mock('../../utils/logger', () => ({
   logger: { error: jest.fn() }
 }))
 
-jest.mock('@tetherto/pear-apps-utils-avatar-initials', () => ({
+jest.mock('lockwright-utils-avatar-initials', () => ({
   __esModule: true,
   generateAvatarInitials: (title?: string) =>
     (title ?? '').slice(0, 2).toUpperCase()
@@ -54,12 +54,12 @@ jest.mock('../../components/RecordAvatar', () => ({
   )
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   __esModule: true,
   Folder: () => <span data-testid="icon-folder" />
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   __esModule: true,
   AlertMessage: ({
     title,

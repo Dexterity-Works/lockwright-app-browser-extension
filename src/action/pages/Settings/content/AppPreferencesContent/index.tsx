@@ -4,7 +4,7 @@ import { t } from '@lingui/core/macro'
 import {
   AUTO_LOCK_TIMEOUT_OPTIONS,
   BE_AUTO_LOCK_ENABLED
-} from '@tetherto/pearpass-lib-constants'
+} from 'lockwright-lib-constants'
 import {
   Button,
   Dropdown,
@@ -14,8 +14,8 @@ import {
   Text,
   ToggleSwitch,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { KeyboardArrowBottom } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { KeyboardArrowBottom } from 'lockwright-lib-ui-react-native-components/icons'
 
 import { useAutoLockPreferences } from '../../../../../hooks/useAutoLockPreferences'
 import {

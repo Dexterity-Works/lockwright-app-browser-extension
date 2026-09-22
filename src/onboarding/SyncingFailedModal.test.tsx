@@ -10,7 +10,7 @@ jest.mock('@lingui/react/macro', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   useTheme: () => ({
     theme: {
       colors: {
@@ -51,7 +51,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   )
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   Sync: () => <span data-testid="icon-sync" />
 }))
 

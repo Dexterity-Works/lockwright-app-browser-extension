@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
 import {
   Button,
   Dialog,
@@ -13,18 +13,14 @@ import {
   type PasswordIndicatorVariant,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
+} from 'lockwright-lib-ui-react-native-components'
+import { checkPasswordStrength } from 'lockwright-utils-password-check'
 import {
   Add,
   SyncLock,
   TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import {
-  RECORD_TYPES,
-  useCreateRecord,
-  useRecords
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components/icons'
+import { RECORD_TYPES, useCreateRecord, useRecords } from 'lockwright-lib-vault'
 
 import { FolderDropdown } from '../../../FolderDropdown'
 import { useGlobalLoading } from '../../../../../shared/context/LoadingContext'

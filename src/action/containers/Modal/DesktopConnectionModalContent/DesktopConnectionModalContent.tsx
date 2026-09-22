@@ -2,7 +2,12 @@ import { useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { Button, Dialog, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Dialog,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { useModal } from '../../../../shared/context/ModalContext'
 import { logger } from '../../../../shared/utils/logger'

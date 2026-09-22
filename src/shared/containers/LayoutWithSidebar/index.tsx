@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { useTheme } from 'lockwright-lib-ui-react-native-components'
 
 import { createStyles } from './LayoutWithSidebar.styles'
 import { Sidebar } from '../Sidebar'

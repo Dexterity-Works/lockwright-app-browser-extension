@@ -7,7 +7,7 @@ import {
   useVault,
   useVaults,
   type Vault
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 import {
   Button,
   ContextMenu,
@@ -15,7 +15,7 @@ import {
   NavbarListItem,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   Add,
   Devices,
@@ -24,7 +24,7 @@ import {
   MoreVert,
   PersonAddAlt,
   TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { createStyles, VAULT_ACTIONS_MENU_WIDTH } from './VaultSelector.styles'
 import { useLoadingContext } from '../../context/LoadingContext'

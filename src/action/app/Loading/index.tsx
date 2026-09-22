@@ -1,7 +1,11 @@
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { PageHeader, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { HourglassBottom } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  PageHeader,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import { HourglassBottom } from 'lockwright-lib-ui-react-native-components/icons'
 
 export const Loading = () => {
   const { theme } = useTheme()

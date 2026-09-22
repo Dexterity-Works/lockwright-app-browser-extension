@@ -7,7 +7,7 @@ import { I18nProvider } from '@lingui/react'
 import {
   ThemeProvider as UIKitProvider,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import { StepIndicatorBar } from './StepIndicatorBar'
 import { Step1Dialog } from './Step1Dialog'
 import { Step2Dialog } from './Step2Dialog'

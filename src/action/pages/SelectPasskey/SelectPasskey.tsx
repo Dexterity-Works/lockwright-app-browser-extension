@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES, useRecords } from 'lockwright-lib-vault'
 import {
   Button,
   ListItem,
   Text,
   Title,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Add } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { Add } from 'lockwright-lib-ui-react-native-components/icons'
 
 import { CONTENT_MESSAGE_TYPES } from '../../../shared/constants/nativeMessaging'
 import { useRouter } from '../../../shared/context/RouterContext'

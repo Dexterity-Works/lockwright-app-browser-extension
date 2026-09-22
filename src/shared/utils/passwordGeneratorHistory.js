@@ -1,4 +1,4 @@
-import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
+import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 /**
  * Password generator history — shared vault key for extension / desktop / Android.

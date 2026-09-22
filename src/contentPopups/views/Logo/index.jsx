@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { useVault } from '@tetherto/pearpass-lib-vault'
+import { useVault } from 'lockwright-lib-vault'
 
 import { useRouter } from '../../../shared/context/RouterContext'
 import { LogoLock } from '../../../shared/svgs/logoLock'

@@ -17,7 +17,7 @@ jest.mock('@lingui/react', () => ({
   }) => <>{children ?? message ?? id}</>
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+jest.mock('lockwright-lib-ui-react-native-components', () => {
   const R = require('react')
   return {
     useTheme: () => ({
@@ -43,7 +43,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
   }
 })
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => {
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => {
   const R = require('react')
   return {
     HourglassBottom: (props: {

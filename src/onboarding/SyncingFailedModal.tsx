@@ -1,8 +1,13 @@
 import { useState } from 'react'
 
 import { Trans } from '@lingui/react/macro'
-import { Button, Text, Title, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Sync } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  Button,
+  Text,
+  Title,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import { Sync } from 'lockwright-lib-ui-react-native-components/icons'
 
 const TEST_IDS = {
   root: 'syncing-failed-modal',

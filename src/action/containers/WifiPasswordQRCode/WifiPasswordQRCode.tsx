@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
-import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { generateQRCodeSVG } from 'lockwright-utils-qr'
+import {
+  rawTokens,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { logger } from '../../../shared/utils/logger'
 

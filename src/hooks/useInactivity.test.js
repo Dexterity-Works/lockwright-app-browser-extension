@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { useUserData, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useUserData, useVaults } from 'lockwright-lib-vault'
 
 import { useAutoLockPreferences } from './useAutoLockPreferences'
 import { useInactivity } from './useInactivity'
@@ -7,7 +7,7 @@ import { useLoadingContext } from '../shared/context/LoadingContext'
 import { useModal } from '../shared/context/ModalContext'
 import { useRouter } from '../shared/context/RouterContext'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useUserData: jest.fn(),
   useVaults: jest.fn()
 }))

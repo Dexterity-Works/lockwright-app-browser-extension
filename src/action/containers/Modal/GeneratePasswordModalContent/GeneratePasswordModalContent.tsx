@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { Button, Dialog } from '@tetherto/pearpass-lib-ui-kit'
-import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Button, Dialog } from 'lockwright-lib-ui-react-native-components'
+import { ContentCopy } from 'lockwright-lib-ui-react-native-components/icons'
 
 import { PasswordGenerator } from '../../../../shared/containers/PasswordGenerator'
 import { useModal } from '../../../../shared/context/ModalContext'

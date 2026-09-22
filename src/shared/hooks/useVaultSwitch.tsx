@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useVault, type Vault } from '@tetherto/pearpass-lib-vault'
+import { useVault, type Vault } from 'lockwright-lib-vault'
 
 import { VaultPasswordFormModalContent } from '../containers/VaultPasswordFormModalContent'
 import { useLoadingContext } from '../context/LoadingContext'

@@ -3,7 +3,7 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent, render, screen } from '@testing-library/react'
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   __esModule: true,
   PageHeader: ({
     title,
@@ -107,12 +107,12 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   __esModule: true,
   KeyboardArrowBottom: () => <span data-testid="icon-arrow-down" />
 }))
 
-jest.mock('@tetherto/pearpass-lib-constants', () => ({
+jest.mock('lockwright-lib-constants', () => ({
   __esModule: true,
   BE_AUTO_LOCK_ENABLED: true,
   AUTO_LOCK_TIMEOUT_OPTIONS: {

@@ -10,7 +10,7 @@ import {
   Text,
   Title,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   Add,
   CalendarToday,
@@ -19,7 +19,7 @@ import {
   ContentCopy,
   FilterList,
   SortByAlpha
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 import {
   formatOtpCode,
   // @ts-expect-error - groupOtpRecords is exported at runtime but absent from the package's main type declarations
@@ -32,11 +32,8 @@ import {
   useUserData,
   useVault,
   useVaults
-} from '@tetherto/pearpass-lib-vault'
-import type {
-  OtpGroupResult,
-  OtpPublic
-} from '@tetherto/pearpass-lib-vault/src/types'
+} from 'lockwright-lib-vault'
+import type { OtpGroupResult, OtpPublic } from 'lockwright-lib-vault/src/types'
 
 import { createStyles } from './styles'
 import { createStyles as createEmptyStyles } from '../../containers/EmptyCollectionView/EmptyCollectionView.styles'

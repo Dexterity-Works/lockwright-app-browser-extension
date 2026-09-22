@@ -6,8 +6,8 @@ import {
   Text,
   Panel,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { DoneAll } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { DoneAll } from 'lockwright-lib-ui-react-native-components/icons'
 import { ONBOARDING_ICON_SIZE } from './constants'
 
 async function tryOpenExtensionPopup(): Promise<boolean> {

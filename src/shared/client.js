@@ -1,4 +1,4 @@
-import { setPearpassVaultClient } from '@tetherto/pearpass-lib-vault'
+import { setPearpassVaultClient } from 'lockwright-lib-vault'
 
 import { PearpassVaultClient } from '../vaultClient'
 import { initCurrentDeviceName } from './utils/initCurrentDeviceName'

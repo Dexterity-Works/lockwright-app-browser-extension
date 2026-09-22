@@ -9,8 +9,8 @@ import {
   PageHeader,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { KeyboardArrowBottom } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { KeyboardArrowBottom } from 'lockwright-lib-ui-react-native-components/icons'
 
 import { useLanguageOptions } from '../../../../../hooks/useLanguageOptions'
 import { setLocaleInStorage } from '../../../../../shared/utils/localeStorage'

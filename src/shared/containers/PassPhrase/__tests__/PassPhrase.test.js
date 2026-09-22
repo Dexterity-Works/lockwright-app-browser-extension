@@ -5,7 +5,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
 import { PassPhrase } from '../PassPhrase'
 
-jest.mock('@tetherto/pearpass-lib-constants', () => ({
+jest.mock('lockwright-lib-constants', () => ({
   PASSPHRASE_WORD_COUNTS: {
     STANDARD_12: 12,
     WITH_RANDOM_12: 13,
@@ -16,7 +16,7 @@ jest.mock('@tetherto/pearpass-lib-constants', () => ({
   DEFAULT_SELECTED_TYPE: 12
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   Button: ({ onClick, 'aria-label': ariaLabel, iconBefore }) => (
     <button onClick={onClick} aria-label={ariaLabel}>
       {iconBefore}
@@ -60,7 +60,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   ContentCopy: () => <i data-testid="icon-copy" />,
   ContentPaste: () => <i data-testid="icon-paste" />
 }))

@@ -1,8 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { Trans } from '@lingui/react/macro'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
+import {
+  Button,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import { useRecords, useVault } from 'lockwright-lib-vault'
 
 import { useRouter } from '../../../shared/context/RouterContext'
 import { PasswordGenerator as PasswordGeneratorBody } from '../../../shared/containers/PasswordGenerator'

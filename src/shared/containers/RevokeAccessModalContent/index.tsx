@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { Button, Dialog, Text } from '@tetherto/pearpass-lib-ui-kit'
-import { kickDevice, useVault } from '@tetherto/pearpass-lib-vault'
+import { Button, Dialog, Text } from 'lockwright-lib-ui-react-native-components'
+import { kickDevice, useVault } from 'lockwright-lib-vault'
 
 import { useModal } from '../../context/ModalContext'
 import { useToast } from '../../context/ToastContext'

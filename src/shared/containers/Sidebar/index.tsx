@@ -2,22 +2,22 @@ import type { MouseEvent } from 'react'
 import { useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
 import {
   closeAllInstances,
   useFolders,
   useRecordCountsByType,
   useVault,
   useVaults
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 import {
   Button,
   ContextMenu,
   NavbarListItem,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Pressable } from '@tetherto/pearpass-lib-ui-kit/components/Pressable'
+} from 'lockwright-lib-ui-react-native-components'
+import { Pressable } from 'lockwright-lib-ui-react-native-components/components/Pressable'
 import {
   Close,
   CreateNewFolder,
@@ -34,7 +34,7 @@ import {
   TrashOutlined,
   TwoFactorAuthenticationFilled,
   TwoFactorAuthenticationOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import {
   createStyles,

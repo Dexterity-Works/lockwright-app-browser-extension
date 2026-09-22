@@ -1,5 +1,5 @@
-import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { useUserData, useVault, useVaults } from '@tetherto/pearpass-lib-vault'
+import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
+import { useUserData, useVault, useVaults } from 'lockwright-lib-vault'
 
 import { AddItemContextMenu } from '../AddItemContextMenu'
 import { AppHeaderAddItemTrigger, AppHeader } from '../AppHeader'

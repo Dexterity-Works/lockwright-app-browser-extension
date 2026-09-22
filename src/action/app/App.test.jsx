@@ -3,7 +3,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   rawTokens: { radius8: 8 },
   useTheme: () => ({
     theme: {
@@ -28,7 +28,7 @@ jest.mock('../../shared/hooks/useVaultAccessRevoked', () => ({
   useVaultAccessRevoked: jest.fn()
 }))
 
-jest.mock('@tetherto/pearpass-lib-constants', () => ({
+jest.mock('lockwright-lib-constants', () => ({
   AUTHENTICATOR_ENABLED: false
 }))
 

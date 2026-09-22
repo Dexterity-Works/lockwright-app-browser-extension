@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { useRecordById } from '@tetherto/pearpass-lib-vault'
+import { useRecordById } from 'lockwright-lib-vault'
 
 import { useRouter } from '../../../shared/context/RouterContext'
 import { RecordDetails as RecordDetailsContainer } from '../../containers/RecordDetails/RecordDetails'

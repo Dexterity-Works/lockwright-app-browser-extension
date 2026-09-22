@@ -1,13 +1,16 @@
 import { openOnboardingPage } from './PairingRequiredModalContent'
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   Title: () => null,
   Text: () => null,
   Button: () => null
 }))
-jest.mock('@tetherto/pearpass-lib-ui-kit/components/PasswordField', () => ({
-  PasswordField: () => null
-}))
+jest.mock(
+  'lockwright-lib-ui-react-native-components/components/PasswordField',
+  () => ({
+    PasswordField: () => null
+  })
+)
 jest.mock('../../../../hooks/useDesktopPairing', () => ({
   useDesktopPairing: () => ({})
 }))

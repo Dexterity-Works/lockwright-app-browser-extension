@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
-import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { OtpRefreshProvider } from '@tetherto/pearpass-lib-vault'
+import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
+import { OtpRefreshProvider } from 'lockwright-lib-vault'
 
 import { useVaultSync } from './hooks/useVaultSync'
 import { useDesktopLogout } from '../../hooks/useDesktopLogout'

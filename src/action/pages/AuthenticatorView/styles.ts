@@ -1,5 +1,5 @@
-import type { ThemeColors } from '@tetherto/pearpass-lib-ui-kit'
-import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
+import type { ThemeColors } from 'lockwright-lib-ui-react-native-components'
+import { rawTokens } from 'lockwright-lib-ui-react-native-components'
 
 // 44 px is the standard minimum tap/click target; no exact token maps to this value
 const HEADER_MIN_HEIGHT = 44

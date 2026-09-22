@@ -1,13 +1,18 @@
 import React, { cloneElement, useId, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { Button, Snackbar, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Snackbar,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 import {
   DriveFileMoveOutlined,
   StarFilled,
   StarOutlined,
   TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { createStyles } from './MultiSelectActionsBar.styles'
 

@@ -204,14 +204,14 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@tetherto/pearpass-lib-constants': git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#0221dba94373926c7316c675d9bff774daf8464f
-  '@tetherto/pearpass-lib-ui-kit': git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#4b254fff341c791a27a45f3e1488a3860f2b1987
+  lockwright-lib-constants: git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#701bf1988d16458c634db85269b436eb9c07cacc
+  lockwright-lib-ui-react-native-components: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#82167746355a4d1b931dae2c3d4abe10a7e10b7e
   react-native: 0.79.5
   react-native>@types/react: 18.3.0
   react-native-windows>react: 19.1.0
 
 patchedDependencies:
-  '@tetherto/pear-apps-utils-validator@0.0.10': 2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6
+  lockwright-utils-validator@0.0.10: 2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6
 
 importers:
 
@@ -241,45 +241,45 @@ importers:
       '@tailwindcss/vite':
         specifier: 4.1.4
         version: 4.1.4(vite@6.3.1(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.29.2)(terser@5.49.2)(yaml@2.9.0))
-      '@tetherto/pear-apps-lib-ui-react-hooks':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-hooks.git#8273bf9e248bbdaacbfb0b7a16d5b63687990481
-        version: pear-apps-lib-ui-react-hooks@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/8273bf9e248bbdaacbfb0b7a16d5b63687990481(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@tetherto/pear-apps-utils-avatar-initials':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-avatar-initials.git#986772c039e88e519ca9da93837df3223a6f335e
-        version: pear-apps-utils-avatar-initials@https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/986772c039e88e519ca9da93837df3223a6f335e
-      '@tetherto/pear-apps-utils-date':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-date.git#28242e47629c327ae4c6687f6a883408917fa024
-        version: pear-apps-utils-date@https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024
-      '@tetherto/pear-apps-utils-generate-unique-id':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-generate-unique-id.git#a2a927374b353f26c05beda7f1052e4e1322027f
-        version: pear-apps-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f
-      '@tetherto/pear-apps-utils-pattern-search':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-pattern-search.git#0e593f8fcee9680342e7b4fa4be6a861a5c48f45
-        version: pear-apps-utils-pattern-search@https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45
-      '@tetherto/pear-apps-utils-qr':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-qr.git#0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7
-        version: pear-apps-utils-qr@https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7
-      '@tetherto/pear-apps-utils-validator':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-validator.git#bf6b3b6ce3e5c773d6df6a1956a38e578ce0e7ff
-        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/bf6b3b6ce3e5c773d6df6a1956a38e578ce0e7ff(patch_hash=2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6)
-      '@tetherto/pearpass-lib-constants':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#0221dba94373926c7316c675d9bff774daf8464f
-        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/0221dba94373926c7316c675d9bff774daf8464f
-      '@tetherto/pearpass-lib-ui-kit':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#4b254fff341c791a27a45f3e1488a3860f2b1987
-        version: '@tetherto/pearpass-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/4b254fff341c791a27a45f3e1488a3860f2b1987(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)'
-      '@tetherto/pearpass-lib-vault':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#e27dbb763e67d480463a11c4ae5e905c4cb002f8
-        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/e27dbb763e67d480463a11c4ae5e905c4cb002f8(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)
-      '@tetherto/pearpass-utils-password-check':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-password-check.git#a549e2b4c486e5f57eb28acd47652ea38154d9c8
-        version: pearpass-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/a549e2b4c486e5f57eb28acd47652ea38154d9c8
-      '@tetherto/pearpass-utils-password-generator':
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-password-generator.git#ce69cd540a232550de361752d04450f0e600ca8a
-        version: pearpass-utils-password-generator@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/ce69cd540a232550de361752d04450f0e600ca8a
       events:
         specifier: 3.3.0
         version: 3.3.0
+      lockwright-lib-constants:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#701bf1988d16458c634db85269b436eb9c07cacc
+        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/701bf1988d16458c634db85269b436eb9c07cacc
+      lockwright-lib-ui-react-hooks:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-hooks.git#56efd44bfc554e38604b1acce2f3ee904b2b16ce
+        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/56efd44bfc554e38604b1acce2f3ee904b2b16ce(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      lockwright-lib-ui-react-native-components:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#82167746355a4d1b931dae2c3d4abe10a7e10b7e
+        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)
+      lockwright-lib-vault:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#8d460cfffa991da39ecd37a199cb2b96b9b5b600
+        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)
+      lockwright-utils-avatar-initials:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-avatar-initials.git#4b143620f2047f51296f36f34289e39a83e4c6cb
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/4b143620f2047f51296f36f34289e39a83e4c6cb
+      lockwright-utils-date:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-date.git#f95507d089126b27561a584147ebcb38852cfe58
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/f95507d089126b27561a584147ebcb38852cfe58
+      lockwright-utils-generate-unique-id:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-generate-unique-id.git#99a1450ca075c570fa08855280c8f73789cea07a
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a
+      lockwright-utils-password-check:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-password-check.git#3fb28bee9328290a12119feaaf912d1018fcf6f8
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/3fb28bee9328290a12119feaaf912d1018fcf6f8
+      lockwright-utils-password-generator:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-password-generator.git#382806f37823902b41087200c6d96bd83f3d3358
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/382806f37823902b41087200c6d96bd83f3d3358
+      lockwright-utils-pattern-search:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-pattern-search.git#37021914926a45d3f1ed1fd9c817db3ade370f25
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/37021914926a45d3f1ed1fd9c817db3ade370f25
+      lockwright-utils-qr:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-qr.git#1d824382bc5ed15c966e4cea824ad44517944e1b
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/1d824382bc5ed15c966e4cea824ad44517944e1b
+      lockwright-utils-validator:
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-validator.git#c9fc16de463fbc78df9bb1f3aa3f588a8ae06bf9
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/c9fc16de463fbc78df9bb1f3aa3f588a8ae06bf9(patch_hash=2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6)
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -2249,48 +2249,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@tetherto/pear-apps-utils-validator@https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/bf6b3b6ce3e5c773d6df6a1956a38e578ce0e7ff':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/bf6b3b6ce3e5c773d6df6a1956a38e578ce0e7ff}
-    version: 0.0.10
-
-  '@tetherto/pearpass-lib-constants@https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/0221dba94373926c7316c675d9bff774daf8464f':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/0221dba94373926c7316c675d9bff774daf8464f}
-    version: 0.0.11
-
-  '@tetherto/pearpass-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/4b254fff341c791a27a45f3e1488a3860f2b1987':
-    resolution: {gitHosted: true, integrity: sha512-FPySBanatgon2u0auS1LE8wkYlvwo3GkpLCwZcRmKka6840Oi18bU5KoUPrGFD2DvpUFNqqg5lbe+lHjK5PXVg==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/4b254fff341c791a27a45f3e1488a3860f2b1987}
-    version: 0.0.40
-    peerDependencies:
-      '@gorhom/bottom-sheet': ^5.1.1
-      '@react-native-community/datetimepicker': ^8.4.4
-      react: ^19.0.0
-      react-dom: ^19.0.0
-      react-native: 0.79.5
-      react-native-gesture-handler: ^2.24.0
-      react-native-reanimated: ^3.17.4
-      react-native-svg: 15.11.2
-    peerDependenciesMeta:
-      '@gorhom/bottom-sheet':
-        optional: true
-      '@react-native-community/datetimepicker':
-        optional: true
-      react-native:
-        optional: true
-      react-native-gesture-handler:
-        optional: true
-      react-native-reanimated:
-        optional: true
-      react-native-svg:
-        optional: true
-
-  '@tetherto/pearpass-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/e27dbb763e67d480463a11c4ae5e905c4cb002f8':
-    resolution: {gitHosted: true, integrity: sha512-M6tOjXR//tSTZYBONLdOOrFEFNynRSDRnOGRKrSHVpmsDaaiN0R970h8kXE+B9fGX57Ced7Lt/iFDeVMtGWFyw==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/e27dbb763e67d480463a11c4ae5e905c4cb002f8}
-    version: 0.1.0
-    engines: {node: '>=22.12.0', pnpm: '>=11.10.0'}
-    peerDependencies:
-      react: '>=18.3.1'
-      react-dom: '>=18.3.1'
-
   '@tetherto/tether-dev-docs@https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583':
     resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583}
     version: 0.0.8
@@ -4133,6 +4091,88 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
+  lockwright-lib-constants@https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/701bf1988d16458c634db85269b436eb9c07cacc:
+    resolution: {gitHosted: true, integrity: sha512-PQg7VxQH7vvspt3r1r6PXdwtsRYBefLEvYVo9lqZsqsYYEwTpIsIhcpvozF08I7UxKFRN/Ae8Phd89h2GFu92g==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/701bf1988d16458c634db85269b436eb9c07cacc}
+    version: 0.0.11
+
+  lockwright-lib-ui-react-hooks@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/56efd44bfc554e38604b1acce2f3ee904b2b16ce:
+    resolution: {gitHosted: true, integrity: sha512-xpGErRX7Hbo9AD2z3aQdKzbP9sHmoZbuMguhBpuJWoExDeuk8QMlJBk4W+p4rWysN539p3KXxTkzQ/MMEuU+8A==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/56efd44bfc554e38604b1acce2f3ee904b2b16ce}
+    version: 0.0.11
+    peerDependencies:
+      react: '>=18.3.1'
+      react-dom: '>=18.3.1'
+
+  lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e:
+    resolution: {gitHosted: true, integrity: sha512-lHKgJXRtwyMIlRx1fYkvpSe9IcuDwcNKOcHlzniO6J+mIn3L4KbTNq6qNiCwlU0i+6kDEflDwM+1DycpKs+Uqw==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e}
+    version: 0.0.40
+    peerDependencies:
+      '@gorhom/bottom-sheet': ^5.1.1
+      '@react-native-community/datetimepicker': ^8.4.4
+      react: ^19.0.0
+      react-dom: ^19.0.0
+      react-native: 0.79.5
+      react-native-gesture-handler: ^2.24.0
+      react-native-reanimated: ^3.17.4
+      react-native-svg: 15.11.2
+    peerDependenciesMeta:
+      '@gorhom/bottom-sheet':
+        optional: true
+      '@react-native-community/datetimepicker':
+        optional: true
+      react-native:
+        optional: true
+      react-native-gesture-handler:
+        optional: true
+      react-native-reanimated:
+        optional: true
+      react-native-svg:
+        optional: true
+
+  lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600:
+    resolution: {gitHosted: true, integrity: sha512-tUVL5jDIMJqofiRdDVaShZEZUWbQHwJ/XRu7H7GgpIl/KrG31Xlf2xZLTDWSItkvbJ0D1FE2l44Z7kqlYQbbew==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600}
+    version: 0.1.0
+    engines: {node: '>=22.12.0', pnpm: '>=11.10.0'}
+    peerDependencies:
+      react: '>=18.3.1'
+      react-dom: '>=18.3.1'
+
+  lockwright-utils-avatar-initials@https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/4b143620f2047f51296f36f34289e39a83e4c6cb:
+    resolution: {gitHosted: true, integrity: sha512-sgNIw2hUFeOniIsHOT00vc0Fx+BFGDVvqnr82G0Ht6zq2z6Cbhw7GPvY/RZcuUho83X28o1DqPkayoE7wAUNxw==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/4b143620f2047f51296f36f34289e39a83e4c6cb}
+    version: 0.0.7
+
+  lockwright-utils-date@https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/f95507d089126b27561a584147ebcb38852cfe58:
+    resolution: {gitHosted: true, integrity: sha512-/nqftDdlR2eLSHKXpPOdFdaq/WbN63aSgVopHFMKaKXPYNj8HadWAAWzo04j0dIATgK1+haqKs7961fvORSvVA==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/f95507d089126b27561a584147ebcb38852cfe58}
+    version: 0.0.8
+
+  lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a:
+    resolution: {gitHosted: true, integrity: sha512-j+IukWCXWZ/35Fzx080x3nDHlNMvG22FIcDLfcdtSitfzy5neqrIyW1uShkDfTomElwc+gUfqNUjjDUlLKnZZQ==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a}
+    version: 0.0.6
+    peerDependencies:
+      expo-crypto: ~13.0.0
+    peerDependenciesMeta:
+      expo-crypto:
+        optional: true
+
+  lockwright-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/3fb28bee9328290a12119feaaf912d1018fcf6f8:
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/3fb28bee9328290a12119feaaf912d1018fcf6f8}
+    version: 0.0.14
+
+  lockwright-utils-password-generator@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/382806f37823902b41087200c6d96bd83f3d3358:
+    resolution: {gitHosted: true, integrity: sha512-FplKvoAOSTpHdOR3lCdnVoPsOnefl2ANyUruzx2dzIBSKYP8yRC/GoojSys5B/RkzFrS/S0vURD2YgXvCzhD0w==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/382806f37823902b41087200c6d96bd83f3d3358}
+    version: 0.0.11
+
+  lockwright-utils-pattern-search@https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/37021914926a45d3f1ed1fd9c817db3ade370f25:
+    resolution: {gitHosted: true, integrity: sha512-hNjGDKbW0nPUUE0So50a9kNgcUkdbWQhTlxV5CxMHdGrWeheDNWita9eLfYt4kiwGhxFbGnlYs4AfuVpswrXTA==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/37021914926a45d3f1ed1fd9c817db3ade370f25}
+    version: 0.0.5
+
+  lockwright-utils-qr@https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/1d824382bc5ed15c966e4cea824ad44517944e1b:
+    resolution: {gitHosted: true, integrity: sha512-I11fIT/g0dO5o8lRoz+di1x/TyKZT8ZIDU997OqUTPntIJ/cXGcePKTwPw5FBsvsc1HdQ9crfsw22zUKhP2VMw==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/1d824382bc5ed15c966e4cea824ad44517944e1b}
+    version: 0.0.5
+
+  lockwright-utils-validator@https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/c9fc16de463fbc78df9bb1f3aa3f588a8ae06bf9:
+    resolution: {gitHosted: true, integrity: sha512-rJDtjB8JH8QgOEp8dpJxtgDL5OPOETiRUQjSBUvkf38Ep7xizJP0/YI0K6Bt+j6r51FXW3LLxSZKFugr7TlHUw==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/c9fc16de463fbc78df9bb1f3aa3f588a8ae06bf9}
+    version: 0.0.10
+
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
 
@@ -4515,46 +4555,6 @@ packages:
 
   pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
-
-  pear-apps-lib-ui-react-hooks@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/8273bf9e248bbdaacbfb0b7a16d5b63687990481:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/8273bf9e248bbdaacbfb0b7a16d5b63687990481}
-    version: 0.0.11
-    peerDependencies:
-      react: '>=18.3.1'
-      react-dom: '>=18.3.1'
-
-  pear-apps-utils-avatar-initials@https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/986772c039e88e519ca9da93837df3223a6f335e:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/986772c039e88e519ca9da93837df3223a6f335e}
-    version: 0.0.7
-
-  pear-apps-utils-date@https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024}
-    version: 0.0.8
-
-  pear-apps-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f}
-    version: 0.0.6
-    peerDependencies:
-      expo-crypto: ~13.0.0
-    peerDependenciesMeta:
-      expo-crypto:
-        optional: true
-
-  pear-apps-utils-pattern-search@https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45}
-    version: 0.0.5
-
-  pear-apps-utils-qr@https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7}
-    version: 0.0.5
-
-  pearpass-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/a549e2b4c486e5f57eb28acd47652ea38154d9c8:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/a549e2b4c486e5f57eb28acd47652ea38154d9c8}
-    version: 0.0.14
-
-  pearpass-utils-password-generator@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/ce69cd540a232550de361752d04450f0e600ca8a:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/ce69cd540a232550de361752d04450f0e600ca8a}
-    version: 0.0.11
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -7529,31 +7529,6 @@ snapshots:
       '@types/react': 19.0.0
       '@types/react-dom': 19.0.0
 
-  '@tetherto/pear-apps-utils-validator@https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/bf6b3b6ce3e5c773d6df6a1956a38e578ce0e7ff(patch_hash=2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6)': {}
-
-  '@tetherto/pearpass-lib-constants@https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/0221dba94373926c7316c675d9bff774daf8464f': {}
-
-  '@tetherto/pearpass-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/4b254fff341c791a27a45f3e1488a3860f2b1987(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)':
-    dependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-strict-dom: 0.0.55(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)
-    optionalDependencies:
-      react-native: 0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0)
-    transitivePeerDependencies:
-      - postcss
-      - supports-color
-
-  '@tetherto/pearpass-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/e27dbb763e67d480463a11c4ae5e905c4cb002f8(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)':
-    dependencies:
-      '@reduxjs/toolkit': 2.5.0(react-redux@9.1.2(@types/react@19.0.0)(react@19.1.0)(redux@5.0.1))(react@19.1.0)
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-redux: 9.1.2(@types/react@19.0.0)(react@19.1.0)(redux@5.0.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - redux
-
   '@tetherto/tether-dev-docs@https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583(jiti@2.7.0)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.59.4(@typescript-eslint/parser@8.59.4(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
@@ -9924,6 +9899,52 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
+  lockwright-lib-constants@https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/701bf1988d16458c634db85269b436eb9c07cacc: {}
+
+  lockwright-lib-ui-react-hooks@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/56efd44bfc554e38604b1acce2f3ee904b2b16ce(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-strict-dom: 0.0.55(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)
+    optionalDependencies:
+      react-native: 0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0)
+    transitivePeerDependencies:
+      - postcss
+      - supports-color
+
+  lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1):
+    dependencies:
+      '@reduxjs/toolkit': 2.5.0(react-redux@9.1.2(@types/react@19.0.0)(react@19.1.0)(redux@5.0.1))(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-redux: 9.1.2(@types/react@19.0.0)(react@19.1.0)(redux@5.0.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - redux
+
+  lockwright-utils-avatar-initials@https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/4b143620f2047f51296f36f34289e39a83e4c6cb: {}
+
+  lockwright-utils-date@https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/f95507d089126b27561a584147ebcb38852cfe58: {}
+
+  lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a: {}
+
+  lockwright-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/3fb28bee9328290a12119feaaf912d1018fcf6f8: {}
+
+  lockwright-utils-password-generator@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/382806f37823902b41087200c6d96bd83f3d3358: {}
+
+  lockwright-utils-pattern-search@https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/37021914926a45d3f1ed1fd9c817db3ade370f25: {}
+
+  lockwright-utils-qr@https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/1d824382bc5ed15c966e4cea824ad44517944e1b:
+    dependencies:
+      qrcode: 1.5.4
+
+  lockwright-utils-validator@https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/c9fc16de463fbc78df9bb1f3aa3f588a8ae06bf9(patch_hash=2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6): {}
+
   lodash.debounce@4.0.8: {}
 
   lodash.merge@4.6.2: {}
@@ -10445,27 +10466,6 @@ snapshots:
   path-type@4.0.0: {}
 
   pathe@1.1.2: {}
-
-  pear-apps-lib-ui-react-hooks@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/8273bf9e248bbdaacbfb0b7a16d5b63687990481(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-
-  pear-apps-utils-avatar-initials@https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/986772c039e88e519ca9da93837df3223a6f335e: {}
-
-  pear-apps-utils-date@https://codeload.github.com/Dexterity-Works/lockwright-utils-date/tar.gz/28242e47629c327ae4c6687f6a883408917fa024: {}
-
-  pear-apps-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/a2a927374b353f26c05beda7f1052e4e1322027f: {}
-
-  pear-apps-utils-pattern-search@https://codeload.github.com/Dexterity-Works/lockwright-utils-pattern-search/tar.gz/0e593f8fcee9680342e7b4fa4be6a861a5c48f45: {}
-
-  pear-apps-utils-qr@https://codeload.github.com/Dexterity-Works/lockwright-utils-qr/tar.gz/0c3f32b3b3e9732aff190c5c7b60ed0f5beb02a7:
-    dependencies:
-      qrcode: 1.5.4
-
-  pearpass-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/a549e2b4c486e5f57eb28acd47652ea38154d9c8: {}
-
-  pearpass-utils-password-generator@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/ce69cd540a232550de361752d04450f0e600ca8a: {}
 
   picocolors@1.1.1: {}
 

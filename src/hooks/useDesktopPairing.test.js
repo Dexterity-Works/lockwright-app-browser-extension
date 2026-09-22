@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { useUserData, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useUserData, useVaults } from 'lockwright-lib-vault'
 
 import { useDesktopPairing, PAIRING_STEP } from './useDesktopPairing.js'
 import { AUTH_ERROR_PATTERNS } from '../shared/constants/auth'
@@ -7,7 +7,7 @@ import { useToast } from '../shared/context/ToastContext'
 import { secureChannelMessages } from '../shared/services/messageBridge'
 import { pendingPairingStore } from '../shared/services/pendingPairingStore'
 
-jest.mock('@tetherto/pearpass-lib-vault')
+jest.mock('lockwright-lib-vault')
 jest.mock('../shared/context/ToastContext')
 jest.mock('../shared/services/messageBridge')
 jest.mock('../shared/services/pendingPairingStore', () => ({

@@ -6,8 +6,8 @@ import {
   InputField,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import { ContentPaste } from 'lockwright-lib-ui-react-native-components/icons'
 
 export type ShareLinkEntryContentProps = {
   shareLink: string

@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { useRecords } from '@tetherto/pearpass-lib-vault'
+import { useRecords } from 'lockwright-lib-vault'
 
 import { useFilteredRecords } from './useFilteredRecords'
 import { URI_MATCH_TYPES } from '../../shared/constants/uriMatch'
@@ -10,7 +10,7 @@ import {
   setUriMatchOverrides
 } from '../../shared/utils/uriMatchSetting'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useRecords: jest.fn()
 }))
 

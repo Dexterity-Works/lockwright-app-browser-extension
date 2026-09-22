@@ -32,7 +32,7 @@ export default defineConfig({
     ]
   },
   optimizeDeps: {
-    exclude: ['@tetherto/pearpass-lib-ui-kit', 'react-strict-dom'],
+    exclude: ['lockwright-lib-ui-react-native-components', 'react-strict-dom'],
   },
   ssr: {
     noExternal: ['react-strict-dom']

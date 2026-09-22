@@ -2,10 +2,15 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { Button, Dialog, Form, InputField } from '@tetherto/pearpass-lib-ui-kit'
-import { useCreateFolder, useFolders } from '@tetherto/pearpass-lib-vault'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
+import {
+  Button,
+  Dialog,
+  Form,
+  InputField
+} from 'lockwright-lib-ui-react-native-components'
+import { useCreateFolder, useFolders } from 'lockwright-lib-vault'
 
 import { useLoadingContext } from '../../context/LoadingContext'
 import { logger } from '../../utils/logger'

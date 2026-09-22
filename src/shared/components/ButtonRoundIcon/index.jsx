@@ -1,6 +1,6 @@
 import React, { createElement } from 'react'
 
-import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { useTheme } from 'lockwright-lib-ui-react-native-components'
 
 /**
  * @param {Object} props - Component props.

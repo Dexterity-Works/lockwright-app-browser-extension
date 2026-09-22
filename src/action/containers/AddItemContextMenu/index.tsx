@@ -1,14 +1,14 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
 import {
   ContextMenu,
   NavbarListItem,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Key, QrCode } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components'
+import { Key, QrCode } from 'lockwright-lib-ui-react-native-components/icons'
+import { RECORD_TYPES } from 'lockwright-lib-vault'
 
 import { useRecordMenuItems } from '../../../shared/hooks/useRecordMenuItems'
 import { useCreateOrEditRecord } from '../../hooks/useCreateOrEditRecord'

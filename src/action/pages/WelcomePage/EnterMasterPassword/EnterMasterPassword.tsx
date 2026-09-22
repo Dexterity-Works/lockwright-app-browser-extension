@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useUserData, useVault, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useUserData, useVault, useVaults } from 'lockwright-lib-vault'
 
 import { MasterPasswordPrompt } from '../../../containers/MasterPasswordPrompt/MasterPasswordPrompt'
 import { useVaultOpenedRedirect } from '../../../app/hooks/useVaultOpenedRedirect'

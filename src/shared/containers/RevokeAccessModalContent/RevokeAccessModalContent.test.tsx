@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { kickDevice, useVault } from '@tetherto/pearpass-lib-vault'
+import { kickDevice, useVault } from 'lockwright-lib-vault'
 
 import { RevokeAccessModalContent } from './index'
 import { useModal } from '../../context/ModalContext'
 import { useToast } from '../../context/ToastContext'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   kickDevice: jest.fn(),
   useVault: jest.fn()
 }))
@@ -22,7 +22,7 @@ jest.mock('../../utils/logger', () => ({
   logger: { error: jest.fn() }
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+jest.mock('lockwright-lib-ui-react-native-components', () => {
   const liftTestID = ({ testID, ...rest }: any) =>
     testID ? { ...rest, 'data-testid': testID } : rest
   return {

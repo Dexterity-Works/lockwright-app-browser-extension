@@ -1,5 +1,10 @@
 import { t } from '@lingui/core/macro'
-import { Button, Dialog, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Dialog,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { useModal } from '../../context/ModalContext'
 

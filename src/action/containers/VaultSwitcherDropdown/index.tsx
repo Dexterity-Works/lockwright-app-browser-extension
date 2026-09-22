@@ -1,13 +1,13 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Pressable } from '@tetherto/pearpass-lib-ui-kit/components/Pressable'
+import { Text, useTheme } from 'lockwright-lib-ui-react-native-components'
+import { Pressable } from 'lockwright-lib-ui-react-native-components/components/Pressable'
 import {
   LockFilled,
   UnfoldMoreOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import type { Vault } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components/icons'
+import type { Vault } from 'lockwright-lib-vault'
 
 type VaultSwitcherDropdownProps = {
   vaults: Vault[]

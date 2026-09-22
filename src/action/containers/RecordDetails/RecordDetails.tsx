@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
+import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
 import {
   Button,
   ContextMenu,
@@ -9,7 +9,7 @@ import {
   NavbarListItem,
   rawTokens,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   ArrowBackOutined,
   ContentPaste,
@@ -19,9 +19,9 @@ import {
   StarBorder,
   StarFilled,
   TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 // @ts-expect-error - declaration file is incomplete
-import { useRecordById } from '@tetherto/pearpass-lib-vault'
+import { useRecordById } from 'lockwright-lib-vault'
 
 import { RecordAvatar } from '../../../shared/components/RecordAvatar'
 import { RECORD_COLOR_BY_TYPE } from '../../../shared/constants/recordColorByType'

@@ -1,9 +1,13 @@
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { PageHeader, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { WatchLater } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useUserData } from '@tetherto/pearpass-lib-vault'
+import { useCountDown } from 'lockwright-lib-ui-react-hooks'
+import {
+  PageHeader,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import { WatchLater } from 'lockwright-lib-ui-react-native-components/icons'
+import { useUserData } from 'lockwright-lib-vault'
 
 import { NAVIGATION_ROUTES } from '../../../../shared/constants/navigation'
 import { useRouter } from '../../../../shared/context/RouterContext'

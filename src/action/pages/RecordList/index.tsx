@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
+import { useTheme } from 'lockwright-lib-ui-react-native-components'
+import { useFolders, useRecords } from 'lockwright-lib-vault'
 
 import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
 import { EmptyResultsView } from '../../containers/EmptyResultsView'

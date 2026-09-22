@@ -2,20 +2,16 @@ import type { ChangeEvent } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
-import {
-  useCreateVault,
-  useVault,
-  type Vault
-} from '@tetherto/pearpass-lib-vault'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
+import { useCreateVault, useVault, type Vault } from 'lockwright-lib-vault'
 import {
   AlertMessage,
   Button,
   Dialog,
   Form,
   InputField
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 
 import { useLoadingContext } from '../../context/LoadingContext'
 import { useRouter } from '../../context/RouterContext'

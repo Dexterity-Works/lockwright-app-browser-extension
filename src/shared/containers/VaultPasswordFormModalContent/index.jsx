@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
 
 import { ButtonPrimary } from '../../components/ButtonPrimary'
 import { FormModalHeaderWrapper } from '../../components/FormModalHeaderWrapper'

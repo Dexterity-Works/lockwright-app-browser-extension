@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { Button, SearchField, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  SearchField,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 import {
   Add,
   ImportOutlined,
   MenuOpen
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { createStyles } from './AppHeader.styles'
 

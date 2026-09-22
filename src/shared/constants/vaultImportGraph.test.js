@@ -2,8 +2,8 @@ import { readdirSync, readFileSync } from 'fs'
 import { createRequire } from 'module'
 import path from 'path'
 
-import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
-import { matchPatternToValue } from '@tetherto/pear-apps-utils-pattern-search'
+import { generateUniqueId } from 'lockwright-utils-generate-unique-id'
+import { matchPatternToValue } from 'lockwright-utils-pattern-search'
 
 const require = createRequire(__filename)
 
@@ -19,7 +19,7 @@ const vaultSrcFiles = (root) => {
 describe('vault import graph', () => {
   it('resolves every @tetherto import from installed vault source', () => {
     const vaultRoot = path.dirname(
-      require.resolve('@tetherto/pearpass-lib-vault/package.json')
+      require.resolve('lockwright-lib-vault/package.json')
     )
     const fromVault = createRequire(
       path.join(vaultRoot, 'src/api/broadcastAction.js')

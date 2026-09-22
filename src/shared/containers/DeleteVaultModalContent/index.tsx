@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
 import {
   AlertMessage,
   Button,
@@ -12,7 +12,7 @@ import {
   PasswordField,
   Text,
   ToggleSwitch
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   broadcastDeleteVault,
   useCreateVault,
@@ -20,7 +20,7 @@ import {
   useVault,
   useVaults,
   type Vault
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 
 import { useModal } from '../../context/ModalContext'
 import { useRouter } from '../../context/RouterContext'

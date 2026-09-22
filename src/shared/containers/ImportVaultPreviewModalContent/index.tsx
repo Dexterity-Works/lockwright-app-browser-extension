@@ -8,9 +8,12 @@ import {
   Text,
   rawTokens,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { ExpandMore, LockOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components'
+import {
+  ExpandMore,
+  LockOutlined
+} from 'lockwright-lib-ui-react-native-components/icons'
+import { useRecords, useVault } from 'lockwright-lib-vault'
 
 import { useGlobalLoading } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'

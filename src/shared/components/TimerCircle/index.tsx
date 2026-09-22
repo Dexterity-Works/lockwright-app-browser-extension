@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useTimerAnimation } from '@tetherto/pearpass-lib-vault'
+import { useTimerAnimation } from 'lockwright-lib-vault'
 
 import { getTimerColor } from '../../utils/otp'
 

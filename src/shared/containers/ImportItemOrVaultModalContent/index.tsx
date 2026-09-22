@@ -14,9 +14,9 @@ import {
   InputField,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components'
+import { ContentPaste } from 'lockwright-lib-ui-react-native-components/icons'
+import { usePair, useVault } from 'lockwright-lib-vault'
 
 import { ImportVaultPreviewModalContent } from '../ImportVaultPreviewModalContent'
 import { useGlobalLoading } from '../../context/LoadingContext'

@@ -8,7 +8,7 @@ import {
   InputField,
   Panel,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import { ONBOARDING_ICON_SIZE } from './constants'
 import { SyncingFailedModal } from './SyncingFailedModal'
 import {
@@ -20,7 +20,7 @@ import {
   ContentPaste,
   Settings,
   SwapVert
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 import { LockwrightMark } from '../shared/components/LockwrightMark'
 import { isAndroidOs } from '../shared/utils/isAndroidOs'
 

@@ -1,6 +1,6 @@
 import { initCurrentDeviceName } from './initCurrentDeviceName'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   setCurrentDeviceName: jest.fn()
 }))
 
@@ -14,7 +14,7 @@ jest.mock('../services/messageBridge', () => ({
   }
 }))
 
-const { setCurrentDeviceName } = require('@tetherto/pearpass-lib-vault')
+const { setCurrentDeviceName } = require('lockwright-lib-vault')
 
 const { logger } = require('./logger')
 const { platformMessages } = require('../services/messageBridge')

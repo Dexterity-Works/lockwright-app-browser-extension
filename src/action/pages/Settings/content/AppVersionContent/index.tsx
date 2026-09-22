@@ -4,8 +4,13 @@ import {
   PEARPASS_WEBSITE,
   PRIVACY_POLICY,
   TERMS_OF_USE
-} from '@tetherto/pearpass-lib-constants'
-import { Link, PageHeader, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-constants'
+import {
+  Link,
+  PageHeader,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { getExtensionDisplayVersion } from '../../../../../shared/utils/appDisplayVersion'
 

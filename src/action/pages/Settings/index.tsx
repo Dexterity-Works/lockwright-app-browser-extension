@@ -7,7 +7,7 @@ import {
   NavbarListItem,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   ArrowBackOutined,
   BugReportFilled,
@@ -21,7 +21,7 @@ import {
   SettingsApplicationsFilled,
   SystemSecurityUpdateFilled,
   Translate
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import {
   AppPreferencesContent,

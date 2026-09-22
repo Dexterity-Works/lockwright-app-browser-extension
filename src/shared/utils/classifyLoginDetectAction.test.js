@@ -1,6 +1,6 @@
 import { classifyLoginDetectAction } from './classifyLoginDetectAction'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   RECORD_TYPES: { LOGIN: 'login' }
 }))
 

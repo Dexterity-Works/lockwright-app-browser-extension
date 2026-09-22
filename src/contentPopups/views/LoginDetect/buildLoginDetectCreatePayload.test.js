@@ -1,8 +1,8 @@
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from 'lockwright-lib-vault'
 
 import { buildLoginDetectCreatePayload } from './buildLoginDetectCreatePayload'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   RECORD_TYPES: { LOGIN: 'login' }
 }))
 

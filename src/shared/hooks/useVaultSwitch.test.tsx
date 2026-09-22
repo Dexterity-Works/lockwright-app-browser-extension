@@ -1,7 +1,7 @@
 import { isValidElement } from 'react'
 
 import { act, renderHook } from '@testing-library/react'
-import { useVault, type Vault } from '@tetherto/pearpass-lib-vault'
+import { useVault, type Vault } from 'lockwright-lib-vault'
 
 import { VaultPasswordFormModalContent } from '../containers/VaultPasswordFormModalContent'
 import { useLoadingContext } from '../context/LoadingContext'
@@ -11,7 +11,7 @@ import { logger } from '../utils/logger'
 
 import { useVaultSwitch } from './useVaultSwitch'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useVault: jest.fn()
 }))
 

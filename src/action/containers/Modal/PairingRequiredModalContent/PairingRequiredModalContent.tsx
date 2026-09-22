@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from 'react'
 
 import { Trans } from '@lingui/react/macro'
-import { Title, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Title,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { useDesktopPairing } from '../../../../hooks/useDesktopPairing'
 import { queryActiveTab, queryTabsByUrl } from '../../../../shared/utils/tabs'

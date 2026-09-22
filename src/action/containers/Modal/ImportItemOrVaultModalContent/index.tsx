@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { usePair, useRecords, useVault } from '@tetherto/pearpass-lib-vault'
-import { Button, Dialog } from '@tetherto/pearpass-lib-ui-kit'
+import { usePair, useRecords, useVault } from 'lockwright-lib-vault'
+import { Button, Dialog } from 'lockwright-lib-ui-react-native-components'
 
 import { useAutoLockPreferences } from '../../../../hooks/useAutoLockPreferences'
 import { useGlobalLoading } from '../../../../shared/context/LoadingContext'

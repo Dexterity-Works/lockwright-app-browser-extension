@@ -42,7 +42,7 @@ jest.mock('../../hooks/useVaultSwitch', () => ({
   useVaultSwitch: () => ({ switchVault: mockSwitchVault })
 }))
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useVaults: jest.fn(),
   useVault: jest.fn(),
   useInvite: jest.fn()
@@ -72,7 +72,7 @@ jest.mock('@lingui/core/macro', () => ({
     typeof strings === 'string' ? strings : strings[0]
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   Add: () => <span data-testid="icon-add" />,
   EditOutlined: () => <span data-testid="icon-edit" />,
   LockFilled: () => <span data-testid="icon-lock" />,
@@ -80,7 +80,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   PersonAddAlt: () => <span data-testid="icon-person-add" />
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   useTheme: () => ({
     theme: {
       colors: {
@@ -156,7 +156,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>
 }))
 
-import { useInvite, useVault, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useInvite, useVault, useVaults } from 'lockwright-lib-vault'
 
 const mockUseVaults = useVaults as jest.Mock
 const mockUseVault = useVault as jest.Mock

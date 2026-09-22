@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { CLIPBOARD_CLEAR_TIMEOUT } from '@tetherto/pearpass-lib-constants'
-import { Check } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { CLIPBOARD_CLEAR_TIMEOUT } from 'lockwright-lib-constants'
+import { Check } from 'lockwright-lib-ui-react-native-components/icons'
 
 import { MESSAGES } from '../../background/constants'
 import { LOCAL_STORAGE_KEYS } from '../constants/storage'

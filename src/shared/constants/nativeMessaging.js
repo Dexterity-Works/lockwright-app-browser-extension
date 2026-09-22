@@ -1,4 +1,4 @@
-import { MANIFEST_NAME, MS_PER_SECOND } from '@tetherto/pearpass-lib-constants'
+import { MANIFEST_NAME, MS_PER_SECOND } from 'lockwright-lib-constants'
 
 /**
  * Error codes used throughout the application

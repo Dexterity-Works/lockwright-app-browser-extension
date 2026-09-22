@@ -1,14 +1,14 @@
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
 import {
   Button,
   Form,
   InputField,
   PasswordField,
   Text
-} from '@tetherto/pearpass-lib-ui-kit'
-import { RECORD_TYPES, useCreateRecord } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components'
+import { RECORD_TYPES, useCreateRecord } from 'lockwright-lib-vault'
 
 import { CONTENT_MESSAGE_TYPES } from '../../../shared/constants/nativeMessaging'
 import { useGlobalLoading } from '../../../shared/context/LoadingContext'

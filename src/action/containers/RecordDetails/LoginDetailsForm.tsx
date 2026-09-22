@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { isBefore, subtractDateUnits } from '@tetherto/pear-apps-utils-date'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { isBefore, subtractDateUnits } from 'lockwright-utils-date'
 import {
   AlertMessage,
   Button,
@@ -11,8 +11,11 @@ import {
   PasswordField,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { ContentCopy, OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
+import {
+  ContentCopy,
+  OpenInNew
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import {
   URI_MATCH_TYPES,

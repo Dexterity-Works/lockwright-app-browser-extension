@@ -1,5 +1,9 @@
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  Button,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import { Close } from 'lockwright-lib-ui-react-native-components/icons'
 import { LockwrightMark } from '../../../shared/components/LockwrightMark'
 
 type PasskeyPopupHeaderProps = {

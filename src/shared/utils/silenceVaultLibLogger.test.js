@@ -1,6 +1,6 @@
-import { initializeUser } from '@tetherto/pearpass-lib-vault/src/actions/initializeUser'
-import userReducer from '@tetherto/pearpass-lib-vault/src/slices/userSlice'
-import { Logger } from '@tetherto/pearpass-lib-vault/src/utils/logger.js'
+import { initializeUser } from 'lockwright-lib-vault/src/actions/initializeUser'
+import userReducer from 'lockwright-lib-vault/src/slices/userSlice'
+import { Logger } from 'lockwright-lib-vault/src/utils/logger.js'
 
 import { logger } from './logger'
 import { silenceVaultLibLogger } from './silenceVaultLibLogger'

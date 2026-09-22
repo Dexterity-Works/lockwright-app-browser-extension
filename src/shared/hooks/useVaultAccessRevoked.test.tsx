@@ -1,10 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
-import {
-  useCreateVault,
-  useVault,
-  useVaults
-} from '@tetherto/pearpass-lib-vault'
-import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
+import { useCreateVault, useVault, useVaults } from 'lockwright-lib-vault'
+import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { useVaultAccessRevoked } from './useVaultAccessRevoked'
 import { useVaultSwitch } from './useVaultSwitch'
@@ -12,13 +8,13 @@ import { useModal } from '../context/ModalContext'
 import { useRouter } from '../context/RouterContext'
 import { useToast } from '../context/ToastContext'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useCreateVault: jest.fn(),
   useVault: jest.fn(),
   useVaults: jest.fn()
 }))
 
-jest.mock('@tetherto/pearpass-lib-vault/src/instances', () => ({
+jest.mock('lockwright-lib-vault/src/instances', () => ({
   pearpassVaultClient: {
     on: jest.fn(),
     off: jest.fn()

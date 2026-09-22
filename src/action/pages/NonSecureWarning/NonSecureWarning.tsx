@@ -1,6 +1,11 @@
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { Button, Dialog, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Dialog,
+  Text,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
 
 import { useAllowHttpEnabled } from '../../../shared/hooks/useAllowHttpEnabled'
 

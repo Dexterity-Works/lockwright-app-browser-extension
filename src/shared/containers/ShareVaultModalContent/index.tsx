@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
+import { useCountDown } from 'lockwright-lib-ui-react-hooks'
+import { generateQRCodeSVG } from 'lockwright-utils-qr'
 import {
   AlertMessage,
   Button,
@@ -10,9 +10,9 @@ import {
   RingSpinner,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useInvite, useVault } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components'
+import { ContentCopy } from 'lockwright-lib-ui-react-native-components/icons'
+import { useInvite, useVault } from 'lockwright-lib-vault'
 
 import { createStyles } from './ShareVaultModalContent.styles'
 import { useModal } from '../../context/ModalContext'

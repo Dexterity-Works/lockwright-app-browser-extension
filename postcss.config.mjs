@@ -12,13 +12,13 @@ const require = createRequire(import.meta.url)
 function getReactStrictDomResolvePaths() {
   const paths = [
     __dirname,
-    path.resolve(__dirname, 'node_modules/@tetherto/pearpass-lib-ui-kit/node_modules'),
+    path.resolve(__dirname, 'node_modules/lockwright-lib-ui-react-native-components/node_modules'),
     path.resolve(__dirname, 'node_modules/.pnpm/node_modules')
   ]
 
   try {
     const kitReal = fs.realpathSync(
-      path.resolve(__dirname, 'node_modules/@tetherto/pearpass-lib-ui-kit')
+      path.resolve(__dirname, 'node_modules/lockwright-lib-ui-react-native-components')
     )
     paths.push(path.resolve(kitReal, '../..'))
   } catch {
@@ -39,7 +39,7 @@ const rsdPostcssPlugin = require(
 // which drops all StyleX rules from the bundle (dark-on-dark / unstyled kit UI).
 const styleSources = [
   'src/**/*.{js,jsx,mjs,ts,tsx}',
-  'node_modules/@tetherto/pearpass-lib-ui-kit/**/*.{js,jsx,mjs,ts,tsx}'
+  'node_modules/lockwright-lib-ui-react-native-components/**/*.{js,jsx,mjs,ts,tsx}'
 ]
 
 export default {

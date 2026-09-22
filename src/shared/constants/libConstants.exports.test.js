@@ -1,4 +1,4 @@
-import { CLIPBOARD_CLEAR_TIMEOUT } from '@tetherto/pearpass-lib-constants'
+import { CLIPBOARD_CLEAR_TIMEOUT } from 'lockwright-lib-constants'
 
 describe('pearpass-lib-constants exports the extension needs', () => {
   it('exports CLIPBOARD_CLEAR_TIMEOUT', () => {

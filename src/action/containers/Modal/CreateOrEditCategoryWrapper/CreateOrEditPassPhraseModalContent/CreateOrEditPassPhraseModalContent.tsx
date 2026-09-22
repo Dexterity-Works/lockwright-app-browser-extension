@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { VALID_WORD_COUNTS } from '@tetherto/pearpass-lib-constants'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
+import { VALID_WORD_COUNTS } from 'lockwright-lib-constants'
 import {
   Button,
   Dialog,
@@ -11,13 +11,12 @@ import {
   PasswordField,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components'
 import {
-  RECORD_TYPES,
-  useCreateRecord,
-  useRecords
-} from '@tetherto/pearpass-lib-vault'
+  Add,
+  TrashOutlined
+} from 'lockwright-lib-ui-react-native-components/icons'
+import { RECORD_TYPES, useCreateRecord, useRecords } from 'lockwright-lib-vault'
 
 import { FolderDropdown } from '../../../FolderDropdown'
 import { PassPhrase } from '../../../../../shared/containers/PassPhrase/PassPhrase'

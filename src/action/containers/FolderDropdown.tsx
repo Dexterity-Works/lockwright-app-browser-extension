@@ -8,14 +8,14 @@ import {
   SelectField,
   rawTokens,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   Close,
   CreateNewFolder,
   Folder,
   KeyboardArrowBottom
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useFolders } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components/icons'
+import { useFolders } from 'lockwright-lib-vault'
 
 import { CreateFolderModalContent } from '../../shared/containers/CreateFolderModalContent'
 import { useModal } from '../../shared/context/ModalContext'

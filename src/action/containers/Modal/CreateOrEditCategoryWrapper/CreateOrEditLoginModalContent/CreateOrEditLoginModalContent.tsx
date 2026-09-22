@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { useForm } from 'lockwright-lib-ui-react-hooks'
+import { Validator } from 'lockwright-utils-validator'
+import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
 import {
   Button,
   ContextMenu,
@@ -17,8 +17,8 @@ import {
   Text,
   rawTokens,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
+} from 'lockwright-lib-ui-react-native-components'
+import { checkPasswordStrength } from 'lockwright-utils-password-check'
 import {
   Add,
   ArrowBackOutined,
@@ -26,12 +26,8 @@ import {
   KeyboardArrowBottom,
   SyncLock,
   TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import {
-  RECORD_TYPES,
-  useCreateRecord,
-  useRecords
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components/icons'
+import { RECORD_TYPES, useCreateRecord, useRecords } from 'lockwright-lib-vault'
 
 import { FolderDropdown } from '../../../FolderDropdown'
 import {

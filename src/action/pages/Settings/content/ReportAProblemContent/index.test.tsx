@@ -13,11 +13,11 @@ Object.assign(globalThis, {
   }
 })
 
-jest.mock('@tetherto/pearpass-lib-constants', () => ({
+jest.mock('lockwright-lib-constants', () => ({
   PEARPASS_WEBSITE: 'https://lockwright.dexterity.works'
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   __esModule: true,
   PageHeader: ({
     title,
@@ -47,7 +47,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   )
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   __esModule: true,
   Send: () => <span data-testid="icon-send" />
 }))

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { useOtpWatch } from '@tetherto/pearpass-lib-vault'
+import { useOtpWatch } from 'lockwright-lib-vault'
 
 jest.mock('@lingui/core/macro', () => ({
   t: (strings: TemplateStringsArray | string, ...values: unknown[]) =>
@@ -14,7 +14,7 @@ jest.mock('@lingui/core/macro', () => ({
       : strings
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+jest.mock('lockwright-lib-ui-react-native-components', () => {
   const { createElement } = require('react')
   const passthrough =
     (tag: string) =>
@@ -34,7 +34,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
   }
 })
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   Add: () => null,
   CalendarToday: () => null,
   Check: () => null,
@@ -44,7 +44,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   SortByAlpha: () => null
 }))
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useRecords: () => ({
     data: [],
     updateFavoriteState: jest.fn()

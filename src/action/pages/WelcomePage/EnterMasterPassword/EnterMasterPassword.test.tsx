@@ -2,7 +2,7 @@ import React from 'react'
 
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { useUserData, useVault, useVaults } from '@tetherto/pearpass-lib-vault'
+import { useUserData, useVault, useVaults } from 'lockwright-lib-vault'
 
 import { EnterMasterPassword } from './EnterMasterPassword'
 import { AUTH_ERROR_PATTERNS } from '../../../../shared/constants/auth'
@@ -20,7 +20,7 @@ jest.mock('@lingui/core/macro', () => ({
       : strings
 }))
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useUserData: jest.fn(),
   useVault: jest.fn(),
   useVaults: jest.fn()

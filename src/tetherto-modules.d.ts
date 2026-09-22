@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- ambient stubs for untyped JS packages */
 // Untyped JS dependencies — keeps strict TS files importable project-wide
-declare module '@tetherto/pear-apps-lib-ui-react-hooks'
-declare module '@tetherto/pear-apps-utils-validator'
-declare module '@tetherto/pear-apps-utils-avatar-initials' {
+declare module 'lockwright-lib-ui-react-hooks'
+declare module 'lockwright-utils-validator'
+declare module 'lockwright-utils-avatar-initials' {
   export function generateAvatarInitials(text?: string): string
 }
-declare module '@tetherto/pear-apps-utils-date'
-declare module '@tetherto/pearpass-lib-constants' {
+declare module 'lockwright-utils-date'
+declare module 'lockwright-lib-constants' {
   export const UNSUPPORTED: boolean
   export const EXTENSION_DESIGN_VERSION: number
   export const AUTHENTICATOR_ENABLED: boolean
@@ -30,13 +30,13 @@ declare module '@tetherto/pearpass-lib-constants' {
   export const VALID_WORD_COUNTS: number[]
   export const DEFAULT_SELECTED_TYPE: number
 }
-declare module '@tetherto/pear-apps-utils-qr' {
+declare module 'lockwright-utils-qr' {
   export function generateQRCodeSVG(
     data: string,
     options?: { type?: string; margin?: number }
   ): Promise<string>
 }
-declare module '@tetherto/pearpass-lib-vault' {
+declare module 'lockwright-lib-vault' {
   export interface VaultDevice {
     id?: string
     name?: string
@@ -333,7 +333,7 @@ declare module '@tetherto/pearpass-lib-vault' {
   export function getMyDeviceId(): Promise<string | null>
 }
 
-declare module '@tetherto/pearpass-lib-vault/src/instances' {
+declare module 'lockwright-lib-vault/src/instances' {
   export const pearpassVaultClient: {
     on?: (event: string, handler: (...args: any[]) => void) => void
     off?: (event: string, handler: (...args: any[]) => void) => void
@@ -348,7 +348,7 @@ declare module '@tetherto/pearpass-lib-vault/src/instances' {
   }
 }
 
-declare module '@tetherto/pearpass-lib-constants' {
+declare module 'lockwright-lib-constants' {
   export const UNSUPPORTED: boolean
   export const EXTENSION_DESIGN_VERSION: number
   export const AUTHENTICATOR_ENABLED: boolean
@@ -366,7 +366,7 @@ declare module '@tetherto/pearpass-lib-constants' {
   export const PASSPHRASE_TYPE_OPTIONS: unknown
 }
 
-declare module '@tetherto/pearpass-utils-password-generator' {
+declare module 'lockwright-utils-password-generator' {
   export function generatePassphrase(
     capitalLetters: boolean,
     symbols: boolean,
@@ -385,7 +385,7 @@ declare module '@tetherto/pearpass-utils-password-generator' {
   ): string
 }
 
-declare module '@tetherto/pearpass-utils-password-check' {
+declare module 'lockwright-utils-password-check' {
   export const PASSWORD_STRENGTH: {
     WEAK: string
     VULNERABLE: string

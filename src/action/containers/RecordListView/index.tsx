@@ -2,14 +2,14 @@ import type { MouseEvent } from 'react'
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { ListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Pressable } from '@tetherto/pearpass-lib-ui-kit/components/Pressable'
+import { ListItem, useTheme } from 'lockwright-lib-ui-react-native-components'
+import { Pressable } from 'lockwright-lib-ui-react-native-components/components/Pressable'
 import {
   ErrorFilled,
   ExpandMore,
   PublicOutlined,
   StarFilled
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { createStyles } from './RecordListView.styles'
 import { RecordRowContextMenu } from './RecordRowContextMenu'

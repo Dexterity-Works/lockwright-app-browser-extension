@@ -1,6 +1,6 @@
 /**
  * Inline SVG nodes for the content-script password strength pill. Paths match
- * `@tetherto/pearpass-lib-ui-kit` `dist/icons/components` (no React / innerHTML).
+ * `lockwright-lib-ui-react-native-components` `dist/icons/components` (no React / innerHTML).
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg'

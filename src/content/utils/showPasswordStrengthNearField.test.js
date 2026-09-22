@@ -4,14 +4,14 @@ import path from 'path'
 import {
   checkPasswordStrength,
   PASSWORD_STRENGTH
-} from '@tetherto/pearpass-utils-password-check'
+} from 'lockwright-utils-password-check'
 
 import { showPasswordStrengthNearField } from './showPasswordStrengthNearField'
 
 jest.mock('./contentI18n.js', () => ({}))
 
-jest.mock('@tetherto/pearpass-utils-password-check', () => {
-  const actual = jest.requireActual('@tetherto/pearpass-utils-password-check')
+jest.mock('lockwright-utils-password-check', () => {
+  const actual = jest.requireActual('lockwright-utils-password-check')
   return {
     ...actual,
     checkPasswordStrength: jest.fn()

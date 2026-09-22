@@ -3,7 +3,7 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   __esModule: true,
   Dialog: ({
     title,
@@ -126,7 +126,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   __esModule: true,
   ContentPaste: () => <span data-testid="icon-content-paste" />,
   ExpandMore: () => <span data-testid="icon-expand-more" />,
@@ -154,7 +154,7 @@ let mockRecordsData: Array<{
 }> = []
 let mockIsPairing = false
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   __esModule: true,
   useVault: () => ({
     data: mockVaultData,

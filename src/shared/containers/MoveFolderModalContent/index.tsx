@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
+import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
 import {
   AlertMessage,
   Button,
   Dialog,
   Text,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Folder } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-ui-react-native-components'
+import { Folder } from 'lockwright-lib-ui-react-native-components/icons'
+import { useFolders, useRecords } from 'lockwright-lib-vault'
 
 import { RecordAvatar } from '../../components/RecordAvatar'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'

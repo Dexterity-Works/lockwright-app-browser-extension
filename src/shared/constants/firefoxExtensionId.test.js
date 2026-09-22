@@ -5,7 +5,7 @@ import {
   FIREFOX_EXTENSION_ID,
   FIREFOX_NIGHTLY_EXTENSION_ID,
   MANIFEST_NAME
-} from '@tetherto/pearpass-lib-constants'
+} from 'lockwright-lib-constants'
 
 // Firefox requires the extension ID in browser_specific_settings.gecko.id to
 // match allowed_extensions in the native messaging host manifest (written by
@@ -102,10 +102,10 @@ describe('Firefox extension ID', () => {
       readFileSync(path.resolve(__dirname, '../../../package.json'), 'utf8')
     )
     const pins = {
-      '@tetherto/pearpass-lib-constants': 'lockwright-lib-constants',
-      '@tetherto/pearpass-lib-ui-kit':
+      'lockwright-lib-constants': 'lockwright-lib-constants',
+      'lockwright-lib-ui-react-native-components':
         'lockwright-lib-ui-react-native-components',
-      '@tetherto/pearpass-lib-vault': 'lockwright-lib-vault'
+      'lockwright-lib-vault': 'lockwright-lib-vault'
     }
 
     for (const [name, repo] of Object.entries(pins)) {

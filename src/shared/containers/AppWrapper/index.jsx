@@ -1,11 +1,8 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import { ThemeProvider as UIKitThemeProvider } from '@tetherto/pearpass-lib-ui-kit'
-import {
-  setPearpassVaultClient,
-  VaultProvider
-} from '@tetherto/pearpass-lib-vault'
-import { logger as vaultLibLogger } from '@tetherto/pearpass-lib-vault/src/utils/logger.js'
+import { ThemeProvider as UIKitThemeProvider } from 'lockwright-lib-ui-react-native-components'
+import { setPearpassVaultClient, VaultProvider } from 'lockwright-lib-vault'
+import { logger as vaultLibLogger } from 'lockwright-lib-vault/src/utils/logger.js'
 
 import { messages } from '../../../locales/en/messages.mjs'
 import { PearpassVaultClient } from '../../../vaultClient'

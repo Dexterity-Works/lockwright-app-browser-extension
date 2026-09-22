@@ -22,12 +22,12 @@ jest.mock('@lingui/react/macro', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }))
 
-jest.mock('@tetherto/pearpass-utils-password-generator', () => ({
+jest.mock('lockwright-utils-password-generator', () => ({
   generatePassword: () => 'SUGGESTED_PASSWORD_24___'
 }))
 
 const mockRefetchVault = jest.fn()
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   useVault: () => ({ refetch: mockRefetchVault })
 }))
 
@@ -56,7 +56,7 @@ jest.mock('../../iframeApi/closeIframe', () => ({
   closeIframe: jest.fn()
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
   useTheme: () => ({
     theme: {
       colors: {
@@ -70,7 +70,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   )
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
   Close: () => <span data-testid="close-icon" />,
   Key: () => <span data-testid="key-icon" />,
   SyncLock: () => <span data-testid="sync-icon" />

@@ -8,14 +8,14 @@ import {
   ContextMenu,
   NavbarListItem,
   useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+} from 'lockwright-lib-ui-react-native-components'
 import {
   CalendarToday,
   Check,
   Checklist,
   FilterList,
   SortByAlpha
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { createStyles, SORT_MENU_WIDTH } from './MainViewHeader.styles'
 import { useRouter } from '../../../shared/context/RouterContext'

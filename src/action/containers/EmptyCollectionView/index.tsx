@@ -1,8 +1,16 @@
 import { useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { Button, Text, Title, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Add, ImportExport } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  Button,
+  Text,
+  Title,
+  useTheme
+} from 'lockwright-lib-ui-react-native-components'
+import {
+  Add,
+  ImportExport
+} from 'lockwright-lib-ui-react-native-components/icons'
 
 import { createStyles } from './EmptyCollectionView.styles'
 import { useAppHeaderContext } from '../../../shared/context/AppHeaderContext'

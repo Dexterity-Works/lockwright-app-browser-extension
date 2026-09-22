@@ -1,5 +1,5 @@
 // @ts-expect-error - JS hook is JSDoc-typed
-import { useRecordById } from '@tetherto/pearpass-lib-vault'
+import { useRecordById } from 'lockwright-lib-vault'
 
 import { CreateOrEditCategoryWrapper } from '../../../action/containers/Modal/CreateOrEditCategoryWrapper'
 import { CONTENT_MESSAGE_TYPES } from '../../constants/nativeMessaging'

@@ -5,7 +5,7 @@ import {
   useUserData,
   useVault,
   useVaults
-} from '@tetherto/pearpass-lib-vault'
+} from 'lockwright-lib-vault'
 
 import { DeleteVaultModalContent } from './index'
 import { useModal } from '../../context/ModalContext'
@@ -13,7 +13,7 @@ import { useRouter } from '../../context/RouterContext'
 import { useToast } from '../../context/ToastContext'
 import { useVaultSwitch } from '../../hooks/useVaultSwitch'
 
-jest.mock('@tetherto/pearpass-lib-vault', () => ({
+jest.mock('lockwright-lib-vault', () => ({
   broadcastDeleteVault: jest.fn(),
   useCreateVault: jest.fn(),
   useUserData: jest.fn(),
@@ -45,7 +45,7 @@ jest.mock('../../utils/logger', () => ({
   logger: { error: jest.fn() }
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+jest.mock('lockwright-lib-ui-react-native-components', () => {
   const liftTestID = ({ testID, ...rest }: any) =>
     testID ? { ...rest, 'data-testid': testID } : rest
   return {
