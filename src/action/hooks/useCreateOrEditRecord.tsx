@@ -35,6 +35,8 @@ export type CreateOrEditRecordOptions = {
   setValue?: (value: string) => void
   /** Non-empty entry title to stamp on history when password is used. */
   contextLabel?: string
+  /** Site and entry labels stamped together when the password is used. */
+  uses?: Array<{ contextLabel: string; contextKind: 'site' | 'entry' }>
 }
 
 export const useCreateOrEditRecord = () => {
@@ -51,7 +53,8 @@ export const useCreateOrEditRecord = () => {
       mode,
       onSaved,
       setValue,
-      contextLabel
+      contextLabel,
+      uses
     } = options
 
     if (recordType === PASSWORD_TYPE) {
@@ -59,6 +62,7 @@ export const useCreateOrEditRecord = () => {
         <GeneratePasswordModalContent
           onPasswordInsert={setValue}
           contextLabel={contextLabel}
+          uses={uses}
         />
       )
       return

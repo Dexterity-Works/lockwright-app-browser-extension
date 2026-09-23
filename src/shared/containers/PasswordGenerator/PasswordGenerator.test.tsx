@@ -41,7 +41,16 @@ jest.mock('lockwright-utils-password-check', () => ({
 jest.mock('../../utils/passwordGeneratorHistory', () => ({
   appendHistory: (value: string) => mockAppendHistory(value),
   clearHistory: () => mockClearHistory(),
-  loadHistory: () => mockLoadHistory()
+  loadHistory: () => mockLoadHistory(),
+  historyUseLabels: (entry: {
+    uses?: Array<{ contextLabel?: string }>
+    contextLabel?: string
+  }) =>
+    entry?.uses?.length
+      ? entry.uses.map((use) => use.contextLabel).filter(Boolean)
+      : entry?.contextLabel
+        ? [entry.contextLabel]
+        : []
 }))
 
 jest.mock('../../hooks/useCopyToClipboard', () => ({
@@ -185,7 +194,11 @@ describe('PasswordGenerator', () => {
         createdAt: 1000,
         contextLabel: 'example.com',
         contextKind: 'site',
-        usedAt: 1500
+        usedAt: 1500,
+        uses: [
+          { contextLabel: 'example.com', contextKind: 'site' },
+          { contextLabel: 'Work bank', contextKind: 'entry' }
+        ]
       },
       { id: 'old-1', value: 'old-unlabeled', createdAt: 500 }
     ])
@@ -210,6 +223,7 @@ describe('PasswordGenerator', () => {
 
     await waitFor(() => {
       expect(screen.getByText('example.com')).toBeInTheDocument()
+      expect(screen.getByText('Work bank')).toBeInTheDocument()
     })
 
     const messages = error.mock.calls

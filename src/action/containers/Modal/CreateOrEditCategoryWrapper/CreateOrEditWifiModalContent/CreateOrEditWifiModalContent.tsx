@@ -27,6 +27,10 @@ import { useGlobalLoading } from '../../../../../shared/context/LoadingContext'
 import { useModal } from '../../../../../shared/context/ModalContext'
 import { useToast } from '../../../../../shared/context/ToastContext'
 import { useCreateOrEditRecord } from '../../../../hooks/useCreateOrEditRecord'
+import {
+  historyUses,
+  markHistoryUsed
+} from '../../../../../shared/utils/passwordGeneratorHistory'
 
 type CustomField = { type: string; name?: string; note?: string }
 
@@ -154,6 +158,13 @@ export const CreateOrEditWifiModalContent = ({
       }
     }
 
+    const password =
+      typeof formValues.password === 'string' ? formValues.password : ''
+    const uses = historyUses({ title: formValues.title })
+    if (password && uses.length) {
+      void markHistoryUsed(password, { uses, onlyExisting: true })
+    }
+
     if (isEdit && initialRecord) {
       updateRecords([{ ...initialRecord, ...data }], onError)
     } else {
@@ -162,11 +173,10 @@ export const CreateOrEditWifiModalContent = ({
   }
 
   const handleGeneratePassword = () => {
-    const title = (values?.title as string | undefined)?.trim()
     handleCreateOrEditRecord({
       recordType: 'password',
       setValue: (value: string) => setValue('password', value),
-      ...(title ? { contextLabel: title } : {})
+      uses: historyUses({ title: values?.title })
     })
   }
 

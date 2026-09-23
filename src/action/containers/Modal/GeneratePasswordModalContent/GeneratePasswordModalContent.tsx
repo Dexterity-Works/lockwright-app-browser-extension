@@ -15,12 +15,14 @@ export type GeneratePasswordModalContentProps = {
   primaryActionLabel?: string
   /** Entry title when inserting into a create/edit form (kind `entry`). */
   contextLabel?: string
+  uses?: Array<{ contextLabel: string; contextKind: 'site' | 'entry' }>
 }
 
 export const GeneratePasswordModalContent = ({
   onPasswordInsert,
   primaryActionLabel,
-  contextLabel
+  contextLabel,
+  uses
 }: GeneratePasswordModalContentProps) => {
   const { closeModal } = useModal()
   const { setToast } = useToast()
@@ -34,12 +36,16 @@ export const GeneratePasswordModalContent = ({
 
   const handlePrimary = () => {
     if (onPasswordInsert) {
-      const label = contextLabel?.trim()
-      if (label) {
-        void markHistoryUsed(generated, {
-          contextLabel: label,
-          contextKind: 'entry'
-        })
+      if (uses?.length) {
+        void markHistoryUsed(generated, { uses })
+      } else {
+        const label = contextLabel?.trim()
+        if (label) {
+          void markHistoryUsed(generated, {
+            contextLabel: label,
+            contextKind: 'entry'
+          })
+        }
       }
       onPasswordInsert(generated)
     } else {

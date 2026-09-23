@@ -45,6 +45,10 @@ import {
   websiteRowsFromRecord
 } from '../../../../../shared/utils/uriMatchSetting'
 import { useCreateOrEditRecord } from '../../../../hooks/useCreateOrEditRecord'
+import {
+  historyUses,
+  markHistoryUsed
+} from '../../../../../shared/utils/passwordGeneratorHistory'
 
 type Website = { website?: string; name?: string; matchType?: UriMatchType }
 type CustomField = { type: string; name: string; note?: string }
@@ -255,6 +259,16 @@ export const CreateOrEditLoginModalContent = ({
       }
     }
 
+    const password =
+      typeof formValues.password === 'string' ? formValues.password : ''
+    const uses = historyUses({
+      title: formValues.title,
+      websiteUrl: websiteRows[0]?.website
+    })
+    if (password && uses.length) {
+      void markHistoryUsed(password, { uses, onlyExisting: true })
+    }
+
     if (isEdit && initialRecord?.id) {
       updateRecords([{ ...initialRecord, ...data }], onError)
     } else {
@@ -263,11 +277,14 @@ export const CreateOrEditLoginModalContent = ({
   }
 
   const handleGeneratePassword = () => {
-    const title = (values?.title as string | undefined)?.trim()
+    const websites = websitesList as Array<{ website?: string }>
     handleCreateOrEditRecord({
       recordType: 'password',
       setValue: (value: string) => setValue('password', value),
-      ...(title ? { contextLabel: title } : {})
+      uses: historyUses({
+        title: values?.title,
+        websiteUrl: websites?.[0]?.website
+      })
     })
   }
 

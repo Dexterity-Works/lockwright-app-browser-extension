@@ -27,6 +27,7 @@ import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
 import {
   appendHistory,
   clearHistory,
+  historyUseLabels,
   loadHistory
 } from '../../utils/passwordGeneratorHistory'
 import {
@@ -68,6 +69,7 @@ type HistoryEntry = {
   contextLabel?: string
   contextKind?: 'site' | 'entry'
   usedAt?: number
+  uses?: Array<{ contextLabel: string; contextKind: 'site' | 'entry' }>
 }
 
 const HISTORY_DISPLAY_LIMIT = 20
@@ -602,16 +604,16 @@ export const PasswordGenerator = ({
                   >
                     {formatHistoryDateTime(entry.createdAt)}
                   </Text>
-                  {entry.contextLabel ? (
+                  {historyUseLabels(entry).map((label, labelIndex) => (
                     <Text
+                      key={`${entry.id}-${labelIndex}`}
                       as="p"
                       variant="caption"
                       color={theme.colors.colorTextTertiary}
-                      numberOfLines={1}
                     >
-                      {entry.contextLabel}
+                      {label}
                     </Text>
-                  ) : null}
+                  ))}
                 </div>
                 <Button
                   variant="tertiary"
