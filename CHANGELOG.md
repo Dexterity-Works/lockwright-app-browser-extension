@@ -9,6 +9,18 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.27] - 2026-09-24
+
+`BUMP_SHA`
+
+### Fixed
+
+- Save card title uses the page title.
+- Locked vault does not reopen the logo iframe.
+- Zen toolbar popup keeps its size.
+- Clipboard replacement can be turned off.
+- Generator history shows each site and entry a generated password was used for.
+
 ## [0.0.26] - 2026-09-22
 
 `7f04001dfc7dd387722d761c158224395ecc3316`
@@ -109,7 +121,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - Login-detect popup closes after a successful save.
 - Onboarding wordmark capped so the pair step still fits.
 
-[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/7f04001dfc7dd387722d761c158224395ecc3316...HEAD
+[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/BUMP_SHA...HEAD
+[0.0.27]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/7f04001dfc7dd387722d761c158224395ecc3316...BUMP_SHA
 [0.0.26]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/a6ac296bfb242127aa37ddf37b37b78afc585e32...7f04001dfc7dd387722d761c158224395ecc3316
 [0.0.25]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96...a6ac296bfb242127aa37ddf37b37b78afc585e32
 [0.0.24]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/d2faea1c4ce956b6c66f32ced05250b92cc3f8f8...f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96
