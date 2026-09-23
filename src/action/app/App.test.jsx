@@ -78,9 +78,18 @@ jest.mock('../../shared/containers/LayoutWithSidebar', () => ({
 
 const { App } = require('./App')
 const { useRedirect } = require('./hooks/useRedirect')
+const { useWindowResize } = require('./hooks/useWindowResize')
 const {
   useBlockingStateContext
 } = require('../../shared/context/BlockingStateContext')
+
+const installBootStyle = () => {
+  const style = document.createElement('style')
+  style.setAttribute('data-lockwright-popup-size', 'boot')
+  style.textContent = 'html,body{width:650px;height:500px}'
+  document.head.appendChild(style)
+  return style
+}
 
 describe('App', () => {
   beforeEach(() => {
@@ -91,6 +100,18 @@ describe('App', () => {
     useRedirect.mockReturnValue({
       isLoading: true
     })
+    useWindowResize.mockReturnValue({
+      height: 600,
+      width: 400,
+      isResizable: false
+    })
+    document
+      .querySelectorAll('style[data-lockwright-popup-size="boot"]')
+      .forEach((node) => node.remove())
+    document.documentElement.style.width = ''
+    document.documentElement.style.height = ''
+    document.body.style.width = ''
+    document.body.style.height = ''
   })
 
   it('renders Loading while loading', () => {
@@ -100,5 +121,34 @@ describe('App', () => {
     expect(screen.queryByTestId('fade-in-wrapper')).not.toBeInTheDocument()
     expect(screen.queryByTestId('welcome-page-wrapper')).not.toBeInTheDocument()
     expect(screen.queryByTestId('routes')).not.toBeInTheDocument()
+  })
+
+  it('keeps the boot size on the toolbar popup', () => {
+    useWindowResize.mockReturnValue({
+      height: 500,
+      width: 650,
+      isResizable: true
+    })
+    installBootStyle()
+
+    render(<App />)
+
+    expect(
+      document.head.querySelector('style[data-lockwright-popup-size="boot"]')
+    ).not.toBeNull()
+    expect(document.documentElement.style.width).toBe('650px')
+    expect(document.documentElement.style.height).toBe('500px')
+  })
+
+  it('drops the boot size for a passkey popup', () => {
+    installBootStyle()
+
+    render(<App />)
+
+    expect(
+      document.head.querySelector('style[data-lockwright-popup-size="boot"]')
+    ).toBeNull()
+    expect(document.documentElement.style.width).toBe('')
+    expect(document.documentElement.style.height).toBe('')
   })
 })

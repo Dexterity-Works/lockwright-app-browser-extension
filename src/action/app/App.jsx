@@ -46,10 +46,13 @@ export const App = () => {
         : {}
 
   // Keep documentElement/body in sync so Firefox toolbar panels follow content size.
-  // Clear on passkey/dynamic so those flows keep content-driven sizing.
+  // Drop the first-layout size on passkey/dynamic so those flows stay content-sized.
   useEffect(() => {
     if (!isResizable) {
       if (typeof document === 'undefined') return
+      document
+        .querySelectorAll('style[data-lockwright-popup-size="boot"]')
+        .forEach((node) => node.remove())
       for (const el of [document.documentElement, document.body]) {
         if (!el?.style) continue
         el.style.width = ''

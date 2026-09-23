@@ -44,7 +44,7 @@ html,
 body {
   background: var(--color-background);
   overscroll-behavior: none;
-  /* Action popup size (width/height/min-*) is owned by JS via applyActionPopupDocumentSize */
+  /* First-layout size is public/boot-popup-size.js. JS may override after paint. */
 }
 
 [data-theme] {
