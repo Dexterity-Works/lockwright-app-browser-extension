@@ -5,6 +5,17 @@ import { render, fireEvent } from '@testing-library/react'
 import { InputField } from './index'
 import '@testing-library/jest-dom'
 
+jest.mock('lockwright-lib-ui-react-native-components', () => ({
+  useTheme: () => ({
+    theme: {
+      colors: {
+        colorSurfaceDestructiveElevated: '#900',
+        colorTextPrimary: '#fff'
+      }
+    }
+  })
+}))
+
 describe('InputField Component', () => {
   it('renders correctly with default props', () => {
     const { container } = render(<InputField />)
@@ -62,5 +73,43 @@ describe('InputField Component', () => {
     const input = getByPlaceholderText('Enter text')
     fireEvent.change(input, { target: { value: 'New Value' } })
     expect(handleChange).not.toHaveBeenCalled()
+  })
+
+  it('ignores browser autofill until the field is focused', () => {
+    const handleChange = jest.fn()
+    const { getByPlaceholderText } = render(
+      <InputField
+        placeholder="Site title"
+        value="Prios Tid"
+        onChange={handleChange}
+        blockAutofill
+      />
+    )
+    const input = getByPlaceholderText('Site title')
+    expect(input).toHaveAttribute('readonly')
+    expect(input).toHaveAttribute('autocomplete', 'off')
+    fireEvent.change(input, { target: { value: 'circularvet.eu' } })
+    expect(handleChange).not.toHaveBeenCalled()
+
+    fireEvent.mouseDown(input)
+    expect(input).not.toHaveAttribute('readonly')
+
+    fireEvent.focus(input)
+    expect(input).not.toHaveAttribute('readonly')
+    fireEvent.change(input, { target: { value: 'Prios Tid edited' } })
+    expect(handleChange).toHaveBeenCalledWith('Prios Tid edited')
+  })
+
+  it('uses a new-password autocomplete token while blocking autofill', () => {
+    const { getByPlaceholderText } = render(
+      <InputField
+        placeholder="Secret"
+        blockAutofill
+        autoComplete="new-password"
+      />
+    )
+    const input = getByPlaceholderText('Secret')
+    expect(input).toHaveAttribute('autocomplete', 'new-password')
+    expect(input).toHaveAttribute('readonly')
   })
 })

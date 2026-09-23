@@ -19,6 +19,9 @@ import { NoticeText } from '../NoticeText'
  *  overlay?: React.ReactNode
  *  autoFocus?: boolean
  *  className?: string
+ *  name?: string
+ *  autoComplete?: string
+ *  blockAutofill?: boolean
  * }} props
  */
 export const InputField = ({
@@ -36,18 +39,31 @@ export const InputField = ({
   variant = 'default',
   overlay,
   autoFocus,
-  className = ''
+  className = '',
+  name,
+  autoComplete,
+  blockAutofill = false
 }) => {
   const inputRef = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
+  const [autofillUnlocked, setAutofillUnlocked] = useState(false)
+  const autofillLocked = blockAutofill && !autofillUnlocked
 
   const handleChange = (e) => {
-    if (!readonly) {
-      onChange?.(e.target.value)
+    if (readonly || autofillLocked) {
+      return
     }
+    onChange?.(e.target.value)
+  }
+
+  const unlockAutofill = () => {
+    if (!blockAutofill || autofillUnlocked) return
+    if (inputRef.current) inputRef.current.readOnly = false
+    setAutofillUnlocked(true)
   }
 
   const handleClick = () => {
+    unlockAutofill()
     inputRef.current?.focus()
     onClick?.(value)
 
@@ -85,12 +101,18 @@ export const InputField = ({
             <input
               ref={inputRef}
               type={type}
+              name={name}
               value={value}
               onChange={handleChange}
-              onFocus={() => setIsFocused(true)}
+              onMouseDown={unlockAutofill}
+              onFocus={() => {
+                setIsFocused(true)
+                unlockAutofill()
+              }}
               onBlur={() => setIsFocused(false)}
               placeholder={placeholder}
-              readOnly={readonly}
+              readOnly={readonly || autofillLocked}
+              autoComplete={autoComplete ?? (blockAutofill ? 'off' : undefined)}
               autoFocus={autoFocus}
               className={`font-inter w-full text-base font-bold ${overlay && !isFocused ? 'caret-primary400-mode1 text-transparent' : 'text-white-mode1'} placeholder:text-grey100-mode1 focus:outline-none ${readonly ? 'cursor-copy' : ''}`}
             />

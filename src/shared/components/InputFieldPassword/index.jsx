@@ -49,7 +49,10 @@ const getTextColor = (strength) => {
  *  placeholder?: string,
  *  hasStrongness?: boolean,
  *  onClick?: () => void,
- *  variant?: 'default' | 'outline'
+ *  variant?: 'default' | 'outline',
+ *  name?: string,
+ *  autoComplete?: string,
+ *  blockAutofill?: boolean
  * }} props
  */
 export const InputFieldPassword = ({
@@ -65,7 +68,10 @@ export const InputFieldPassword = ({
   readonly,
   hasStrongness = false,
   onClick,
-  variant = 'default'
+  variant = 'default',
+  name,
+  autoComplete,
+  blockAutofill = false
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
@@ -133,6 +139,9 @@ export const InputFieldPassword = ({
         </>
       }
       type={isPasswordVisible ? 'text' : 'password'}
+      name={name}
+      autoComplete={autoComplete}
+      blockAutofill={blockAutofill}
     />
   )
 }

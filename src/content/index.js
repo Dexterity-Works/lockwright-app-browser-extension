@@ -19,6 +19,7 @@ import { isIdentityField } from './utils/isIdentityField'
 import { isOtpField } from './utils/isOtpField'
 import { isPasswordField } from './utils/isPasswordField'
 import { isUsernameField } from './utils/isUsernameField'
+import { loginDetectContext } from './utils/loginDetectContext'
 import { positionPopupFromLogo } from './utils/positionPopupFromLogo'
 import { scheduleShowLogoForField } from './utils/scheduleShowLogoForField'
 import { setInputValue } from './utils/setInputValue'
@@ -660,7 +661,10 @@ function onSubmit({ username, password }) {
     }
 
     const data = {
-      url: window.location.href,
+      ...loginDetectContext({
+        href: window.location.href,
+        title: document.title
+      }),
       username: capture.username,
       password: capture.password
     }
@@ -777,7 +781,10 @@ runtime
     ) {
       showLoginIframe({
         ...msg.data,
-        url: window.location.href
+        ...loginDetectContext({
+          href: window.location.href,
+          title: document.title
+        })
       })
       return
     }

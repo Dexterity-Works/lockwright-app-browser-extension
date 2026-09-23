@@ -14,6 +14,7 @@ import { Validator } from 'lockwright-utils-validator'
 
 import { buildLoginDetectCreatePayload } from './buildLoginDetectCreatePayload'
 import { isLoginDetectReady } from './isLoginDetectReady'
+import { resolveLoginDetectTitle } from './resolveLoginDetectTitle'
 import { shouldDismissAfterSaveError } from './shouldDismissAfterSaveError'
 import { visibleSaveError } from './visibleSaveError'
 import { FormGroup } from '../../../shared/components/FormGroup'
@@ -25,7 +26,6 @@ import { KeyIcon } from '../../../shared/icons/KeyIcon'
 import { UserIcon } from '../../../shared/icons/UserIcon'
 import { appendWebsiteToLoginRecord } from '../../../shared/utils/appendWebsiteToLoginRecord'
 import { classifyLoginDetectAction } from '../../../shared/utils/classifyLoginDetectAction'
-import { extractNameFromDomain } from '../../../shared/utils/extractNameFromDomain'
 import {
   hydrateUriMatchSettings,
   onUriMatchSettingsChanged
@@ -55,7 +55,6 @@ export const LoginDetect = () => {
     }
   }, [])
 
-  const recordTitle = extractNameFromDomain(routerState?.url)
   const pageUrl = routerState?.url ?? ''
   const username = routerState?.username ?? ''
   const password = routerState?.password ?? ''
@@ -101,11 +100,11 @@ export const LoginDetect = () => {
     [recordsData, pageUrl, username, password, uriMatchEpoch]
   )
 
-  const resolvedTitle =
-    (typeof existingRecord?.data?.title === 'string' &&
-      existingRecord.data.title.trim()) ||
-    recordTitle ||
-    ''
+  const resolvedTitle = resolveLoginDetectTitle({
+    pageTitle: routerState?.pageTitle,
+    pageUrl,
+    existingTitle: existingRecord?.data?.title
+  })
 
   const { register, handleSubmit, setValue } = useForm({
     initialValues: {
@@ -116,10 +115,13 @@ export const LoginDetect = () => {
     validate: (values) => schema.validate(values)
   })
 
+  const setValueRef = useRef(setValue)
+  setValueRef.current = setValue
+
   useEffect(() => {
-    if (!resolvedTitle || typeof setValue !== 'function') return
-    setValue('title', resolvedTitle)
-  }, [resolvedTitle, setValue])
+    if (!resolvedTitle || typeof setValueRef.current !== 'function') return
+    setValueRef.current('title', resolvedTitle)
+  }, [resolvedTitle])
 
   const dismiss = () =>
     closeIframe({
@@ -223,35 +225,50 @@ export const LoginDetect = () => {
       className="flex w-[460px] flex-col gap-4 overflow-auto"
       ref={popupRef}
     >
-      <FormGroup>
-        <InputField
-          label={t`Title`}
-          placeholder={t`Insert title`}
-          variant="outline"
-          {...register('title')}
-        />
-      </FormGroup>
-
-      <FormGroup>
-        {action === 'save' && (
+      <form
+        autoComplete="off"
+        className="contents"
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <FormGroup>
           <InputField
-            label={t`Email or username`}
-            placeholder={t`Email or username`}
+            {...register('title')}
+            label={t`Title`}
+            placeholder={t`Insert title`}
             variant="outline"
-            icon={UserIcon}
-            {...register('username')}
+            name="lockwright-site-title"
+            autoComplete="off"
+            blockAutofill
           />
-        )}
+        </FormGroup>
 
-        <InputFieldPassword
-          label={t`Password`}
-          placeholder={t`Password`}
-          variant="outline"
-          icon={KeyIcon}
-          hasStrongness
-          {...register('password')}
-        />
-      </FormGroup>
+        <FormGroup>
+          {action === 'save' && (
+            <InputField
+              {...register('username')}
+              label={t`Email or username`}
+              placeholder={t`Email or username`}
+              variant="outline"
+              icon={UserIcon}
+              name="lockwright-account"
+              autoComplete="off"
+              blockAutofill
+            />
+          )}
+
+          <InputFieldPassword
+            {...register('password')}
+            label={t`Password`}
+            placeholder={t`Password`}
+            variant="outline"
+            icon={KeyIcon}
+            hasStrongness
+            name="lockwright-secret"
+            autoComplete="new-password"
+            blockAutofill
+          />
+        </FormGroup>
+      </form>
 
       {submitError ? (
         <AlertMessage
