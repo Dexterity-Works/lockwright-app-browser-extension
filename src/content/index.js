@@ -20,6 +20,7 @@ import { isOtpField } from './utils/isOtpField'
 import { isPasswordField } from './utils/isPasswordField'
 import { isUsernameField } from './utils/isUsernameField'
 import { loginDetectContext } from './utils/loginDetectContext'
+import { createLogoAttachGuard } from './utils/logoAttachGuard'
 import { positionPopupFromLogo } from './utils/positionPopupFromLogo'
 import { scheduleShowLogoForField } from './utils/scheduleShowLogoForField'
 import { setInputValue } from './utils/setInputValue'
@@ -37,6 +38,7 @@ import { logger } from '../shared/utils/logger'
 import { runtime } from '../shared/utils/runtime'
 
 const activeIframes = new Set()
+const logoAttachGuard = createLogoAttachGuard()
 
 let isAutoFillEnabled = true
 
@@ -925,6 +927,10 @@ function isAcceptedField(field) {
 function toggleLogoOnFocus(event) {
   const element = event.target
 
+  if (!logoAttachGuard.onFocus(element)) {
+    return
+  }
+
   const logoIframeData = getIframeData(IFRAME_TYPES.logo)
 
   if (logoIframeData) {
@@ -945,6 +951,9 @@ function toggleLogoOnFocus(event) {
 
 function attachLogoForField(field) {
   if (document.activeElement !== field) {
+    return
+  }
+  if (!logoAttachGuard.canAttach(field)) {
     return
   }
   const existing = getIframeData(IFRAME_TYPES.logo)
@@ -1209,6 +1218,9 @@ const handleIframeEvent = (event) => {
   }
 
   if (eventType === 'close') {
+    if (iframeData?.type === IFRAME_TYPES.logo) {
+      logoAttachGuard.onLogoClosed(iframeData.element)
+    }
     removeIframe(iframeData)
     return
   }
