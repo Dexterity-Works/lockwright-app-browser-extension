@@ -7,7 +7,10 @@ import { Check } from 'lockwright-lib-ui-react-native-components/icons'
 import { MESSAGES } from '../../background/constants'
 import { LOCAL_STORAGE_KEYS } from '../constants/storage'
 import { useToast } from '../context/ToastContext'
-import { isCopyToClipboardEnabled as getIsCopyToClipboardEnabled } from '../utils/isCopyToClipboardEnabled'
+import {
+  isClipboardClearEnabled as getIsClipboardClearEnabled,
+  isCopyToClipboardEnabled as getIsCopyToClipboardEnabled
+} from '../utils/isCopyToClipboardEnabled'
 import { logger } from '../utils/logger'
 
 const { SCHEDULE_CLIPBOARD_CLEAR } = MESSAGES
@@ -19,7 +22,9 @@ const { SCHEDULE_CLIPBOARD_CLEAR } = MESSAGES
  *  isCopied: boolean,
  *  copyToClipboard: (text: string) => boolean,
  *  handleCopyToClipboardSettingChange: (isEnabled: boolean) => void,
- *  isCopyToClipboardEnabled: boolean
+ *  isCopyToClipboardEnabled: boolean,
+ *  handleClipboardClearSettingChange: (isEnabled: boolean) => void,
+ *  isClipboardClearEnabled: boolean
  * }}
  */
 export const useCopyToClipboard = ({ onCopy } = {}) => {
@@ -29,6 +34,9 @@ export const useCopyToClipboard = ({ onCopy } = {}) => {
   const setToast = toastCtx?.setToast
   const [isCopyToClipboardEnabled, setIsCopyToClipboardEnabled] = useState(
     getIsCopyToClipboardEnabled()
+  )
+  const [isClipboardClearEnabled, setIsClipboardClearEnabled] = useState(
+    getIsClipboardClearEnabled()
   )
   const handleCopyToClipboardSettingChange = (isEnabled) => {
     if (!isEnabled) {
@@ -41,6 +49,15 @@ export const useCopyToClipboard = ({ onCopy } = {}) => {
     }
 
     setIsCopyToClipboardEnabled(isEnabled)
+  }
+  const handleClipboardClearSettingChange = (isEnabled) => {
+    if (!isEnabled) {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.CLIPBOARD_CLEAR_ENABLED, 'false')
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.CLIPBOARD_CLEAR_ENABLED)
+    }
+
+    setIsClipboardClearEnabled(isEnabled)
   }
 
   const copyToClipboard = React.useCallback((text) => {
@@ -66,17 +83,19 @@ export const useCopyToClipboard = ({ onCopy } = {}) => {
           setToast?.({ message: t`Copied to clipboard`, icon: Check })
         }
 
-        try {
-          if (typeof chrome !== 'undefined') {
-            chrome?.runtime?.sendMessage?.({
-              type: SCHEDULE_CLIPBOARD_CLEAR,
-              delayMs: CLIPBOARD_CLEAR_TIMEOUT
-            })
+        if (getIsClipboardClearEnabled()) {
+          try {
+            if (typeof chrome !== 'undefined') {
+              chrome?.runtime?.sendMessage?.({
+                type: SCHEDULE_CLIPBOARD_CLEAR,
+                delayMs: CLIPBOARD_CLEAR_TIMEOUT
+              })
+            }
+          } catch {
+            setTimeout(() => {
+              navigator?.clipboard?.writeText('')
+            }, CLIPBOARD_CLEAR_TIMEOUT)
           }
-        } catch {
-          setTimeout(() => {
-            navigator?.clipboard?.writeText('')
-          }, CLIPBOARD_CLEAR_TIMEOUT)
         }
 
         if (timeoutRef.current) {
@@ -97,6 +116,8 @@ export const useCopyToClipboard = ({ onCopy } = {}) => {
     isCopied,
     copyToClipboard,
     handleCopyToClipboardSettingChange,
-    isCopyToClipboardEnabled
+    isCopyToClipboardEnabled,
+    handleClipboardClearSettingChange,
+    isClipboardClearEnabled
   }
 }

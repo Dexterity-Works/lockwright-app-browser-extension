@@ -161,6 +161,7 @@ jest.mock('@lingui/react', () => ({
 const mockSetTimeoutMs = jest.fn()
 const mockSetAllowHttp = jest.fn()
 const mockHandleCopyChange = jest.fn()
+const mockHandleClipboardClearChange = jest.fn()
 
 let mockTimeoutMs: number | null = 30_000
 let mockIsAllowHttpEnabled = false
@@ -183,7 +184,9 @@ jest.mock('../../../../../shared/hooks/useCopyToClipboard', () => ({
   __esModule: true,
   useCopyToClipboard: () => ({
     isCopyToClipboardEnabled: mockIsCopyEnabled,
-    handleCopyToClipboardSettingChange: mockHandleCopyChange
+    handleCopyToClipboardSettingChange: mockHandleCopyChange,
+    isClipboardClearEnabled: true,
+    handleClipboardClearSettingChange: mockHandleClipboardClearChange
   })
 }))
 
@@ -224,6 +227,7 @@ describe('AppPreferencesContent', () => {
     mockSetTimeoutMs.mockClear()
     mockSetAllowHttp.mockClear()
     mockHandleCopyChange.mockClear()
+    mockHandleClipboardClearChange.mockClear()
     mockSetAutofill.mockClear()
     mockGetAutofill.mockClear()
     mockGetAutofill.mockResolvedValue(true)
@@ -316,6 +320,14 @@ describe('AppPreferencesContent', () => {
     fireEvent.click(toggle)
 
     expect(mockHandleCopyChange).toHaveBeenCalledWith(false)
+  })
+
+  it('toggles clipboard replacement through the hook', () => {
+    render(<AppPreferencesContent />)
+
+    fireEvent.click(screen.getByTestId('settings-clipboard-clear-toggle'))
+
+    expect(mockHandleClipboardClearChange).toHaveBeenCalledWith(false)
   })
 
   it('writes the reminders preference to localStorage when disabled', () => {

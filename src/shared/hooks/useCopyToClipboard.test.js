@@ -3,6 +3,18 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { LOCAL_STORAGE_KEYS } from '../constants/storage'
 
+jest.mock('../context/ToastContext', () => ({
+  useToast: () => ({ setToast: jest.fn() })
+}))
+
+jest.mock('lockwright-lib-constants', () => ({
+  CLIPBOARD_CLEAR_TIMEOUT: 30000
+}))
+
+jest.mock('lockwright-lib-ui-react-native-components/icons', () => ({
+  Check: () => null
+}))
+
 Object.assign(navigator, {
   clipboard: {
     writeText: jest.fn().mockImplementation(() => Promise.resolve())
@@ -170,6 +182,21 @@ describe('useCopyToClipboard', () => {
     })
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test text')
+  })
+
+  test('does not replace the clipboard when replacement is turned off', async () => {
+    localStorageMock.getItem.mockImplementation((key) =>
+      key === LOCAL_STORAGE_KEYS.CLIPBOARD_CLEAR_ENABLED ? 'false' : null
+    )
+    const { result } = renderHook(() => useCopyToClipboard())
+
+    await act(async () => {
+      result.current.copyToClipboard('secret')
+      await Promise.resolve()
+    })
+
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('secret')
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalled()
   })
 
   test('hook returns all expected properties', () => {

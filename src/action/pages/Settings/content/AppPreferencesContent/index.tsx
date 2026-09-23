@@ -53,6 +53,7 @@ const TEST_IDS = {
   autoLockSelect: 'settings-auto-lock-select',
   autoLockOption: 'settings-auto-lock-option',
   copyToClipboardToggle: 'settings-copy-to-clipboard-toggle',
+  clipboardClearToggle: 'settings-clipboard-clear-toggle',
   remindersToggle: 'settings-reminders-toggle',
   passkeyValidation: 'settings-passkey-validation',
   debugLoggingToggle: 'settings-debug-logging-toggle'
@@ -84,8 +85,12 @@ export const AppPreferencesContent = () => {
     timeoutMs: number | null
     setTimeoutMs: (ms: number | null) => void
   }
-  const { isCopyToClipboardEnabled, handleCopyToClipboardSettingChange } =
-    useCopyToClipboard()
+  const {
+    isCopyToClipboardEnabled,
+    handleCopyToClipboardSettingChange,
+    isClipboardClearEnabled,
+    handleClipboardClearSettingChange
+  } = useCopyToClipboard()
   const [isAllowHttpEnabled, setIsAllowHttpEnabled] = useAllowHttpEnabled() as [
     boolean,
     (value: boolean) => void
@@ -399,6 +404,16 @@ export const AppPreferencesContent = () => {
               onChange={handleCopyToClipboardSettingChange}
               label={t`Copy to Clipboard`}
               description={t`Enable one-tap copying to move your credentials between apps effortlessly.`}
+            />
+          </div>
+
+          <div className="border-border-primary border-t p-[12px]">
+            <ToggleSwitch
+              data-testid={TEST_IDS.clipboardClearToggle}
+              checked={isClipboardClearEnabled}
+              onChange={handleClipboardClearSettingChange}
+              label={t`Replace clipboard`}
+              description={t`Overwrite a copied password after a short time. Turn this off if you need the password to stay put.`}
             />
           </div>
 
