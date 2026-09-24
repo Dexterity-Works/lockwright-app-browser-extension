@@ -4,6 +4,7 @@ import { lingui } from '@lingui/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import viteBabel from 'vite-plugin-babel'
 
 import { readGitSha6 } from './scripts/gitSha.mjs'
 
@@ -18,6 +19,10 @@ export default defineConfig({
       babel: {
         configFile: path.resolve(__dirname, 'babel.config.cjs')
       }
+    }),
+    // The React plugin skips node_modules; this compiles react-strict-dom and UI kit css.create.
+    viteBabel({
+      filter: /\.[jt]sx?$/,
     }),
     tailwindcss(),
     lingui()
