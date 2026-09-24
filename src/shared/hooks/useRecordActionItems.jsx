@@ -8,7 +8,7 @@ import { useModal } from '../../shared/context/ModalContext'
 import { useRouter } from '../../shared/context/RouterContext'
 import { DeleteRecordsModalContent } from '../containers/DeleteRecordsModalContent'
 import { MoveFolderModalContent } from '../containers/MoveFolderModalContent'
-import { queryActiveTab } from '../utils/tabs'
+import { autofillActiveTab } from '../utils/tabs'
 
 /**
  * @param {{
@@ -114,20 +114,7 @@ export const useRecordActionItems = ({
   ]
 
   const handleAutofill = ({ recordType, data }) => {
-    void (async () => {
-      const tab = await queryActiveTab()
-      if (!tab?.id) return
-
-      try {
-        await chrome.tabs.sendMessage(tab.id, {
-          type: 'autofillFromAction',
-          recordType,
-          data
-        })
-      } catch {
-        // No content script (empty Zen workspace, restricted URL, etc.)
-      }
-    })()
+    void autofillActiveTab({ recordType, data })
   }
 
   const actionsByRecordType = {

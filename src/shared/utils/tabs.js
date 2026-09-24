@@ -16,6 +16,30 @@ export async function queryActiveTab() {
 }
 
 /**
+ * Send an Autofill record to the active tab's top frame. Content scripts run
+ * in every frame, so a tab-wide send would hand the secrets to third-party
+ * iframes too.
+ *
+ * @param {{ recordType: string, data: Record<string, string> }} params
+ * @returns {Promise<chrome.tabs.Tab | null>}
+ */
+export async function autofillActiveTab({ recordType, data }) {
+  const tab = await queryActiveTab()
+  if (!tab?.id) return tab
+
+  try {
+    await chrome.tabs.sendMessage(
+      tab.id,
+      { type: 'autofillFromAction', recordType, data },
+      { frameId: 0 }
+    )
+  } catch {
+    // No content script (empty Zen workspace, restricted URL, etc.)
+  }
+  return tab
+}
+
+/**
  * Query tabs by URL pattern; falls back to scanning all tabs when the browser
  * rejects URL filters (some Firefox builds) or when the query throws.
  *

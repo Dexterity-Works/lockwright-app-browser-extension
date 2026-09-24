@@ -1,7 +1,15 @@
 import { findLoginFields } from './findLoginFields'
 
 describe('findLoginFields', () => {
+  beforeEach(() => {
+    // jsdom lays everything out at 0x0; give fields a visible size.
+    jest
+      .spyOn(Element.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ width: 200, height: 30 })
+  })
+
   afterEach(() => {
+    jest.restoreAllMocks()
     document.body.innerHTML = ''
   })
 

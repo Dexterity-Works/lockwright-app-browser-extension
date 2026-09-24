@@ -33,7 +33,7 @@ import { useRecordActionItems } from '../../../shared/hooks/useRecordActionItems
 import { URI_MATCH_TYPES } from '../../../shared/constants/uriMatch'
 import { appendWebsiteToLoginRecord } from '../../../shared/utils/appendWebsiteToLoginRecord'
 import type { VaultRecord } from '../../../shared/utils/groupRecordsByTimePeriod'
-import { queryActiveTab } from '../../../shared/utils/tabs'
+import { autofillActiveTab } from '../../../shared/utils/tabs'
 import { useCreateOrEditRecord } from '../../hooks/useCreateOrEditRecord'
 import { recordRowAutofillMenuItems } from './recordRowAutofillMenuItems'
 
@@ -79,34 +79,24 @@ export const RecordRowContextMenu = ({
     recordType: record.type
   })
 
-  const autofillActiveTab = async () => {
-    const tab = await queryActiveTab()
-    if (!tab?.id) return tab
-
-    try {
-      await chrome.tabs.sendMessage(tab.id, {
-        type: 'autofillFromAction',
-        recordType: record.type,
-        data: {
-          username: record.data?.username || '',
-          password: record.data?.password || ''
-        }
-      })
-    } catch {
-      // No content script (empty Zen workspace, restricted URL, etc.)
-    }
-    return tab
-  }
+  const autofillRecord = () =>
+    autofillActiveTab({
+      recordType: record.type,
+      data: {
+        username: record.data?.username || '',
+        password: record.data?.password || ''
+      }
+    })
 
   const handleAutofill = () => {
     close()
-    void autofillActiveTab()
+    void autofillRecord()
   }
 
   const handleAutofillAndAddSite = () => {
     close()
     void (async () => {
-      const tab = await autofillActiveTab()
+      const tab = await autofillRecord()
       if (!tab?.url) return
       const updated = appendWebsiteToLoginRecord(record, tab.url, {
         matchType: URI_MATCH_TYPES.HOST

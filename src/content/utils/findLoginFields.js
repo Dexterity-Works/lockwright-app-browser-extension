@@ -2,6 +2,7 @@ import { getField, PASSWORD_MATCHERS } from './getField'
 import { isIgnoredField } from './isIgnoredField'
 import { isPasswordField } from './isPasswordField'
 import { isUsernameField } from './isUsernameField'
+import { isVisibleField } from './isVisibleField'
 
 const USERNAME_FALLBACK_KEYWORDS = ['username', 'email', 'user', 'login']
 
@@ -12,7 +13,9 @@ const USERNAME_FALLBACK_KEYWORDS = ['username', 'email', 'user', 'login']
 export function findLoginFields(preferredElement) {
   const scope = resolveScope(preferredElement)
 
-  const inputs = Array.from(scope.querySelectorAll('input'))
+  const inputs = Array.from(scope.querySelectorAll('input')).filter(
+    isVisibleField
+  )
 
   let passwordField = inputs.find((el) => isPasswordField(el)) || null
   let usernameField = inputs.find((el) => isUsernameField(el)) || null
@@ -22,15 +25,17 @@ export function findLoginFields(preferredElement) {
   }
 
   if (!passwordField) {
-    passwordField = getField(PASSWORD_MATCHERS).element
+    passwordField = visibleOrNull(getField(PASSWORD_MATCHERS).element)
   }
 
   if (!usernameField) {
-    usernameField = getField(USERNAME_FALLBACK_KEYWORDS).element
+    usernameField = visibleOrNull(getField(USERNAME_FALLBACK_KEYWORDS).element)
   }
 
   return { usernameField, passwordField }
 }
+
+const visibleOrNull = (element) => (isVisibleField(element) ? element : null)
 
 /**
  * @param {HTMLElement | null | undefined} preferredElement
@@ -77,7 +82,7 @@ function findPrecedingUsernameCandidate(passwordField) {
     if (type !== 'text' && type !== 'email' && type !== 'tel') {
       continue
     }
-    if (isIgnoredField(el)) {
+    if (isIgnoredField(el) || !isVisibleField(el)) {
       continue
     }
     return el

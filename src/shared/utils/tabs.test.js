@@ -1,4 +1,4 @@
-import { queryActiveTab, queryTabsByUrl } from './tabs'
+import { autofillActiveTab, queryActiveTab, queryTabsByUrl } from './tabs'
 
 describe('tabs helpers', () => {
   afterEach(() => {
@@ -69,6 +69,29 @@ describe('tabs helpers', () => {
 
       const result = await queryTabsByUrl('chrome-extension://x/*')
       expect(result).toEqual([all[1]])
+    })
+  })
+
+  describe('autofillActiveTab', () => {
+    it('sends the record to the top frame only', async () => {
+      global.chrome = {
+        tabs: {
+          query: jest
+            .fn()
+            .mockResolvedValue([{ id: 7, url: 'https://a.test' }]),
+          sendMessage: jest.fn().mockResolvedValue(undefined)
+        }
+      }
+      const data = { username: 'alice', password: 's3cret' }
+
+      await expect(
+        autofillActiveTab({ recordType: 'login', data })
+      ).resolves.toEqual({ id: 7, url: 'https://a.test' })
+      expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+        7,
+        { type: 'autofillFromAction', recordType: 'login', data },
+        { frameId: 0 }
+      )
     })
   })
 })

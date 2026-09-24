@@ -160,7 +160,8 @@ runtime.onMessage.addListener(async (msg) => {
   }
 
   if (msg.type === CONTENT_MESSAGE_TYPES.AUTOFILL_FROM_ACTION) {
-    if (!isAutoFillEnabled) {
+    // Top frame only: child frames can be third-party ads or widgets.
+    if (!isAutoFillEnabled || window !== window.top) {
       return
     }
     const { recordType, data: recordData } = msg
