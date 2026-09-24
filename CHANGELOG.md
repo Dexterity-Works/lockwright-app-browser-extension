@@ -9,6 +9,14 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.28] - 2026-09-24
+
+`BUMP_SHA`
+
+### Fixed
+
+- Toolbar popup opens again instead of showing an empty dark panel.
+
 ## [0.0.27] - 2026-09-24
 
 `405f162420b37806e6803ab0b6bd6237d4241e4c`
@@ -121,7 +129,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - Login-detect popup closes after a successful save.
 - Onboarding wordmark capped so the pair step still fits.
 
-[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/405f162420b37806e6803ab0b6bd6237d4241e4c...HEAD
+[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/BUMP_SHA...HEAD
+[0.0.28]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/405f162420b37806e6803ab0b6bd6237d4241e4c...BUMP_SHA
 [0.0.27]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/7f04001dfc7dd387722d761c158224395ecc3316...405f162420b37806e6803ab0b6bd6237d4241e4c
 [0.0.26]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/a6ac296bfb242127aa37ddf37b37b78afc585e32...7f04001dfc7dd387722d761c158224395ecc3316
 [0.0.25]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/f37a781f7fcb08b93f4b1cb28fd4a6ff7c252b96...a6ac296bfb242127aa37ddf37b37b78afc585e32
