@@ -12,6 +12,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 ### Fixed
 
 - Generator history shows the vault entries that use each password, even ones never stamped.
+- Generator history no longer loses entries when another device writes at the same time or has not synced yet.
 
 ## [0.0.28] - 2026-09-24
 
