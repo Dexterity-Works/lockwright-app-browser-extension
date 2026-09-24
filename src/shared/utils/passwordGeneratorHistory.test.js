@@ -3,6 +3,7 @@ import {
   PASSWORD_GENERATOR_HISTORY_MAX,
   appendHistory,
   clearHistory,
+  historyEntryLabels,
   historyUseLabels,
   historyUses,
   loadHistory,
@@ -271,6 +272,53 @@ describe('passwordGeneratorHistory', () => {
       })
 
       expect(mockAdd).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('historyEntryLabels', () => {
+    const records = [
+      {
+        id: 'r1',
+        data: {
+          title: 'Work bank',
+          password: 'same',
+          websites: ['https://example.com/login']
+        }
+      },
+      { id: 'r2', data: { title: 'Home wifi', password: 'same' } },
+      { id: 'r3', data: { title: 'Other', password: 'different' } }
+    ]
+
+    it('adds the site and title of vault records using the password', () => {
+      expect(
+        historyEntryLabels({ id: 'h', value: 'same', createdAt: 1 }, records)
+      ).toEqual(['example.com', 'Work bank', 'Home wifi'])
+    })
+
+    it('keeps stamped labels first and does not repeat them', () => {
+      expect(
+        historyEntryLabels(
+          {
+            id: 'h',
+            value: 'same',
+            createdAt: 1,
+            uses: [{ contextLabel: 'Work bank', contextKind: 'entry' }]
+          },
+          records
+        )
+      ).toEqual(['Work bank', 'example.com', 'Home wifi'])
+    })
+
+    it('returns only stamped labels when no record matches', () => {
+      const entry = {
+        id: 'h',
+        value: 'nobody',
+        createdAt: 1,
+        contextLabel: 'site.test',
+        contextKind: 'site'
+      }
+      expect(historyEntryLabels(entry, records)).toEqual(['site.test'])
+      expect(historyEntryLabels(entry, undefined)).toEqual(['site.test'])
     })
   })
 

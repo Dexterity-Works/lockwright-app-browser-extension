@@ -38,19 +38,20 @@ jest.mock('lockwright-utils-password-check', () => ({
   checkPassphraseStrength: () => ({ type: 'safe' })
 }))
 
+jest.mock('lockwright-lib-vault/src/instances', () => ({
+  pearpassVaultClient: {}
+}))
+
 jest.mock('../../utils/passwordGeneratorHistory', () => ({
+  ...jest.requireActual('../../utils/passwordGeneratorHistory'),
   appendHistory: (value: string) => mockAppendHistory(value),
   clearHistory: () => mockClearHistory(),
-  loadHistory: () => mockLoadHistory(),
-  historyUseLabels: (entry: {
-    uses?: Array<{ contextLabel?: string }>
-    contextLabel?: string
-  }) =>
-    entry?.uses?.length
-      ? entry.uses.map((use) => use.contextLabel).filter(Boolean)
-      : entry?.contextLabel
-        ? [entry.contextLabel]
-        : []
+  loadHistory: () => mockLoadHistory()
+}))
+
+let mockRecords: unknown[] | undefined = []
+jest.mock('lockwright-lib-vault', () => ({
+  useRecords: () => ({ data: mockRecords })
 }))
 
 jest.mock('../../hooks/useCopyToClipboard', () => ({
@@ -206,6 +207,7 @@ describe('PasswordGenerator', () => {
     mockLoadHistory.mockResolvedValue([])
     mockGeneratePassword.mockClear()
     mockGeneratePassword.mockReturnValue('Abcdef1!')
+    mockRecords = []
   })
 
   it('appends the generated password as an unlabeled history entry', async () => {
@@ -231,6 +233,16 @@ describe('PasswordGenerator', () => {
       .join('\n')
     expect(messages).not.toMatch(/invalid prop "className"/)
     error.mockRestore()
+  })
+
+  it('shows the vault entry that uses an unstamped history password', async () => {
+    mockRecords = [
+      { id: 'r1', data: { title: 'Mail account', password: 'old-unlabeled' } }
+    ]
+
+    render(<PasswordGenerator />)
+
+    expect(await screen.findByText('Mail account')).toBeInTheDocument()
   })
 
   it('shows random-mode charset toggles, all on by default', () => {

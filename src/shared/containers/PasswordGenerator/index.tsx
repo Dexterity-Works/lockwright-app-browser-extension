@@ -22,12 +22,13 @@ import {
   useTheme
 } from 'lockwright-lib-ui-react-native-components'
 import { ContentCopy } from 'lockwright-lib-ui-react-native-components/icons'
+import { useRecords } from 'lockwright-lib-vault'
 
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
 import {
   appendHistory,
   clearHistory,
-  historyUseLabels,
+  historyEntryLabels,
   loadHistory
 } from '../../utils/passwordGeneratorHistory'
 import {
@@ -135,6 +136,7 @@ export const PasswordGenerator = ({
 }: PasswordGeneratorProps) => {
   const { theme } = useTheme()
   const { copyToClipboard } = useCopyToClipboard()
+  const { data: records } = useRecords()
 
   const [mode, setMode] = useState<Mode>(MODE_RANDOM)
   const [memorable, setMemorable] = useState({
@@ -604,16 +606,18 @@ export const PasswordGenerator = ({
                   >
                     {formatHistoryDateTime(entry.createdAt)}
                   </Text>
-                  {historyUseLabels(entry).map((label, labelIndex) => (
-                    <Text
-                      key={`${entry.id}-${labelIndex}`}
-                      as="p"
-                      variant="caption"
-                      color={theme.colors.colorTextTertiary}
-                    >
-                      {label}
-                    </Text>
-                  ))}
+                  {historyEntryLabels(entry, records).map(
+                    (label, labelIndex) => (
+                      <Text
+                        key={`${entry.id}-${labelIndex}`}
+                        as="p"
+                        variant="caption"
+                        color={theme.colors.colorTextTertiary}
+                      >
+                        {label}
+                      </Text>
+                    )
+                  )}
                 </div>
                 <Button
                   variant="tertiary"
