@@ -38,7 +38,6 @@ const getInitialRouteFromUrl = () => {
           serializedPublicKey: urlParams.get('serializedPublicKey'),
           requestId: urlParams.get('requestId'),
           requestOrigin: urlParams.get('requestOrigin'),
-          tabId: urlParams.get('tabId'),
           page: urlParams.get('page')
         }
       }

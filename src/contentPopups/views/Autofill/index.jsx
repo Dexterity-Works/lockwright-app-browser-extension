@@ -28,7 +28,6 @@ export const Autofill = () => {
   const { filteredRecords } = useFilteredRecords()
 
   const [passkeyRequest, setPasskeyRequest] = useState(null)
-  const [currentTabId, setCurrentTabId] = useState(null)
   const [isAuthenticating, setIsAuthenticating] = useState(false)
 
   useEffect(() => {
@@ -44,7 +43,6 @@ export const Autofill = () => {
         }
         if (response?.request) {
           setPasskeyRequest(response.request)
-          setCurrentTabId(response.tabId)
         }
       }
     )
@@ -65,7 +63,7 @@ export const Autofill = () => {
       if (record.type !== RECORD_TYPES.LOGIN || !record.data?.credential)
         return false
 
-      const origin = passkeyRequest.requestOrigin
+      const origin = passkeyRequest.origin
       if (
         origin &&
         record.data?.websites?.some(
@@ -203,8 +201,7 @@ export const Autofill = () => {
     chrome.runtime.sendMessage(
       {
         type: MESSAGE_TYPES.AUTHENTICATE_WITH_PASSKEY,
-        credential: record.data.credential,
-        tabId: currentTabId
+        credential: record.data.credential
       },
       () => {
         if (chrome.runtime.lastError) {

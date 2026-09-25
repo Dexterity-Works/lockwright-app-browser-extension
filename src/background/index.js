@@ -1,5 +1,7 @@
 import './nativeMessaging'
 
+import { getDomain } from 'tldts'
+
 import {
   ensureClientKeypairUnlocked,
   commitPendingClientKeystore
@@ -20,6 +22,7 @@ import {
   MESSAGE_TYPES,
   SECURE_MESSAGE_TYPES
 } from '../shared/services/messageBridge'
+import { getAllowHttpFromStorage } from '../shared/utils/allowHttpStorage'
 import { arrayBufferToBase64Url } from '../shared/utils/arrayBufferToBase64Url'
 import { base64UrlToArrayBuffer } from '../shared/utils/base64UrlToArrayBuffer'
 import {
@@ -33,6 +36,7 @@ const { SCHEDULE_CLIPBOARD_CLEAR, CLEAR_CLIPBOARD_NOW } = MESSAGES
 const { CLEAR_CLIPBOARD } = ALARMS
 
 const pending = new Map()
+const passkeyRequests = new Map()
 const conditionalPasskeyRequests = new Map()
 
 void loadDebugLogging()
@@ -139,7 +143,8 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
   const sensitiveTypes = [
     ...Object.values(SECURE_MESSAGE_TYPES),
     MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD,
-    MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL
+    MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL,
+    MESSAGE_TYPES.PASSKEY_RESULT
   ]
 
   if (sensitiveTypes.includes(msg.type)) {
@@ -176,16 +181,9 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return
     }
 
-    case MESSAGE_TYPES.CREATE_PASSKEY: {
-      const queryParams = new URLSearchParams({
-        requestId: msg.requestId,
-        tabId: sender.tab.id,
-        page: msg.type,
-        serializedPublicKey: JSON.stringify(msg.publicKey),
-        requestOrigin: msg.requestOrigin
-      })
-
-      openPasskeyWindow(queryParams)
+    case MESSAGE_TYPES.CREATE_PASSKEY:
+    case MESSAGE_TYPES.GET_PASSKEY: {
+      void handlePasskeyRequest({ msg, sender, sendResponse })
       return true
     }
 
@@ -261,41 +259,14 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return true
     }
 
-    case MESSAGE_TYPES.GET_PASSKEY: {
-      // Check if this is a conditional UI request (passive autofill)
-      if (msg.mediation === 'conditional') {
-        // Store the conditional request so autofill UI can use it
-        conditionalPasskeyRequests.set(sender.tab.id, {
-          requestId: msg.requestId,
-          publicKey: msg.publicKey,
-          requestOrigin: msg.requestOrigin,
-          timestamp: Date.now()
-        })
-        logger.log('Stored conditional UI passkey request for autofill')
-
-        return false
-      }
-
-      const queryParams = new URLSearchParams({
-        requestId: msg.requestId,
-        tabId: sender.tab.id,
-        page: msg.type,
-        serializedPublicKey: JSON.stringify(msg.publicKey),
-        requestOrigin: msg.requestOrigin
-      })
-
-      openPasskeyWindow(queryParams)
-      return true
-    }
-
     case MESSAGE_TYPES.GET_CONDITIONAL_PASSKEY_REQUEST: {
       const request = conditionalPasskeyRequests.get(sender.tab.id) || null
-      sendResponse({ request, tabId: sender.tab.id })
+      sendResponse({ request })
       return true
     }
 
     case MESSAGE_TYPES.AUTHENTICATE_WITH_PASSKEY: {
-      const { credential, tabId } = msg
+      const tabId = sender.tab.id
       const request = conditionalPasskeyRequests.get(tabId)
 
       if (!request) {
@@ -305,17 +276,12 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }
 
       void getAssertionCredential(
-        request.requestOrigin,
+        request.origin,
         JSON.stringify(request.publicKey),
-        credential
+        msg.credential
       )
         .then((assertionCredential) => {
-          chrome.tabs.sendMessage(parseInt(tabId), {
-            type: CONTENT_MESSAGE_TYPES.GOT_PASSKEY,
-            requestId: request.requestId,
-            credential: assertionCredential
-          })
-
+          sendPasskeyResult(request, { credential: assertionCredential })
           conditionalPasskeyRequests.delete(tabId)
 
           sendResponse({ success: true, credential: assertionCredential })
@@ -326,6 +292,21 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
         })
 
       return true
+    }
+
+    case MESSAGE_TYPES.PASSKEY_RESULT: {
+      const request = passkeyRequests.get(msg.requestId)
+      if (!request) {
+        sendResponse({ success: false, error: 'Unknown passkey request' })
+        return
+      }
+
+      sendPasskeyResult(request, {
+        credential: msg.credential ?? null,
+        recordId: msg.recordId ?? null
+      })
+      sendResponse({ success: true })
+      return
     }
 
     case MESSAGE_TYPES.SELECTED_PASSKEY: {
@@ -666,6 +647,98 @@ const clearPending = (tabId) => {
   }
 }
 
+// A passkey is bound to the frame that asked for it. The origin comes from
+// the sender, never from the page, and the rpId has to be the sender host or
+// a registrable parent of it, so no page can ask for another site's passkey.
+const bindPasskeyRequest = async (sender, publicKey) => {
+  const origin = sender.origin ?? new URL(sender.url).origin
+  const { protocol, hostname: host } = new URL(origin)
+
+  if (protocol !== 'https:') {
+    const allowHttp = protocol === 'http:' && (await getAllowHttpFromStorage())
+    if (!allowHttp) throw new Error(`Passkeys need https, got ${origin}`)
+  }
+
+  const rpId = publicKey?.rpId ?? publicKey?.rp?.id ?? host
+  const domain = getDomain(host)
+  const isRegistrableParent =
+    typeof rpId === 'string' &&
+    host.endsWith(`.${rpId}`) &&
+    Boolean(domain) &&
+    (rpId === domain || rpId.endsWith(`.${domain}`))
+
+  if (rpId !== host && !isRegistrableParent) {
+    throw new Error(`rpId ${rpId} does not match ${host}`)
+  }
+
+  return { origin, rpId }
+}
+
+const handlePasskeyRequest = async ({ msg, sender, sendResponse }) => {
+  const isCreate = msg.type === MESSAGE_TYPES.CREATE_PASSKEY
+
+  let bound
+  try {
+    bound = await bindPasskeyRequest(sender, msg.publicKey)
+  } catch (error) {
+    logger.error('Rejected passkey request:', error?.message || error)
+    sendResponse({ success: false, error: error?.message })
+    return
+  }
+
+  const { origin, rpId } = bound
+  const publicKey = isCreate
+    ? { ...msg.publicKey, rp: { ...msg.publicKey?.rp, id: rpId } }
+    : { ...msg.publicKey, rpId }
+  const request = {
+    requestId: msg.requestId,
+    tabId: sender.tab.id,
+    frameId: sender.frameId,
+    origin,
+    rpId,
+    publicKey,
+    resultType: isCreate
+      ? CONTENT_MESSAGE_TYPES.SAVED_PASSKEY
+      : CONTENT_MESSAGE_TYPES.GOT_PASSKEY
+  }
+
+  // Conditional UI (passive autofill) waits for the in-page popup instead.
+  if (!isCreate && msg.mediation === 'conditional') {
+    conditionalPasskeyRequests.set(sender.tab.id, {
+      ...request,
+      timestamp: Date.now()
+    })
+    logger.log('Stored conditional UI passkey request for autofill')
+    sendResponse({ success: true })
+    return
+  }
+
+  passkeyRequests.set(msg.requestId, request)
+  openPasskeyWindow(
+    new URLSearchParams({
+      requestId: msg.requestId,
+      page: msg.type,
+      serializedPublicKey: JSON.stringify(publicKey),
+      requestOrigin: origin
+    })
+  )
+  sendResponse({ success: true })
+}
+
+const sendPasskeyResult = ({ tabId, frameId, requestId, resultType }, result) =>
+  chrome.tabs.sendMessage(
+    tabId,
+    { type: resultType, requestId, ...result },
+    { frameId }
+  )
+
+const forgetTab = (tabId) => {
+  conditionalPasskeyRequests.delete(tabId)
+  for (const [requestId, request] of passkeyRequests) {
+    if (request.tabId === tabId) passkeyRequests.delete(requestId)
+  }
+}
+
 const openPasskeyWindow = (queryParams = new URLSearchParams()) => {
   // Get the page type from queryParams to determine the route
   const page = queryParams.get('page')
@@ -759,17 +832,11 @@ const getAssertionCredential = async (
 }
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  if (conditionalPasskeyRequests.has(tabId)) {
-    conditionalPasskeyRequests.delete(tabId)
-    logger.log(`Cleaned up conditional passkey request for closed tab ${tabId}`)
-  }
+  forgetTab(tabId)
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.url && conditionalPasskeyRequests.has(tabId)) {
-    conditionalPasskeyRequests.delete(tabId)
-    logger.log(
-      `Cleaned up conditional passkey request for tab ${tabId} navigation`
-    )
+  if (changeInfo.url) {
+    forgetTab(tabId)
   }
 })

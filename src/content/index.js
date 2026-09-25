@@ -38,6 +38,7 @@ import { logger } from '../shared/utils/logger'
 import { runtime } from '../shared/utils/runtime'
 
 const activeIframes = new Set()
+const passkeyRequestIds = new Set()
 const logoAttachGuard = createLogoAttachGuard()
 
 let isAutoFillEnabled = true
@@ -117,46 +118,28 @@ runtime.onMessage.addListener(async (msg) => {
   }
 
   if (msg.type === CONTENT_MESSAGE_TYPES.SAVED_PASSKEY) {
-    window.postMessage(
-      {
-        type: msg.type,
-        requestId: msg.requestId,
-        recordId: msg.recordId,
-        credential: msg.credential
-      },
-      '*'
-    )
+    postPasskeyResult({
+      type: msg.type,
+      requestId: msg.requestId,
+      recordId: msg.recordId,
+      credential: msg.credential
+    })
   }
 
   if (msg.type === CONTENT_MESSAGE_TYPES.CREATE_THIRD_PARTY_KEY) {
-    window.postMessage(
-      {
-        type: msg.type,
-        requestId: msg.requestId
-      },
-      '*'
-    )
+    postPasskeyResult({ type: msg.type, requestId: msg.requestId })
   }
 
   if (msg.type === CONTENT_MESSAGE_TYPES.GOT_PASSKEY) {
-    window.postMessage(
-      {
-        type: msg.type,
-        requestId: msg.requestId,
-        credential: msg.credential
-      },
-      '*'
-    )
+    postPasskeyResult({
+      type: msg.type,
+      requestId: msg.requestId,
+      credential: msg.credential
+    })
   }
 
   if (msg.type === CONTENT_MESSAGE_TYPES.GET_THIRD_PARTY_KEY) {
-    window.postMessage(
-      {
-        type: msg.type,
-        requestId: msg.requestId
-      },
-      '*'
-    )
+    postPasskeyResult({ type: msg.type, requestId: msg.requestId })
   }
 
   if (msg.type === CONTENT_MESSAGE_TYPES.AUTOFILL_FROM_ACTION) {
@@ -1091,23 +1074,54 @@ function handleWindowEvent(event) {
   const type = data.type
 
   if (type === CONTENT_MESSAGE_TYPES.CREATE_PASSKEY) {
-    runtime.sendMessage({
-      type: MESSAGE_TYPES.CREATE_PASSKEY,
-      requestId: data.requestId,
-      publicKey: data.publicKey,
-      requestOrigin: data.requestOrigin
-    })
+    forwardPasskeyRequest(
+      {
+        type: MESSAGE_TYPES.CREATE_PASSKEY,
+        requestId: data.requestId,
+        publicKey: data.publicKey
+      },
+      CONTENT_MESSAGE_TYPES.SAVED_PASSKEY
+    )
   }
 
   if (type === CONTENT_MESSAGE_TYPES.GET_PASSKEY) {
-    runtime.sendMessage({
-      type: MESSAGE_TYPES.GET_PASSKEY,
-      requestId: data.requestId,
-      publicKey: data.publicKey,
-      mediation: data.mediation,
-      requestOrigin: data.requestOrigin
-    })
+    forwardPasskeyRequest(
+      {
+        type: MESSAGE_TYPES.GET_PASSKEY,
+        requestId: data.requestId,
+        publicKey: data.publicKey,
+        mediation: data.mediation
+      },
+      CONTENT_MESSAGE_TYPES.GOT_PASSKEY
+    )
   }
+}
+
+// The background binds the request to this frame's own origin, so the page's
+// requestOrigin is never forwarded. A rejected request resolves the page's
+// promise with null instead of leaving it hanging.
+const forwardPasskeyRequest = (message, resultType) => {
+  passkeyRequestIds.add(message.requestId)
+  runtime
+    .sendMessage(message)
+    .then((response) => {
+      if (response?.success === false) {
+        postPasskeyResult({
+          type: resultType,
+          requestId: message.requestId,
+          credential: null
+        })
+      }
+    })
+    .catch(() => {})
+}
+
+// Only results for requests this frame forwarded, and only to this origin.
+const postPasskeyResult = (msg) => {
+  if (!passkeyRequestIds.has(msg.requestId)) {
+    return
+  }
+  window.postMessage(msg, window.location.origin)
 }
 
 const handleIframeEvent = (event) => {

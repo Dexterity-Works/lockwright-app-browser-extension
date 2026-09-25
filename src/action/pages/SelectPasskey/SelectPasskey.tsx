@@ -11,9 +11,11 @@ import {
 } from 'lockwright-lib-ui-react-native-components'
 import { Add } from 'lockwright-lib-ui-react-native-components/icons'
 
-import { CONTENT_MESSAGE_TYPES } from '../../../shared/constants/nativeMessaging'
 import { useRouter } from '../../../shared/context/RouterContext'
-import { MESSAGE_TYPES } from '../../../shared/services/messageBridge'
+import {
+  MESSAGE_TYPES,
+  passkeyMessages
+} from '../../../shared/services/messageBridge'
 import { getHostname } from '../../../shared/utils/getHostname'
 import { doesWebsiteMatchPage } from '../../../shared/utils/doesWebsiteMatchPage'
 import { logger } from '../../../shared/utils/logger'
@@ -43,7 +45,7 @@ export const SelectPasskey = () => {
   const { theme } = useTheme()
   const [uriMatchEpoch, setUriMatchEpoch] = useState(0)
 
-  const { serializedPublicKey, requestId, requestOrigin, tabId } = routerState
+  const { serializedPublicKey, requestId, requestOrigin } = routerState
 
   useEffect(() => {
     let alive = true
@@ -59,6 +61,9 @@ export const SelectPasskey = () => {
     }
   }, [])
 
+  const reportResult = (credential: unknown) =>
+    passkeyMessages.reportResult(requestId, { credential })
+
   const handleRecordSelect = (record: PasskeyRecord) => {
     chrome.runtime
       .sendMessage({
@@ -67,23 +72,13 @@ export const SelectPasskey = () => {
         credential: record.data?.credential,
         requestOrigin
       })
-      .then((response) => {
-        chrome.tabs.sendMessage(parseInt(tabId), {
-          type: CONTENT_MESSAGE_TYPES.GOT_PASSKEY,
-          requestId,
-          credential: response.assertionCredential
-        })
-      })
+      .then((response) => reportResult(response.assertionCredential))
       .catch((error) => {
         logger.error(
           'Failed to get assertion credential:',
           (error as Error)?.message || error
         )
-        chrome.tabs.sendMessage(parseInt(tabId), {
-          type: CONTENT_MESSAGE_TYPES.GOT_PASSKEY,
-          requestId,
-          credential: null
-        })
+        return reportResult(null)
       })
       .finally(() => {
         window.close()
@@ -91,25 +86,13 @@ export const SelectPasskey = () => {
   }
 
   const handleCancel = () => {
-    chrome.tabs
-      .sendMessage(parseInt(tabId), {
-        type: CONTENT_MESSAGE_TYPES.GOT_PASSKEY,
-        requestId,
-        credential: null
-      })
-      .finally(() => {
-        window.close()
-      })
+    reportResult(null).finally(() => {
+      window.close()
+    })
   }
 
   const handleAddNewLogin = () => {
-    chrome.tabs
-      .sendMessage(parseInt(tabId), {
-        type: CONTENT_MESSAGE_TYPES.GOT_PASSKEY,
-        requestId,
-        credential: null
-      })
-      .catch(() => {})
+    void reportResult(null)
     navigate('createPasskey', { state: routerState })
   }
 

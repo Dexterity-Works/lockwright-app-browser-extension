@@ -29,18 +29,18 @@ const layOut = (element, width, height) => {
   element.getBoundingClientRect = () => ({ width, height })
 }
 
+beforeAll(async () => {
+  chrome.runtime.sendMessage.mockResolvedValue({})
+  chrome.runtime.getURL = jest.fn(() => '')
+  await import('./index')
+})
+
+afterEach(() => {
+  jest.restoreAllMocks()
+  document.body.innerHTML = ''
+})
+
 describe('content script autofill from action', () => {
-  beforeAll(async () => {
-    chrome.runtime.sendMessage.mockResolvedValue({})
-    chrome.runtime.getURL = jest.fn(() => '')
-    await import('./index')
-  })
-
-  afterEach(() => {
-    jest.restoreAllMocks()
-    document.body.innerHTML = ''
-  })
-
   it('fills only visible login fields in the top frame', async () => {
     document.body.innerHTML = `
       <form>
@@ -78,5 +78,51 @@ describe('content script autofill from action', () => {
 
     expect(document.getElementById('user').value).toBe('')
     expect(document.getElementById('pwd').value).toBe('')
+  })
+})
+
+describe('content script passkey results', () => {
+  const fromBackground = async (msg) => {
+    const [listener] = chrome.runtime.onMessage.addListener.mock.calls.at(-1)
+    await listener(msg)
+  }
+
+  const fromPage = async (data) => {
+    window.dispatchEvent(new MessageEvent('message', { data, source: window }))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  }
+
+  it('ignores a result for a request it never forwarded', async () => {
+    const postMessage = jest.spyOn(window, 'postMessage')
+
+    await fromBackground({
+      type: 'gotPasskey',
+      requestId: 'never-seen',
+      credential: { id: 'x' }
+    })
+
+    expect(postMessage).not.toHaveBeenCalled()
+  })
+
+  it('posts a forwarded result to the page origin only', async () => {
+    const postMessage = jest.spyOn(window, 'postMessage')
+    chrome.runtime.sendMessage.mockResolvedValue({ success: true })
+
+    await fromPage({
+      source: 'pearpass',
+      type: 'getPasskey',
+      requestId: 'r-1',
+      publicKey: { challenge: 'c' }
+    })
+    await fromBackground({
+      type: 'gotPasskey',
+      requestId: 'r-1',
+      credential: { id: 'x' }
+    })
+
+    expect(postMessage).toHaveBeenCalledWith(
+      { type: 'gotPasskey', requestId: 'r-1', credential: { id: 'x' } },
+      window.location.origin
+    )
   })
 })

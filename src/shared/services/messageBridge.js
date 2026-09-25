@@ -27,6 +27,7 @@ export const MESSAGE_TYPES = Object.freeze({
   GET_ASSERTION_CREDENTIAL: 'getAssertionCredential',
   GET_CONDITIONAL_PASSKEY_REQUEST: 'getConditionalPasskeyRequest',
   AUTHENTICATE_WITH_PASSKEY: 'authenticateWithPasskey',
+  PASSKEY_RESULT: 'passkeyResult',
   GET_PLATFORM_INFO: 'GET_PLATFORM_INFO',
   GET_AUTO_LOCK_SETTINGS: 'GET_AUTO_LOCK_SETTINGS',
   SET_AUTO_LOCK_ENABLED: 'SET_AUTO_LOCK_ENABLED',
@@ -311,6 +312,23 @@ export const passkeyMessages = {
       serializedPublicKey,
       credential
     })
+  },
+
+  /**
+   * Hand the popup's outcome to the background, which delivers it to the
+   * frame that made the request. Never rejects; the bridge already logs.
+   * @param {string} requestId
+   * @param {{ credential?: unknown, recordId?: string | null }} result
+   */
+  async reportResult(requestId, result) {
+    try {
+      await messageBridge.sendMessage(MESSAGE_TYPES.PASSKEY_RESULT, {
+        requestId,
+        ...result
+      })
+    } catch {
+      // logged by the bridge
+    }
   }
 }
 

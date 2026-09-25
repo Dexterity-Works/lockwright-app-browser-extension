@@ -14,6 +14,7 @@ import { useGlobalLoading } from '../../../shared/context/LoadingContext'
 import { useModal } from '../../../shared/context/ModalContext'
 import { useRouter } from '../../../shared/context/RouterContext'
 import { VaultPasswordFormModalContent } from '../../../shared/containers/VaultPasswordFormModalContent'
+import { getHostname } from '../../../shared/utils/getHostname'
 import { logger } from '../../../shared/utils/logger'
 import { PASSKEY_VERIFICATION_OPTIONS } from '../../../shared/constants/storage'
 import { getPasskeyVerificationPreference } from '../../../shared/utils/passkeyVerificationPreference'
@@ -42,8 +43,7 @@ export const PasskeyContainer = ({
   const {
     serializedPublicKey = null,
     requestId = null,
-    requestOrigin = null,
-    tabId = null
+    requestOrigin = null
   } = routerState ?? {}
 
   const { data: vaultsData, refetch: refetchVaults } = useVaults()
@@ -122,7 +122,6 @@ export const PasskeyContainer = ({
           serializedPublicKey,
           requestId,
           requestOrigin,
-          tabId,
           inPasskeyFlow: true,
           isVerified: true
         }
@@ -156,14 +155,17 @@ export const PasskeyContainer = ({
     serializedPublicKey,
     requestId,
     requestOrigin,
-    tabId,
     routerState?.isVerified,
     currentPage
   ])
 
   return (
     <div className="bg-background flex w-full flex-col">
-      <PasskeyPopupHeader title={title} onClose={onClose} />
+      <PasskeyPopupHeader
+        title={title}
+        hostname={getHostname(requestOrigin)}
+        onClose={onClose}
+      />
 
       <div className="border-border-primary bg-surface-primary flex flex-1 flex-col gap-[var(--spacing24)] overflow-hidden rounded-[var(--radius16)] border p-[var(--spacing12)]">
         <VaultSwitcherDropdown

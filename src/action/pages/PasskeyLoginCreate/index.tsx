@@ -10,31 +10,25 @@ import {
 } from 'lockwright-lib-ui-react-native-components'
 import { RECORD_TYPES, useCreateRecord } from 'lockwright-lib-vault'
 
-import { CONTENT_MESSAGE_TYPES } from '../../../shared/constants/nativeMessaging'
 import { useGlobalLoading } from '../../../shared/context/LoadingContext'
 import { useRouter } from '../../../shared/context/RouterContext'
 import { RecordItemIcon } from '../../../shared/containers/RecordItemIcon'
+import { passkeyMessages } from '../../../shared/services/messageBridge'
 import { sanitizeCredentialForPage } from '../../../shared/utils/sanitizeCredentialForPage'
 import { formatPasskeyDate } from '../../../shared/utils/formatPasskeyDate'
 import { PasskeyContainer } from '../../containers/PasskeyContainer/PasskeyContainer'
 
 export const PasskeyLoginCreate = () => {
   const { state: routerState } = useRouter()
-  const { passkeyCredential, passkeyCreatedAt, initialData, requestId, tabId } =
+  const { passkeyCredential, passkeyCreatedAt, initialData, requestId } =
     routerState ?? {}
 
   const { title = '', username = '', websites = [] } = initialData ?? {}
 
   const handleDiscard = () => {
-    chrome.tabs
-      .sendMessage(parseInt(tabId), {
-        type: CONTENT_MESSAGE_TYPES.SAVED_PASSKEY,
-        requestId,
-        recordId: null
-      })
-      .finally(() => {
-        window.close()
-      })
+    passkeyMessages.reportResult(requestId, { recordId: null }).finally(() => {
+      window.close()
+    })
   }
 
   const schema = Validator.object({
@@ -57,10 +51,8 @@ export const PasskeyLoginCreate = () => {
     onCompleted: (payload) => {
       const recordId =
         (payload as { record?: { id?: string } })?.record?.id ?? null
-      chrome.tabs
-        .sendMessage(parseInt(tabId), {
-          type: CONTENT_MESSAGE_TYPES.SAVED_PASSKEY,
-          requestId,
+      passkeyMessages
+        .reportResult(requestId, {
           recordId,
           credential: sanitizeCredentialForPage(passkeyCredential)
         })

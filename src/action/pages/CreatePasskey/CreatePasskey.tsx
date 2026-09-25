@@ -11,12 +11,14 @@ import {
 import { Add } from 'lockwright-lib-ui-react-native-components/icons'
 import { RECORD_TYPES, useRecords } from 'lockwright-lib-vault'
 
-import { CONTENT_MESSAGE_TYPES } from '../../../shared/constants/nativeMessaging'
 import { RecordItemIcon } from '../../../shared/containers/RecordItemIcon'
 import { ReplacePasskeyModalContent } from '../../../shared/containers/ReplacePasskeyModalContent/ReplacePasskeyModalContent'
 import { useModal } from '../../../shared/context/ModalContext'
 import { useRouter } from '../../../shared/context/RouterContext'
-import { MESSAGE_TYPES } from '../../../shared/services/messageBridge'
+import {
+  MESSAGE_TYPES,
+  passkeyMessages
+} from '../../../shared/services/messageBridge'
 import { getHostname } from '../../../shared/utils/getHostname'
 import { getRecordSubtitle } from '../../../shared/utils/getRecordSubtitle'
 import { logger } from '../../../shared/utils/logger'
@@ -34,7 +36,7 @@ type RecordEntry = {
 
 export const CreatePasskey = () => {
   const { state: routerState, navigate } = useRouter()
-  const { requestId, tabId, serializedPublicKey, requestOrigin } = routerState
+  const { requestId, serializedPublicKey, requestOrigin } = routerState
   const { setModal } = useModal()
   const { theme } = useTheme()
   const { data: records } = useRecords()
@@ -63,8 +65,7 @@ export const CreatePasskey = () => {
           },
           serializedPublicKey,
           requestId,
-          requestOrigin,
-          tabId
+          requestOrigin
         }
       })
     } catch (error) {
@@ -97,7 +98,6 @@ export const CreatePasskey = () => {
             serializedPublicKey,
             requestId,
             requestOrigin,
-            tabId,
             isVerified: routerState?.isVerified ?? true
           }
         })
@@ -135,15 +135,9 @@ export const CreatePasskey = () => {
   }
 
   const handleCancel = () => {
-    chrome.tabs
-      .sendMessage(parseInt(tabId), {
-        type: CONTENT_MESSAGE_TYPES.SAVED_PASSKEY,
-        requestId,
-        recordId: null
-      })
-      .finally(() => {
-        window.close()
-      })
+    passkeyMessages.reportResult(requestId, { recordId: null }).finally(() => {
+      window.close()
+    })
   }
 
   const recordsFiltered = useMemo(() => {

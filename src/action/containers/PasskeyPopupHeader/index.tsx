@@ -8,11 +8,14 @@ import { LockwrightMark } from '../../../shared/components/LockwrightMark'
 
 type PasskeyPopupHeaderProps = {
   title: string
+  /** Host of the frame that asked, as the background saw it. */
+  hostname?: string | null
   onClose: () => void
 }
 
 export const PasskeyPopupHeader = ({
   title,
+  hostname,
   onClose
 }: PasskeyPopupHeaderProps) => {
   const { theme } = useTheme()
@@ -24,9 +27,21 @@ export const PasskeyPopupHeader = ({
         color={theme.colors.colorAccentActive}
       />
 
-      <Text variant="labelEmphasized" as="span">
-        {title}
-      </Text>
+      <div className="flex flex-col items-center">
+        <Text variant="labelEmphasized" as="span">
+          {title}
+        </Text>
+        {hostname ? (
+          <Text
+            variant="caption"
+            as="span"
+            color={theme.colors.colorTextSecondary}
+            data-testid="passkey-popup-header-hostname"
+          >
+            {hostname}
+          </Text>
+        ) : null}
+      </div>
 
       <Button
         variant="tertiary"

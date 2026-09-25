@@ -2,9 +2,9 @@
 import { useRecordById } from 'lockwright-lib-vault'
 
 import { CreateOrEditCategoryWrapper } from '../../../action/containers/Modal/CreateOrEditCategoryWrapper'
-import { CONTENT_MESSAGE_TYPES } from '../../constants/nativeMessaging'
 import { useRouter } from '../../context/RouterContext'
 import { useIsPasskeyPopup } from '../../hooks/useIsPasskeyPopup'
+import { passkeyMessages } from '../../services/messageBridge'
 import { sanitizeCredentialForPage } from '../../utils/sanitizeCredentialForPage'
 
 type RouterParams = {
@@ -23,7 +23,6 @@ type RouterState = {
   serializedPublicKey?: string
   requestId?: string
   requestOrigin?: string
-  tabId?: string
 }
 
 type LoadedRecord = {
@@ -77,10 +76,8 @@ export const CreateOrEditCategory = () => {
   const selectedFolder = params?.selectedFolder ?? record?.folder
 
   const handleSaved = (savedRecordId?: string) => {
-    if (isPasskeyPopup && state?.tabId) {
-      chrome.tabs.sendMessage(parseInt(state.tabId), {
-        type: CONTENT_MESSAGE_TYPES.SAVED_PASSKEY,
-        requestId: state.requestId,
+    if (isPasskeyPopup && state?.requestId) {
+      void passkeyMessages.reportResult(state.requestId, {
         recordId: savedRecordId ?? null,
         credential: passkeyCredential
           ? sanitizeCredentialForPage(passkeyCredential)
@@ -107,8 +104,7 @@ export const CreateOrEditCategory = () => {
         state: {
           serializedPublicKey: state?.serializedPublicKey,
           requestId: state?.requestId,
-          requestOrigin: state?.requestOrigin,
-          tabId: state?.tabId
+          requestOrigin: state?.requestOrigin
         }
       })
       return
