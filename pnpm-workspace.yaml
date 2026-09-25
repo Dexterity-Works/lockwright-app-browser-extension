@@ -32,7 +32,7 @@ allowBuilds:
   "lockwright-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/3fb28bee9328290a12119feaaf912d1018fcf6f8": true
   "lockwright-utils-password-generator@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-generator/tar.gz/382806f37823902b41087200c6d96bd83f3d3358": true
   "lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e": true
-  "lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600": true
+  "lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/7b16a0e53026b752d580a302052fdab1ea726b01": true
   "@tetherto/tether-dev-docs@https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583": true
 
 patchedDependencies:

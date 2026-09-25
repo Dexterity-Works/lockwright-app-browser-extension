@@ -254,8 +254,8 @@ importers:
         specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#82167746355a4d1b931dae2c3d4abe10a7e10b7e
         version: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)
       lockwright-lib-vault:
-        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#8d460cfffa991da39ecd37a199cb2b96b9b5b600
-        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)
+        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#7b16a0e53026b752d580a302052fdab1ea726b01
+        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/7b16a0e53026b752d580a302052fdab1ea726b01(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)
       lockwright-utils-avatar-initials:
         specifier: git+https://github.com/Dexterity-Works/lockwright-utils-avatar-initials.git#4b143620f2047f51296f36f34289e39a83e4c6cb
         version: https://codeload.github.com/Dexterity-Works/lockwright-utils-avatar-initials/tar.gz/4b143620f2047f51296f36f34289e39a83e4c6cb
@@ -2250,7 +2250,7 @@ packages:
         optional: true
 
   '@tetherto/tether-dev-docs@https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583}
+    resolution: {gitHosted: true, integrity: sha512-aMgE0ADJBcxBgsBHH/BV8wLxnvbCQZteaVo6bm8B3v/qXuOf8FXvgO9DRa9RowY+mawSZrgVD1KYlu2DDDF3zw==, tarball: https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583}
     version: 0.0.8
 
   '@tootallnate/once@2.0.1':
@@ -4128,8 +4128,8 @@ packages:
       react-native-svg:
         optional: true
 
-  lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600:
-    resolution: {gitHosted: true, integrity: sha512-tUVL5jDIMJqofiRdDVaShZEZUWbQHwJ/XRu7H7GgpIl/KrG31Xlf2xZLTDWSItkvbJ0D1FE2l44Z7kqlYQbbew==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600}
+  lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/7b16a0e53026b752d580a302052fdab1ea726b01:
+    resolution: {gitHosted: true, integrity: sha512-VJLIqlZVOl4JULWUPhlgPELH4resNQVp9KakgJSxANmgvbNX36bQSKmJ9ms+I8M0wOtf8pitj603AcoPihYDZg==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/7b16a0e53026b752d580a302052fdab1ea726b01}
     version: 0.1.0
     engines: {node: '>=22.12.0', pnpm: '>=11.10.0'}
     peerDependencies:
@@ -9917,7 +9917,7 @@ snapshots:
       - postcss
       - supports-color
 
-  lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/8d460cfffa991da39ecd37a199cb2b96b9b5b600(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1):
+  lockwright-lib-vault@https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/7b16a0e53026b752d580a302052fdab1ea726b01(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1):
     dependencies:
       '@reduxjs/toolkit': 2.5.0(react-redux@9.1.2(@types/react@19.0.0)(react@19.1.0)(redux@5.0.1))(react@19.1.0)
       react: 19.1.0
