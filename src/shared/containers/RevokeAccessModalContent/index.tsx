@@ -43,7 +43,7 @@ export const RevokeAccessModalContent = ({
       setToast({
         message: failures?.length
           ? t`Couldn't reach the device. It will lose access next time it comes online.`
-          : t`"${deviceName}" no longer has access to this vault`
+          : t`"${deviceName}" can no longer edit this vault`
       })
     } catch (error) {
       logger.error('RevokeAccessModalContent', 'kickDevice failed:', error)
@@ -91,7 +91,7 @@ export const RevokeAccessModalContent = ({
       >
         <div className="flex flex-col">
           <Text as="p" variant="caption">
-            {t`This will disconnect the device from future syncing.`}
+            {t`Revoking stops this device from making changes. It can still read what has already synced, and anything synced later, until you move your items to a new vault.`}
           </Text>
           <Text as="p" variant="caption">
             {t`Before you proceed, please note:`}
@@ -105,7 +105,7 @@ export const RevokeAccessModalContent = ({
           </li>
           <li className="m-0">
             <Text as="span" variant="caption">
-              {t`Offline Data: Revoking access prevents future syncing, but it cannot remotely delete data that was already exported.`}
+              {t`Offline Data: Revoking cannot remotely delete data that is already on the device or was exported from it.`}
             </Text>
           </li>
         </ul>

@@ -98,7 +98,7 @@ describe('RevokeAccessModalContent', () => {
     expect(refetchVault).toHaveBeenCalledWith('v1')
     expect(closeModal).toHaveBeenCalled()
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/no longer has access/)
+      message: expect.stringMatching(/can no longer edit this vault/)
     })
   })
 
