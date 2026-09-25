@@ -9,6 +9,22 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.29] - 2026-09-26
+
+`BUMP_SHA`
+
+### Security
+
+- Passkey requests use the requesting frame's origin, never the value the page supplied, and the relying party must match the page host. The result goes only to the frame that asked, and the popup shows the site.
+- Popup Autofill fills the top frame only and skips hidden or zero-size fields.
+- A captured login is returned only to the frame origin that saved it.
+- Content scripts no longer pass as extension pages.
+- Pin lib-vault `7b16a0e`: a protected vault's unwrap key stays out of the master catalog, pairing refuses a vault id already on the device, and a leaving device loses its writer key. A protected vault renamed or paired before this build should be moved to a new vault.
+
+### Changed
+
+- The revoke dialog says the device keeps reading until the vault is moved.
+
 ## [0.0.28] - 2026-09-24
 
 `228bf1ec4c40c8f9fff9590711da38027b2e4f4d`
@@ -129,7 +145,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - Login-detect popup closes after a successful save.
 - Onboarding wordmark capped so the pair step still fits.
 
-[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/228bf1ec4c40c8f9fff9590711da38027b2e4f4d...HEAD
+[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/BUMP_SHA...HEAD
+[0.0.29]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/228bf1ec4c40c8f9fff9590711da38027b2e4f4d...BUMP_SHA
 [0.0.28]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/405f162420b37806e6803ab0b6bd6237d4241e4c...228bf1ec4c40c8f9fff9590711da38027b2e4f4d
 [0.0.27]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/7f04001dfc7dd387722d761c158224395ecc3316...405f162420b37806e6803ab0b6bd6237d4241e4c
 [0.0.26]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/a6ac296bfb242127aa37ddf37b37b78afc585e32...7f04001dfc7dd387722d761c158224395ecc3316
