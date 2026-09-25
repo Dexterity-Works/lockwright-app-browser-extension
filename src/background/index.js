@@ -35,6 +35,8 @@ import { runtime } from '../shared/utils/runtime'
 const { SCHEDULE_CLIPBOARD_CLEAR, CLEAR_CLIPBOARD_NOW } = MESSAGES
 const { CLEAR_CLIPBOARD } = ALARMS
 
+const CLIPBOARD_CLEAR_MAX_MS = 10 * 60 * 1000
+
 const pending = new Map()
 const passkeyRequests = new Map()
 const conditionalPasskeyRequests = new Map()
@@ -309,11 +311,6 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return
     }
 
-    case MESSAGE_TYPES.SELECTED_PASSKEY: {
-      handlePasskeyCreated({ msg })
-      return
-    }
-
     case MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD: {
       const { requestOrigin, serializedPublicKey } = msg
       void sendPasskeyPayload(requestOrigin, serializedPublicKey, sendResponse)
@@ -504,7 +501,11 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
     case SCHEDULE_CLIPBOARD_CLEAR: {
       void (async () => {
         await chrome.alarms.clear(CLEAR_CLIPBOARD)
-        const when = Date.now() + msg.delayMs
+        const delayMs = Math.min(
+          Math.max(Number(msg.delayMs) || 0, 0),
+          CLIPBOARD_CLEAR_MAX_MS
+        )
+        const when = Date.now() + delayMs
         await chrome.alarms.create(CLEAR_CLIPBOARD, { when })
         sendResponse({ success: true })
       })()
@@ -614,30 +615,32 @@ const sendPasskeyPayload = async (
   }
 }
 
+// A captured login is keyed by tab but handed back only to the origin that
+// saved it, so another frame on the page cannot read or plant it.
 const handleLoginMessage = ({ msg, sender }) => {
-  if (!msg.data.username && msg.data.password) {
-    pending.set(sender.tab.id, {
-      ...pending.get(sender.tab.id),
-      password: msg.data.password
-    })
-  } else {
-    pending.set(sender.tab.id, msg.data)
-  }
+  const origin = new URL(sender.url).origin
+  const current = pending.get(sender.tab.id)
+  const isPasswordOnly = !msg.data.username && msg.data.password
+  const data =
+    isPasswordOnly && current?.origin === origin
+      ? { ...current.data, password: msg.data.password }
+      : msg.data
+
+  pending.set(sender.tab.id, { origin, data })
 
   setTimeout(() => {
     clearPending(sender.tab.id)
   }, 1000 * 30)
 }
 
-const handleGetPendingLogin = ({ msg, sender, sendResponse }) => {
-  if (!pending.has(sender.tab.id) && !msg.data) {
+const handleGetPendingLogin = ({ sender, sendResponse }) => {
+  const entry = pending.get(sender.tab.id)
+  if (!entry || entry.origin !== new URL(sender.url).origin) {
     sendResponse({ type: 'pendingLogin', data: null })
     return
   }
 
-  const data = pending.get(sender.tab.id) || null
-
-  sendResponse({ type: 'pendingLogin', data: data })
+  sendResponse({ type: 'pendingLogin', data: entry.data })
   clearPending(sender.tab.id)
 }
 
@@ -752,16 +755,6 @@ const openPasskeyWindow = (queryParams = new URLSearchParams()) => {
     width: passkeyWindowSize.width,
     url: runtime.getURL(`index.html#/${page}?${queryParams.toString()}`),
     type: 'popup'
-  })
-}
-
-const handlePasskeyCreated = ({ msg }) => {
-  const { requestId, selectedItem, tabId } = msg
-
-  chrome.tabs.sendMessage(parseInt(tabId), {
-    type: 'selectedPasskey',
-    requestId,
-    selectedItem
   })
 }
 

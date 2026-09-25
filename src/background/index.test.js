@@ -148,3 +148,28 @@ describe('passkey requests', () => {
     )
   })
 })
+
+describe('captured logins', () => {
+  it('returns a captured login only to the origin that saved it', async () => {
+    const data = { username: 'alice', password: 'pw' }
+    await send(
+      { type: MESSAGE_TYPES.LOGIN, data },
+      pageSender('https://a.example/login', { tabId: 21, frameId: 0 })
+    )
+
+    const otherOrigin = await send(
+      { type: MESSAGE_TYPES.GET_PENDING_LOGIN },
+      pageSender('https://evil.example/', { tabId: 21, frameId: 5 })
+    )
+    expect(otherOrigin).toHaveBeenCalledWith({
+      type: 'pendingLogin',
+      data: null
+    })
+
+    const sameOrigin = await send(
+      { type: MESSAGE_TYPES.GET_PENDING_LOGIN },
+      pageSender('https://a.example/welcome', { tabId: 21, frameId: 0 })
+    )
+    expect(sameOrigin).toHaveBeenCalledWith({ type: 'pendingLogin', data })
+  })
+})

@@ -22,7 +22,6 @@ export const MESSAGE_TYPES = Object.freeze({
   GET_PENDING_LOGIN: 'getPendingLogin',
   CREATE_PASSKEY: 'createPasskey',
   GET_PASSKEY: 'getPasskey',
-  SELECTED_PASSKEY: 'selectedPasskey',
   READY_FOR_PASSKEY_PAYLOAD: 'readyForPasskeyPayload',
   GET_ASSERTION_CREDENTIAL: 'getAssertionCredential',
   GET_CONDITIONAL_PASSKEY_REQUEST: 'getConditionalPasskeyRequest',
@@ -294,14 +293,6 @@ export const passkeyMessages = {
       publicKey,
       requestOrigin,
       requestId,
-      tabId
-    })
-  },
-
-  async selectPasskey(requestId, selectedItem, tabId) {
-    return messageBridge.sendMessage(MESSAGE_TYPES.SELECTED_PASSKEY, {
-      requestId,
-      selectedItem,
       tabId
     })
   },

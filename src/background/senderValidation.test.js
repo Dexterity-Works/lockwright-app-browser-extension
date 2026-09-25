@@ -31,6 +31,11 @@ describe('validateSender', () => {
       const sender = { id: EXTENSION_ID, url: undefined }
       expect(validateSender(sender, 'extension-page')).toBe(true)
     })
+
+    it('blocks content scripts, which share the runtime id but have a tab', () => {
+      const sender = { id: EXTENSION_ID, url: 'https://x', tab: { id: 1 } }
+      expect(validateSender(sender, 'extension-page')).toBe(false)
+    })
   })
 
   describe('content-script context', () => {
