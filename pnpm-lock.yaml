@@ -250,8 +250,8 @@ importers:
         specifier: git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#fd4dd5859d0bd9a23f90c7ae9f2346fdb3d72cf8
         version: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/fd4dd5859d0bd9a23f90c7ae9f2346fdb3d72cf8(@types/react@19.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)
       lockwright-utils-generate-unique-id:
-        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-generate-unique-id.git#99a1450ca075c570fa08855280c8f73789cea07a
-        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a
+        specifier: git+https://github.com/Dexterity-Works/lockwright-utils-generate-unique-id.git#b1cec22b12b85bb1186aafa05223be64b7aea2cc
+        version: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/b1cec22b12b85bb1186aafa05223be64b7aea2cc
       lockwright-utils-password-check:
         specifier: git+https://github.com/Dexterity-Works/lockwright-utils-password-check.git#dc56473c03d574ddb80a98f2560cea69d01b1cca
         version: https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/dc56473c03d574ddb80a98f2560cea69d01b1cca
@@ -4065,8 +4065,8 @@ packages:
       react: '>=18.3.1'
       react-dom: '>=18.3.1'
 
-  lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a:
-    resolution: {gitHosted: true, integrity: sha512-j+IukWCXWZ/35Fzx080x3nDHlNMvG22FIcDLfcdtSitfzy5neqrIyW1uShkDfTomElwc+gUfqNUjjDUlLKnZZQ==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a}
+  lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/b1cec22b12b85bb1186aafa05223be64b7aea2cc:
+    resolution: {gitHosted: true, integrity: sha512-k+Duj9gQtDJCGNowPlqj2IPryzNsrM20VCilmOXbRzyc9IcV18vJ68lck4j+tAm1rdEnAAKeK4dHPSNx6/qahg==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/b1cec22b12b85bb1186aafa05223be64b7aea2cc}
     version: 0.0.6
     peerDependencies:
       expo-crypto: ~13.0.0
@@ -9693,7 +9693,7 @@ snapshots:
       - '@types/react'
       - redux
 
-  lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/99a1450ca075c570fa08855280c8f73789cea07a: {}
+  lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/b1cec22b12b85bb1186aafa05223be64b7aea2cc: {}
 
   lockwright-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/dc56473c03d574ddb80a98f2560cea69d01b1cca: {}
 
