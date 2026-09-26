@@ -9,6 +9,27 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.30] - 2026-09-26
+
+`BUMP_SHA`
+
+### Security
+
+- Only extension pages may relay to the desktop, and relayed commands are checked against the command list.
+- Auto-lock settings and the activity heartbeat travel over the secure channel.
+- Passkeys are signed from the request the background stored, never from popup parameters.
+- The client key is derived with 600,000 PBKDF2 iterations. An existing key is upgraded on its next unlock.
+- The autofill frame posts only to the page origin. The popup CSP no longer allows docs.google.com or hooks.slack.com.
+
+### Changed
+
+- Redux, events, autoprefixer, npm-run-all and four utils packages are gone; small local helpers replace them. The content script no longer bundles React (212 KB to 63 KB). Unused fonts and images removed.
+- Pin lib-vault `b1a4bb0` and the utils libraries to commits without install hooks.
+
+### Fixed
+
+- The test suite loads every package again and runs green.
+
 ## [0.0.29] - 2026-09-26
 
 `c418bd1a1b6be44e548b97a7fceedc88c9a90538`
@@ -145,7 +166,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - Login-detect popup closes after a successful save.
 - Onboarding wordmark capped so the pair step still fits.
 
-[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/c418bd1a1b6be44e548b97a7fceedc88c9a90538...HEAD
+[unreleased]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/BUMP_SHA...HEAD
+[0.0.30]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/c418bd1a1b6be44e548b97a7fceedc88c9a90538...BUMP_SHA
 [0.0.29]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/228bf1ec4c40c8f9fff9590711da38027b2e4f4d...c418bd1a1b6be44e548b97a7fceedc88c9a90538
 [0.0.28]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/405f162420b37806e6803ab0b6bd6237d4241e4c...228bf1ec4c40c8f9fff9590711da38027b2e4f4d
 [0.0.27]: https://github.com/Dexterity-Works/lockwright-app-browser-extension/compare/7f04001dfc7dd387722d761c158224395ecc3316...405f162420b37806e6803ab0b6bd6237d4241e4c
