@@ -68,9 +68,8 @@ export const SelectPasskey = () => {
     chrome.runtime
       .sendMessage({
         type: MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL,
-        serializedPublicKey,
-        credential: record.data?.credential,
-        requestOrigin
+        requestId,
+        credential: record.data?.credential
       })
       .then((response) => reportResult(response.assertionCredential))
       .catch((error) => {

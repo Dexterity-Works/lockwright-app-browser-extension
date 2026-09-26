@@ -48,8 +48,7 @@ export const CreatePasskey = () => {
     try {
       const response = await chrome.runtime.sendMessage({
         type: MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD,
-        requestOrigin,
-        serializedPublicKey
+        requestId
       })
 
       const { credential, publicKey } = response
@@ -80,8 +79,7 @@ export const CreatePasskey = () => {
     chrome.runtime
       .sendMessage({
         type: MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD,
-        requestOrigin,
-        serializedPublicKey
+        requestId
       })
       .then((response) => {
         const { credential, publicKey } = response

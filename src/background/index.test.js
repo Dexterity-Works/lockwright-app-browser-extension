@@ -13,12 +13,21 @@ jest.mock('./secureChannel', () => ({
   }
 }))
 
+jest.mock('./utils/credentialGenerator', () => ({
+  rebuildClientDataJSON: jest.fn(() => new ArrayBuffer(4)),
+  buildAuthenticatorData: jest.fn(async () => new Uint8Array(37)),
+  generateKeyPair: jest.fn(async () => {
+    throw new Error('stop before key generation')
+  })
+}))
+
 jest.mock('lockwright-lib-constants', () => ({
   MANIFEST_NAME: 'com.lockwright.test',
   MS_PER_SECOND: 1000
 }))
 
 import { MESSAGES } from './constants'
+import * as CredentialGenerator from './utils/credentialGenerator'
 import { CONTENT_MESSAGE_TYPES } from '../shared/constants/nativeMessaging'
 import { MESSAGE_TYPES } from '../shared/services/messageBridge'
 
@@ -148,6 +157,95 @@ describe('passkey requests', () => {
       }),
       { frameId: 4 }
     )
+  })
+})
+
+describe('passkey signing', () => {
+  const askFromPage = (requestId, type = MESSAGE_TYPES.GET_PASSKEY) =>
+    send(
+      {
+        type,
+        requestId,
+        publicKey: { challenge: 'real-challenge', rpId: 'example.com' }
+      },
+      pageSender('https://login.example.com/signin')
+    )
+
+  const forgedPopupFields = {
+    requestOrigin: 'https://attacker.example',
+    serializedPublicKey: JSON.stringify({
+      challenge: 'forged-challenge',
+      rpId: 'attacker.example'
+    })
+  }
+
+  it('signs an assertion with the stored origin and rpId, not the popup message', async () => {
+    await askFromPage('r-sign')
+    await send(
+      {
+        type: MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL,
+        requestId: 'r-sign',
+        credential: { _privateKeyBuffer: 'AAAA', response: {} },
+        ...forgedPopupFields
+      },
+      popupSender
+    )
+
+    expect(CredentialGenerator.rebuildClientDataJSON).toHaveBeenCalledWith(
+      'real-challenge',
+      'https://login.example.com',
+      'webauthn.get'
+    )
+    expect(CredentialGenerator.buildAuthenticatorData).toHaveBeenCalledWith(
+      'example.com',
+      null,
+      null,
+      true,
+      'preferred'
+    )
+    expect(CredentialGenerator.rebuildClientDataJSON).not.toHaveBeenCalledWith(
+      'forged-challenge',
+      expect.anything(),
+      expect.anything()
+    )
+  })
+
+  it('builds a registration from the stored request, not the popup message', async () => {
+    await askFromPage('r-create', MESSAGE_TYPES.CREATE_PASSKEY)
+    await send(
+      {
+        type: MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD,
+        requestId: 'r-create',
+        ...forgedPopupFields
+      },
+      popupSender
+    )
+
+    expect(CredentialGenerator.rebuildClientDataJSON).toHaveBeenCalledWith(
+      'real-challenge',
+      'https://login.example.com',
+      'webauthn.create'
+    )
+    expect(CredentialGenerator.rebuildClientDataJSON).not.toHaveBeenCalledWith(
+      'forged-challenge',
+      expect.anything(),
+      expect.anything()
+    )
+  })
+
+  it.each([
+    MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL,
+    MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD
+  ])('refuses %s for a request the page never made', async (type) => {
+    const sendResponse = await send(
+      { type, requestId: 'never-asked', credential: {}, ...forgedPopupFields },
+      popupSender
+    )
+
+    expect(sendResponse).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    )
+    expect(CredentialGenerator.rebuildClientDataJSON).not.toHaveBeenCalled()
   })
 })
 

@@ -289,11 +289,7 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true
       }
 
-      void getAssertionCredential(
-        request.origin,
-        JSON.stringify(request.publicKey),
-        msg.credential
-      )
+      void getAssertionCredential(request, msg.credential)
         .then((assertionCredential) => {
           sendPasskeyResult(request, { credential: assertionCredential })
           conditionalPasskeyRequests.delete(tabId)
@@ -323,24 +319,26 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return
     }
 
+    // The popup names the request; origin and rpId come from what the
+    // background stored when the page asked, never from the message.
     case MESSAGE_TYPES.READY_FOR_PASSKEY_PAYLOAD: {
-      const { requestOrigin, serializedPublicKey } = msg
-      void sendPasskeyPayload(requestOrigin, serializedPublicKey, sendResponse)
+      const request = passkeyRequests.get(msg.requestId)
+      if (!request) {
+        sendResponse({ success: false, error: 'Unknown passkey request' })
+        return
+      }
+      void sendPasskeyPayload(request, sendResponse)
       return true
     }
 
     case MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL: {
-      const {
-        requestOrigin,
-        serializedPublicKey,
-        credential: savedCredential
-      } = msg
+      const request = passkeyRequests.get(msg.requestId)
+      if (!request) {
+        sendResponse({ success: false, error: 'Unknown passkey request' })
+        return
+      }
 
-      getAssertionCredential(
-        requestOrigin,
-        serializedPublicKey,
-        savedCredential
-      )
+      getAssertionCredential(request, msg.credential)
         .then((assertionCredential) => {
           sendResponse({
             success: true,
@@ -601,17 +599,9 @@ const createRegistrationCredential = async (options, requestOrigin) => {
   }
 }
 
-const sendPasskeyPayload = async (
-  requestOrigin,
-  serializedPublicKey,
-  sendResponse
-) => {
+const sendPasskeyPayload = async ({ origin, publicKey }, sendResponse) => {
   try {
-    const publicKey = JSON.parse(serializedPublicKey)
-    const credential = await createRegistrationCredential(
-      publicKey,
-      requestOrigin
-    )
+    const credential = await createRegistrationCredential(publicKey, origin)
 
     sendResponse({
       success: true,
@@ -771,17 +761,15 @@ const openPasskeyWindow = (queryParams = new URLSearchParams()) => {
 }
 
 const getAssertionCredential = async (
-  requestOrigin,
-  serializedPublicKey,
+  { origin, publicKey },
   savedCredential
 ) => {
-  const publicKey = JSON.parse(serializedPublicKey)
   const { challenge: challengeB64, rpId, userVerification } = publicKey
 
   // Rebuild the clientDataJSON for "webauthn.get"
   const clientDataJSON = CredentialGenerator.rebuildClientDataJSON(
     challengeB64,
-    requestOrigin,
+    origin,
     'webauthn.get'
   )
 
