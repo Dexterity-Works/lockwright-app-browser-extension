@@ -109,10 +109,10 @@ describe('autofillSetting', () => {
       expect(result).toBe(true)
     })
 
-    it('should handle storage errors gracefully', async () => {
+    it('defaults to enabled when storage fails', async () => {
       mockChromeStorage.local.get.mockRejectedValue(new Error('Storage error'))
 
-      await expect(getAutofillEnabled()).rejects.toThrow('Storage error')
+      await expect(getAutofillEnabled()).resolves.toBe(true)
     })
   })
 

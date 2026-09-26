@@ -97,7 +97,7 @@ describe('Firefox extension ID', () => {
     expect(leftover).toEqual([])
   })
 
-  it('pins Lockwright libs to Thaoh git SHAs so a source zip installs without siblings', () => {
+  it('pins Lockwright libs to Dexterity-Works git SHAs so a source zip installs without siblings', () => {
     const pkg = JSON.parse(
       readFileSync(path.resolve(__dirname, '../../../package.json'), 'utf8')
     )
@@ -112,7 +112,7 @@ describe('Firefox extension ID', () => {
       const spec = pkg.dependencies[name]
       expect(spec).toMatch(
         new RegExp(
-          `^git\\+https://github\\.com/Thaoh/${repo}\\.git#[0-9a-f]{40}$`
+          `^git\\+https://github\\.com/Dexterity-Works/${repo}\\.git#[0-9a-f]{40}$`
         )
       )
       expect(spec).not.toMatch(/file:/)

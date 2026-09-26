@@ -16,7 +16,7 @@ exports[`ButtonLittle Component renders correctly with a start icon 1`] = `
   type="button"
 >
   <svg
-    fill="#08090C"
+    fill="#08090b"
     height="24px"
     width="24px"
   >

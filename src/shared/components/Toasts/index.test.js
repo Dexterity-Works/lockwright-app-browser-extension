@@ -20,7 +20,7 @@ describe('Toasts Component', () => {
 
     const { container } = render(<Toasts toasts={toasts} />)
 
-    expect(mockIcon).toHaveBeenCalledWith({ color: '#08090C' }, undefined)
+    expect(mockIcon).toHaveBeenCalledWith({ color: '#08090b' }, undefined)
     expect(container).toMatchSnapshot()
   })
 

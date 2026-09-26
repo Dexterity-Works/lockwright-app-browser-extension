@@ -7,7 +7,7 @@ import { matchPatternToValue } from 'lockwright-utils-pattern-search'
 
 const require = createRequire(__filename)
 
-const TETHERTO_FROM = /from\s+['"](@tetherto\/[^'"]+)['"]/g
+const LOCKWRIGHT_FROM = /from\s+['"](lockwright-[a-z-]+(?:\/[^'"]+)?)['"]/g
 
 const vaultSrcFiles = (root) => {
   const src = path.join(root, 'src')
@@ -17,7 +17,7 @@ const vaultSrcFiles = (root) => {
 }
 
 describe('vault import graph', () => {
-  it('resolves every @tetherto import from installed vault source', () => {
+  it('resolves every lockwright-* import from installed vault source', () => {
     const vaultRoot = path.dirname(
       require.resolve('lockwright-lib-vault/package.json')
     )
@@ -28,7 +28,7 @@ describe('vault import graph', () => {
     const seen = new Set()
     for (const file of vaultSrcFiles(vaultRoot)) {
       const src = readFileSync(file, 'utf8')
-      for (const match of src.matchAll(TETHERTO_FROM)) {
+      for (const match of src.matchAll(LOCKWRIGHT_FROM)) {
         const spec = match[1]
         if (seen.has(spec)) continue
         seen.add(spec)
