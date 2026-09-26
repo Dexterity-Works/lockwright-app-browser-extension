@@ -22,6 +22,8 @@ export const Autofill = () => {
   const popupRef = useRef(null)
   const authTimeoutRef = useRef(null)
   const { state: routerState } = useRouter()
+  // Credentials go to the page the records were filtered for, not '*'.
+  const pageOrigin = routerState?.pageOrigin
 
   const { refetch: refetchVault } = useVault()
 
@@ -136,7 +138,7 @@ export const Autofill = () => {
             otpCode
           }
         },
-        '*'
+        pageOrigin
       )
       return
     }
@@ -151,7 +153,7 @@ export const Autofill = () => {
           password: record?.data?.password
         }
       },
-      '*'
+      pageOrigin
     )
   }
 
@@ -172,7 +174,7 @@ export const Autofill = () => {
           country: record?.data?.country
         }
       },
-      '*'
+      pageOrigin
     )
   }
 
@@ -189,7 +191,7 @@ export const Autofill = () => {
           securityCode: record?.data?.securityCode
         }
       },
-      '*'
+      pageOrigin
     )
   }
 
@@ -223,7 +225,7 @@ export const Autofill = () => {
                 iframeType: routerState?.iframeType
               }
             },
-            '*'
+            pageOrigin
           )
         }, delay)
       }

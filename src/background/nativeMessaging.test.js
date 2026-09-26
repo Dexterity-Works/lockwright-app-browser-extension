@@ -52,12 +52,25 @@ jest.mock('../shared/utils/runtime', () => ({
   }
 }))
 
+const EXTENSION_URL = `chrome-extension://${global.chrome.runtime.id}/`
+const popupSender = {
+  id: global.chrome.runtime.id,
+  url: `${EXTENSION_URL}index.html`
+}
+const contentScriptSender = {
+  id: global.chrome.runtime.id,
+  url: 'https://page.example/login',
+  tab: { id: 1 },
+  frameId: 0
+}
+
 describe('NativeMessaging & integration', () => {
   let nativeModule
   let runtime
   beforeEach(() => {
     // Reset modules to apply fresh mocks
     jest.resetModules()
+    global.chrome.runtime.getURL = (path) => `${EXTENSION_URL}${path}`
 
     // Get fresh runtime mock
     runtime = require('../shared/utils/runtime').runtime
@@ -219,10 +232,10 @@ describe('NativeMessaging & integration', () => {
       messageListener(
         {
           type: NATIVE_MESSAGE_TYPES.REQUEST,
-          command: 'securedCommand',
+          command: 'vaultsList',
           params: {}
         },
-        {},
+        popupSender,
         (response) => {
           expect(response.success).toBe(false)
           expect(response.code).toBeDefined()
@@ -259,7 +272,7 @@ describe('NativeMessaging & integration', () => {
             command,
             params: {}
           },
-          {},
+          popupSender,
           resolve
         )
       })
@@ -293,7 +306,7 @@ describe('NativeMessaging & integration', () => {
           command: 'getMasterPasswordStatus',
           params: {}
         },
-        {},
+        popupSender,
         resolve
       )
     })
@@ -327,7 +340,7 @@ describe('NativeMessaging & integration', () => {
           command: 'recordFailedMasterPassword',
           params: {}
         },
-        {},
+        popupSender,
         resolve
       )
     })
@@ -357,7 +370,7 @@ describe('NativeMessaging & integration', () => {
           command: 'resetFailedAttempts',
           params: {}
         },
-        {},
+        popupSender,
         resolve
       )
     })
@@ -368,7 +381,7 @@ describe('NativeMessaging & integration', () => {
     expect(secureChannel.secureChannel.secureRequest).not.toHaveBeenCalled()
   })
 
-  test('securedCommand still fails closed on auth session failure', async () => {
+  test('a secured command still fails closed on auth session failure', async () => {
     const secureChannel = require('./secureChannel')
     const { nativeMessaging } = nativeModule
 
@@ -384,15 +397,69 @@ describe('NativeMessaging & integration', () => {
       messageListener(
         {
           type: NATIVE_MESSAGE_TYPES.REQUEST,
-          command: 'securedCommand',
+          command: 'vaultsList',
           params: {}
         },
-        {},
+        popupSender,
         resolve
       )
     })
 
     expect(response.success).toBe(false)
+    expect(sendRequestSpy).not.toHaveBeenCalled()
+  })
+
+  test('refuses a content-script sender before touching the desktop', async () => {
+    const secureChannel = require('./secureChannel')
+    const { nativeMessaging } = nativeModule
+    secureChannel.secureChannel.ensureSession = jest.fn()
+    secureChannel.secureChannel.secureRequest = jest.fn()
+    const sendRequestSpy = jest.spyOn(nativeMessaging, 'sendRequest')
+
+    const messageListener = runtime.onMessage.addListener.mock.calls[0][0]
+
+    const response = await new Promise((resolve) => {
+      messageListener(
+        {
+          type: NATIVE_MESSAGE_TYPES.REQUEST,
+          command: 'vaultsList',
+          params: {}
+        },
+        contentScriptSender,
+        resolve
+      )
+    })
+
+    expect(response).toEqual({ success: false, error: 'Unauthorized' })
+    expect(secureChannel.secureChannel.ensureSession).not.toHaveBeenCalled()
+    expect(secureChannel.secureChannel.secureRequest).not.toHaveBeenCalled()
+    expect(sendRequestSpy).not.toHaveBeenCalled()
+  })
+
+  test('refuses a command the desktop does not define', async () => {
+    const secureChannel = require('./secureChannel')
+    const { nativeMessaging } = nativeModule
+    secureChannel.secureChannel.ensureSession = jest.fn()
+    secureChannel.secureChannel.secureRequest = jest.fn()
+    const sendRequestSpy = jest.spyOn(nativeMessaging, 'sendRequest')
+
+    const messageListener = runtime.onMessage.addListener.mock.calls[0][0]
+
+    const response = await new Promise((resolve) => {
+      messageListener(
+        {
+          type: NATIVE_MESSAGE_TYPES.REQUEST,
+          command: 'removeAllListeners',
+          params: {}
+        },
+        popupSender,
+        resolve
+      )
+    })
+
+    expect(response.success).toBe(false)
+    expect(response.error).toContain('Unknown command')
+    expect(secureChannel.secureChannel.secureRequest).not.toHaveBeenCalled()
     expect(sendRequestSpy).not.toHaveBeenCalled()
   })
 })

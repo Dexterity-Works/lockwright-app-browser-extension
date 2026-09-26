@@ -1024,10 +1024,11 @@ function getIframeData(type) {
 function sendDataToIframe({ iframeType, iframeData }) {
   const extensionOrigin = runtime.getURL('').slice(0, -1)
 
+  // The popup answers to this origin only, never '*'.
   iframeData?.iframe?.contentWindow?.postMessage(
     {
       type: iframeType,
-      data: iframeData.data
+      data: { ...iframeData.data, pageOrigin: window.location.origin }
     },
     extensionOrigin
   )

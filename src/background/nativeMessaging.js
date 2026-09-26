@@ -5,6 +5,8 @@ import {
   wrapMessage
 } from './nativeMessagingProtocol'
 import { secureChannel } from './secureChannel'
+import { validateSender } from './utils/validateSender'
+import { COMMAND_NAMES } from '../shared/commandDefinitions'
 import { AUTH_ERROR_PATTERNS } from '../shared/constants/auth'
 import {
   NATIVE_MESSAGE_TYPES,
@@ -285,6 +287,13 @@ const LOCKED_BOOT_RESULTS = {
 
 const shouldSecure = (command) => !SECURE_EXEMPT_COMMANDS.has(command)
 
+// The desktop rejects unknown methods too; this keeps the relay from being a
+// generic pipe if an extension page is ever driven by hostile input.
+const RELAY_COMMANDS = new Set([
+  ...COMMAND_NAMES,
+  SPECIAL_COMMANDS.CHECK_AVAILABILITY
+])
+
 const isAuthSessionError = (errorMessage) =>
   !!errorMessage &&
   (errorMessage.includes(AUTH_ERROR_PATTERNS.MASTER_PASSWORD_REQUIRED) ||
@@ -367,6 +376,14 @@ const getErrorCode = (errorMessage) => {
 
 const handleRequest = async (msg, sendResponse) => {
   const { command, params: msgParams } = msg
+  if (!RELAY_COMMANDS.has(command)) {
+    sendResponse({
+      success: false,
+      error: `Unknown command: ${command}`,
+      code: ERROR_CODES.UNKNOWN
+    })
+    return
+  }
   const timeout = getTimeoutForCommand(command)
   const params = { ...msgParams, timeout }
 
@@ -443,12 +460,17 @@ const messageHandlers = {
   [NATIVE_MESSAGE_TYPES.DISCONNECT]: handleDisconnect
 }
 
+// Only extension pages may talk to the desktop. Content scripts, and any page
+// that can drive one, never reach the vault through this relay.
 runtime.onMessage.addListener((msg, sender, sendResponse) => {
   const handler = messageHandlers[msg.type]
-  if (handler) {
-    handler(msg, sendResponse)
-    return true
+  if (!handler) return
+  if (!validateSender(sender, 'extension-page')) {
+    sendResponse({ success: false, error: 'Unauthorized' })
+    return
   }
+  handler(msg, sendResponse)
+  return true
 })
 
 export { nativeMessaging }

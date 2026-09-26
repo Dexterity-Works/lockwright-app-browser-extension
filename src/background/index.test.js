@@ -17,6 +17,7 @@ jest.mock('lockwright-lib-constants', () => ({
   MS_PER_SECOND: 1000
 }))
 
+import { MESSAGES } from './constants'
 import { CONTENT_MESSAGE_TYPES } from '../shared/constants/nativeMessaging'
 import { MESSAGE_TYPES } from '../shared/services/messageBridge'
 
@@ -146,6 +147,28 @@ describe('passkey requests', () => {
       }),
       { frameId: 4 }
     )
+  })
+})
+
+describe('auto-lock and clipboard controls', () => {
+  it.each([
+    MESSAGE_TYPES.GET_AUTO_LOCK_SETTINGS,
+    MESSAGE_TYPES.SET_AUTO_LOCK_ENABLED,
+    MESSAGE_TYPES.SET_AUTO_LOCK_TIMEOUT,
+    MESSAGE_TYPES.RESET_TIMER,
+    MESSAGES.SCHEDULE_CLIPBOARD_CLEAR
+  ])('refuses %s from a content script', async (type) => {
+    const sendResponse = await send(
+      { type, autoLockEnabled: false, autoLockTimeoutMs: null, delayMs: 1 },
+      pageSender('https://page.example/')
+    )
+
+    expect(sendResponse).toHaveBeenCalledWith({
+      success: false,
+      error: 'Unauthorized'
+    })
+    expect(chrome.storage.local.set).not.toHaveBeenCalled()
+    expect(chrome.alarms.create).not.toHaveBeenCalled()
   })
 })
 

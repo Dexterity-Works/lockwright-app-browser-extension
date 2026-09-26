@@ -31,7 +31,7 @@ const layOut = (element, width, height) => {
 
 beforeAll(async () => {
   chrome.runtime.sendMessage.mockResolvedValue({})
-  chrome.runtime.getURL = jest.fn(() => '')
+  chrome.runtime.getURL = jest.fn((path) => path)
   await import('./index')
 })
 
@@ -78,6 +78,41 @@ describe('content script autofill from action', () => {
 
     expect(document.getElementById('user').value).toBe('')
     expect(document.getElementById('pwd').value).toBe('')
+  })
+})
+
+describe('content script iframe handshake', () => {
+  it('answers ready with the page origin the popup must post back to', async () => {
+    document.body.innerHTML = '<input type="password" id="pwd" />'
+    const field = document.getElementById('pwd')
+    layOut(field, 200, 30)
+    field.getClientRects = () => [{}]
+
+    field.focus()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    const iframe = document.querySelector('iframe')
+    expect(iframe).not.toBeNull()
+    const iframeId = new URL(iframe.src).searchParams.get('id')
+    const postMessage = jest
+      .spyOn(iframe.contentWindow, 'postMessage')
+      .mockImplementation(() => {})
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { type: 'ready', data: { iframeId, iframeType: 'logo' } },
+        source: iframe.contentWindow
+      })
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(postMessage).toHaveBeenCalledWith(
+      {
+        type: 'logo',
+        data: expect.objectContaining({ pageOrigin: window.location.origin })
+      },
+      expect.any(String)
+    )
   })
 })
 
