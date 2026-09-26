@@ -2,7 +2,6 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
-import autoprefixer from 'autoprefixer'
 import babelLoader from './babel.config.cjs'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -48,7 +47,6 @@ export default {
       include: styleSources,
       babelConfig: babelLoader,
       useCSSLayers: true
-    }),
-    autoprefixer()
+    })
   ]
 }

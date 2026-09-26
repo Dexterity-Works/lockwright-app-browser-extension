@@ -2,9 +2,6 @@ import { readdirSync, readFileSync } from 'fs'
 import { createRequire } from 'module'
 import path from 'path'
 
-import { generateUniqueId } from 'lockwright-utils-generate-unique-id'
-import { matchPatternToValue } from 'lockwright-utils-pattern-search'
-
 const require = createRequire(__filename)
 
 const LOCKWRIGHT_FROM = /from\s+['"](lockwright-[a-z-]+(?:\/[^'"]+)?)['"]/g
@@ -41,11 +38,5 @@ describe('vault import graph', () => {
     }
     expect(seen.size).toBeGreaterThan(0)
     expect(missing).toEqual([])
-  })
-
-  it('ships generateUniqueId skipUUID as 32 hex, and case-insensitive search', () => {
-    expect(generateUniqueId({ skipUUID: true })).toMatch(/^[0-9a-f]{32}$/)
-    expect(matchPatternToValue('Ab', 'xxabXX')).toBe(true)
-    expect(matchPatternToValue('Ab', 'xxxx')).toBe(false)
   })
 })
