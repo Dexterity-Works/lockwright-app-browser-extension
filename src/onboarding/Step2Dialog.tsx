@@ -166,7 +166,7 @@ export const Step2Dialog = ({ onNext }: Step2Props) => {
       <div className="flex min-w-0 flex-col gap-[var(--spacing24)] px-[var(--spacing8)] py-[var(--spacing24)]">
         <div className="bg-surface-hover border-border-primary relative h-[120px] w-full overflow-hidden rounded-lg border sm:h-[200px]">
           <img
-            src="/assets/images/step2.svg"
+            src="/assets/images/step2.webp"
             className="h-full w-full object-contain sm:object-cover"
             alt="Step 2"
           />
