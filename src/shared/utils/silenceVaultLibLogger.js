@@ -9,7 +9,7 @@ import { logger } from './logger'
  * @param {unknown} arg
  * @returns {unknown}
  */
-export const formatVaultLogArg = (arg) => {
+const formatVaultLogArg = (arg) => {
   if (arg instanceof Error) return arg
   if (arg && typeof arg === 'object') {
     if (typeof arg.message === 'string' && arg.message !== '') {

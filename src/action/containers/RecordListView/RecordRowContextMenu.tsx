@@ -37,7 +37,7 @@ import { autofillActiveTab } from '../../../shared/utils/tabs'
 import { useCreateOrEditRecord } from '../../hooks/useCreateOrEditRecord'
 import { recordRowAutofillMenuItems } from './recordRowAutofillMenuItems'
 
-export const RECORD_ROW_CONTEXT_MENU_WIDTH = 220
+const RECORD_ROW_CONTEXT_MENU_WIDTH = 220
 const VIEWPORT_MARGIN = 8
 
 type RecordRowContextMenuProps = {

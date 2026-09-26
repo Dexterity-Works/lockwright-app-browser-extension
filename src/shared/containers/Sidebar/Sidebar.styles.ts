@@ -1,9 +1,9 @@
 import type { ThemeColors } from 'lockwright-lib-ui-react-native-components'
 import { rawTokens } from 'lockwright-lib-ui-react-native-components'
 
-export const SIDEBAR_WIDTH_EXPANDED = 250
-export const SIDEBAR_WIDTH_COLLAPSED = 0
-export const SIDEBAR_HEADER_HEIGHT = 44
+const SIDEBAR_WIDTH_EXPANDED = 250
+const SIDEBAR_WIDTH_COLLAPSED = 0
+const SIDEBAR_HEADER_HEIGHT = 44
 export const FADE_GRADIENT_HEIGHT = 32
 export const FOLDER_CONTEXT_MENU_WIDTH = 200
 

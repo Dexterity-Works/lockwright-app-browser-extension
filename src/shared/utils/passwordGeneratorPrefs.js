@@ -1,7 +1,7 @@
 export const PASSWORD_GENERATOR_CHARACTERS_KEY = 'password-generator-characters'
 export const DEFAULT_CHARACTER_COUNT = 20
-export const MIN_CHARACTER_COUNT = 4
-export const MAX_CHARACTER_COUNT = 4096
+const MIN_CHARACTER_COUNT = 4
+const MAX_CHARACTER_COUNT = 4096
 
 const clampCharacterCount = (value) => {
   const parsed = Number.parseInt(String(value), 10)

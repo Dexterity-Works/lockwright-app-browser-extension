@@ -1,5 +1,20 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/contentPopups/main.jsx",
+    "src/onboarding/index.tsx",
+    "src/content/index.js",
+    "src/content/inject-shim.js",
+    "src/inject/index.js",
+    "src/background/index.js",
+    "public/*.js",
+    "scripts/*.mjs",
+    "lingui.config.js"
+  ],
+  "ignoreDependencies": [
+    "lockwright-utils-generate-unique-id",
+    "lockwright-utils-pattern-search"
+  ],
   "tags": [
     "-lintignore"
   ]

@@ -97,22 +97,6 @@ export const AVAILABILITY_ERROR_MESSAGES = {
 }
 
 /**
- * Vault error handler constants
- */
-export const VAULT_ERROR_MESSAGES = {
-  VAULT_OPERATION_ERROR: 'Vault operation error:',
-  DESKTOP_CONNECTION_ERROR: 'Unable to connect to desktop app'
-}
-
-/**
- * Navigation constants for vault error handling
- */
-export const VAULT_NAVIGATION = {
-  WELCOME_ROUTE: 'welcome',
-  MASTER_PASSWORD_STATE: 'masterPassword'
-}
-
-/**
  * Native messaging configuration
  */
 export const NATIVE_MESSAGING_CONFIG = {

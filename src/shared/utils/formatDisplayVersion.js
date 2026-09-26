@@ -1,4 +1,4 @@
-export function normalizeSha6(gitSha) {
+function normalizeSha6(gitSha) {
   if (typeof gitSha !== 'string') {
     return 'unknown'
   }

@@ -10,5 +10,3 @@ const LOCALE = 'en'
 
 i18n.load(LOCALE, messages)
 i18n.activate(LOCALE)
-
-export { i18n }

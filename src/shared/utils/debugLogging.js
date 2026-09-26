@@ -3,7 +3,7 @@ import { CHROME_STORAGE_KEYS } from '../constants/storage'
 
 const KEY = CHROME_STORAGE_KEYS.DEBUG_LOGGING
 
-export const applyDebugLogging = (enabled) => {
+const applyDebugLogging = (enabled) => {
   logger.setDebugMode(!!enabled)
 }
 

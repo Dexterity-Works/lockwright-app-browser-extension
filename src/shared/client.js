@@ -4,22 +4,18 @@ import { PearpassVaultClient } from '../vaultClient'
 import { initCurrentDeviceName } from './utils/initCurrentDeviceName'
 
 /**
- * @type {import('../vaultClient/nativeMessaging').NativeMessagingVaultClient}
+ * @type {import('../vaultClient').PearpassVaultClient}
  */
 export let client
 
 /**
- * @returns {import('../vaultClient/nativeMessaging').NativeMessagingVaultClient}
+ * @returns {import('../vaultClient').PearpassVaultClient}
  */
 export const createClient = async () => {
   if (client) {
     return client
   }
 
-  // Create native messaging client
-  // client = new PearpassVaultClient({
-  //   debugMode: MODE === 'development'
-  // })
   client = new PearpassVaultClient({
     debugMode: false
   })
@@ -31,7 +27,7 @@ export const createClient = async () => {
 }
 
 /**
- * @returns {import('../vaultClient/nativeMessaging').NativeMessagingVaultClient}
+ * @returns {import('../vaultClient').PearpassVaultClient}
  */
 export const getClient = () => {
   if (!client) {

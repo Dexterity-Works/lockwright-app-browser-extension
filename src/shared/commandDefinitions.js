@@ -4,7 +4,7 @@
  */
 
 // Define all available commands with their parameter extraction logic
-export const COMMAND_DEFINITIONS = {
+const COMMAND_DEFINITIONS = {
   // Encryption commands
   encryptionInit: { params: [] },
   encryptionGetStatus: { params: [] },

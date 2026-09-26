@@ -37,7 +37,7 @@ export const MESSAGE_TYPES = Object.freeze({
 /**
  * Error codes for message bridge operations
  */
-export const MESSAGE_ERROR_CODES = Object.freeze({
+const MESSAGE_ERROR_CODES = Object.freeze({
   RUNTIME_ERROR: 'RUNTIME_ERROR',
   TIMEOUT: 'TIMEOUT',
   INVALID_RESPONSE: 'INVALID_RESPONSE',
@@ -59,7 +59,6 @@ class MessageBridgeError extends Error {
 class MessageBridge {
   constructor() {
     this.defaultTimeout = 30000 // 30 seconds
-    this.listeners = new Map()
   }
 
   /**
@@ -156,58 +155,10 @@ class MessageBridge {
       }
     })
   }
-
-  /**
-   * Register a message listener
-   * @param {string} type - Message type to listen for
-   * @param {Function} handler - Handler function
-   */
-  addListener(type, handler) {
-    if (!this.listeners.has(type)) {
-      this.listeners.set(type, new Set())
-    }
-    this.listeners.get(type).add(handler)
-  }
-
-  /**
-   * Remove a message listener
-   * @param {string} type - Message type
-   * @param {Function} handler - Handler function to remove
-   */
-  removeListener(type, handler) {
-    if (this.listeners.has(type)) {
-      this.listeners.get(type).delete(handler)
-    }
-  }
-
-  /**
-   * Setup global message listener for incoming messages
-   */
-  setupGlobalListener() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      const { type } = message
-
-      if (this.listeners.has(type)) {
-        const handlers = this.listeners.get(type)
-        handlers.forEach((handler) => {
-          try {
-            handler(message, sender, sendResponse)
-          } catch (error) {
-            logger.error(
-              'MessageBridge',
-              `Error in handler for '${type}':`,
-              error
-            )
-          }
-        })
-        return true // Keep channel open for async response
-      }
-    })
-  }
 }
 
 // Singleton instance
-export const messageBridge = new MessageBridge()
+const messageBridge = new MessageBridge()
 
 // Convenience methods for specific message types
 
@@ -279,32 +230,6 @@ export const secureChannelMessages = {
  * Passkey operations
  */
 export const passkeyMessages = {
-  async createPasskey(publicKey, requestOrigin, requestId, tabId) {
-    return messageBridge.sendMessage(MESSAGE_TYPES.CREATE_PASSKEY, {
-      publicKey,
-      requestOrigin,
-      requestId,
-      tabId
-    })
-  },
-
-  async getPasskey(publicKey, requestOrigin, requestId, tabId) {
-    return messageBridge.sendMessage(MESSAGE_TYPES.GET_PASSKEY, {
-      publicKey,
-      requestOrigin,
-      requestId,
-      tabId
-    })
-  },
-
-  async getAssertionCredential(requestOrigin, serializedPublicKey, credential) {
-    return messageBridge.sendMessage(MESSAGE_TYPES.GET_ASSERTION_CREDENTIAL, {
-      requestOrigin,
-      serializedPublicKey,
-      credential
-    })
-  },
-
   /**
    * Hand the popup's outcome to the background, which delivers it to the
    * frame that made the request. Never rejects; the bridge already logs.

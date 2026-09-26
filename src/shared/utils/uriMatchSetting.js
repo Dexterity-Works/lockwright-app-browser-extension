@@ -282,7 +282,7 @@ export const buildLoginUris = (websiteRows, existingUris) => {
  * @param {{ data?: { websites?: string[]|null, uris?: Array<{ uri?: string }>|null } }|null|undefined} record
  * @returns {string[]}
  */
-export const getRecordWebsiteValues = (record) => {
+const getRecordWebsiteValues = (record) => {
   const websites = Array.isArray(record?.data?.websites)
     ? record.data.websites
         .filter(

@@ -7,9 +7,6 @@ jest.mock('../vaultClient')
 jest.mock('lockwright-lib-vault', () => ({
   setPearpassVaultClient: jest.fn()
 }))
-jest.mock('./constants/envMode', () => ({
-  MODE: 'test'
-}))
 jest.mock('./utils/initCurrentDeviceName', () => ({
   initCurrentDeviceName: jest.fn().mockResolvedValue(undefined)
 }))

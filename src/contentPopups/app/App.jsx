@@ -10,12 +10,6 @@ import { PearpassVaultClient } from '../../vaultClient'
 import { closeIframe } from '../iframeApi/closeIframe'
 import { doesPayloadUrlMatchOrigin } from '../utils/messageValidation'
 
-// const isProduction =
-//   (typeof Pear !== 'undefined' && !!Pear.config?.key) ||
-//   (typeof process !== 'undefined' &&
-//     process.env &&
-//     process.env.NODE_ENV === 'production')
-
 export const App = () => {
   const { navigate } = useRouter()
 
@@ -75,9 +69,6 @@ export const App = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      // const client = new PearpassVaultClient({
-      //   debugMode: MODE === 'development' && !isProduction
-      // })
       const client = new PearpassVaultClient({
         debugMode: false
       })

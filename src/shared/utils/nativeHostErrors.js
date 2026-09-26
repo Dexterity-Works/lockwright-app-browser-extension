@@ -4,7 +4,7 @@ import { AVAILABILITY_ERROR_MESSAGES } from '../constants/nativeMessaging'
  * Browser-reported native messaging failures that mean the host manifest
  * was not found / not registered for this browser profile.
  */
-export const NATIVE_HOST_NOT_FOUND_PATTERNS = [
+const NATIVE_HOST_NOT_FOUND_PATTERNS = [
   'Specified native messaging host not found',
   'Native messaging host not found',
   'Attempt to postMessage on disconnected port',

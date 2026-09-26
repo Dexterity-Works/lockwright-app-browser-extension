@@ -15,7 +15,7 @@ import {
 
 import { MESSAGE_TYPES } from '../shared/services/messageBridge'
 
-export const AutoLockContext = createContext({
+const AutoLockContext = createContext({
   shouldBypassAutoLock: false,
   setShouldBypassAutoLock: () => {},
   isAutoLockEnabled: BE_AUTO_LOCK_ENABLED,

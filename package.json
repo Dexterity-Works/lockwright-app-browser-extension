@@ -22,7 +22,6 @@
     }
   },
   "scripts": {
-    "preinstall": "node scripts/ensure-pnpm.mjs",
     "dev": "vite",
     "build:main": "vite build --config vite.config.main.js",
     "build:content": "vite build --config vite.config.content.js",
