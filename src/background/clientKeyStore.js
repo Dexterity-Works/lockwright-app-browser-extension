@@ -10,6 +10,9 @@ const DB_NAME = 'pearpassClientKeyStore'
 const DB_VERSION = 1
 const STORE_NAME = 'clientKeys'
 const KEY_ID = 'client-ed25519'
+const PBKDF2_ITERATIONS = 600000
+// Records written before the `iterations` field existed used this count.
+const LEGACY_PBKDF2_ITERATIONS = 100000
 
 let inMemoryKeypair = null
 let pendingKeypair = null
@@ -92,13 +95,13 @@ const getKeyMaterial = async (password) => {
   )
 }
 
-const deriveKey = async (password, salt) => {
+const deriveKey = async (password, salt, iterations) => {
   const keyMaterial = await getKeyMaterial(password)
   return crypto.subtle.deriveKey(
     {
       name: CRYPTO_ALGORITHMS.PBKDF2,
       salt,
-      iterations: 100000,
+      iterations,
       hash: CRYPTO_ALGORITHMS.SHA_256
     },
     keyMaterial,
@@ -114,7 +117,7 @@ const encryptPrivateKey = async (privateKeyBytes, password) => {
   const nonce = new Uint8Array(12)
   crypto.getRandomValues(nonce)
 
-  const key = await deriveKey(password, salt)
+  const key = await deriveKey(password, salt, PBKDF2_ITERATIONS)
   const ciphertextBuffer = await crypto.subtle.encrypt(
     { name: CRYPTO_ALGORITHMS.AES_GCM, iv: nonce },
     key,
@@ -124,16 +127,20 @@ const encryptPrivateKey = async (privateKeyBytes, password) => {
   return {
     salt,
     nonce,
-    ciphertext: new Uint8Array(ciphertextBuffer)
+    ciphertext: new Uint8Array(ciphertextBuffer),
+    iterations: PBKDF2_ITERATIONS
   }
 }
+
+const recordIterations = (record) =>
+  record.iterations ?? LEGACY_PBKDF2_ITERATIONS
 
 const decryptPrivateKey = async (record, password) => {
   const salt = base64Decode(record.saltB64)
   const nonce = base64Decode(record.nonceB64)
   const ciphertext = base64Decode(record.ciphertextB64)
 
-  const key = await deriveKey(password, salt)
+  const key = await deriveKey(password, salt, recordIterations(record))
   const plaintextBuffer = await crypto.subtle.decrypt(
     { name: CRYPTO_ALGORITHMS.AES_GCM, iv: nonce },
     key,
@@ -235,7 +242,7 @@ const unlockKeypair = async (masterPassword) => {
       publicKey = ed25519.getPublicKey(privateKey)
     }
 
-    const { salt, nonce, ciphertext } = await encryptPrivateKey(
+    const { salt, nonce, ciphertext, iterations } = await encryptPrivateKey(
       privateKey,
       masterPassword
     )
@@ -246,6 +253,7 @@ const unlockKeypair = async (masterPassword) => {
       saltB64: base64Encode(salt),
       nonceB64: base64Encode(nonce),
       ciphertextB64: base64Encode(ciphertext),
+      iterations,
       createdAt: new Date().toISOString()
     }
 
@@ -254,15 +262,50 @@ const unlockKeypair = async (masterPassword) => {
     return inMemoryKeypair
   }
 
+  let privateKey
   try {
-    const privateKey = await decryptPrivateKey(record, masterPassword)
-    const publicKey = base64Decode(record.publicKeyB64)
-
-    inMemoryKeypair = { publicKey, privateKey }
-    return inMemoryKeypair
+    privateKey = await decryptPrivateKey(record, masterPassword)
   } catch {
     logger.log('[ClientKeyStore]', 'Failed to decrypt client keypair')
     throw new Error(AUTH_ERROR_PATTERNS.MASTER_PASSWORD_INVALID)
+  }
+
+  const publicKey = base64Decode(record.publicKeyB64)
+  inMemoryKeypair = { publicKey, privateKey }
+
+  if (recordIterations(record) < PBKDF2_ITERATIONS) {
+    await migrateRecordIterations(db, record, privateKey, masterPassword)
+  }
+
+  return inMemoryKeypair
+}
+
+/**
+ * Re-encrypt the private key at the current iteration count with a fresh
+ * salt and nonce, so the next unlock uses it. The password was just verified
+ * by a successful decrypt. A failed rewrite leaves the old record in place and
+ * does not fail the unlock.
+ */
+const migrateRecordIterations = async (db, record, privateKey, password) => {
+  try {
+    const { salt, nonce, ciphertext, iterations } = await encryptPrivateKey(
+      privateKey,
+      password
+    )
+    await putKeyRecord(db, {
+      ...record,
+      saltB64: base64Encode(salt),
+      nonceB64: base64Encode(nonce),
+      ciphertextB64: base64Encode(ciphertext),
+      iterations
+    })
+    logger.log('[ClientKeyStore]', 'Client key re-encrypted at', iterations)
+  } catch (e) {
+    logger.log(
+      '[ClientKeyStore]',
+      'Failed to re-encrypt client key at current iterations:',
+      e?.message
+    )
   }
 }
 
