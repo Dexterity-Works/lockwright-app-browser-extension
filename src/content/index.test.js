@@ -1,7 +1,3 @@
-jest.mock('lockwright-lib-vault', () => ({
-  RECORD_TYPES: { LOGIN: 'login' }
-}))
-
 jest.mock('lockwright-lib-constants', () => ({
   MANIFEST_NAME: 'com.lockwright.test',
   MS_PER_SECOND: 1000

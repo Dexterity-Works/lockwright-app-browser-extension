@@ -1,6 +1,6 @@
 import './utils/contentI18n.js'
 
-import { RECORD_TYPES } from 'lockwright-lib-vault'
+import { RECORD_TYPES } from 'lockwright-lib-vault/src/constants/recordTypes.js'
 
 import { IFRAME_TYPES } from './constants/iframe'
 import { LOGO_PADDING, LOGO_SIZE } from './constants/styles'
