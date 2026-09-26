@@ -740,9 +740,17 @@ export class SecureChannelClient {
     }
   }
 
+  // Auto-lock controls run inside the session, like every vault command, so
+  // no local process can tell the desktop to stay unlocked. Not paired or
+  // locked surfaces as the ensureSession error.
+  async _sessionRequest(method, params = {}) {
+    await this.ensureSession()
+    return this.secureRequest({ method, params })
+  }
+
   async getAutoLockSettings() {
     try {
-      return await nativeMessaging.sendRequest('getAutoLockSettings')
+      return await this._sessionRequest('getAutoLockSettings')
     } catch (error) {
       logger.error('Failed to get auto lock settings:', error?.message || error)
       throw error
@@ -751,7 +759,7 @@ export class SecureChannelClient {
 
   async setAutoLockTimeout(autoLockTimeoutMs) {
     try {
-      return await nativeMessaging.sendRequest('setAutoLockTimeout', {
+      return await this._sessionRequest('setAutoLockTimeout', {
         autoLockTimeoutMs
       })
     } catch (error) {
@@ -762,7 +770,7 @@ export class SecureChannelClient {
 
   async setAutoLockEnabled(autoLockEnabled) {
     try {
-      return await nativeMessaging.sendRequest('setAutoLockEnabled', {
+      return await this._sessionRequest('setAutoLockEnabled', {
         autoLockEnabled
       })
     } catch (error) {
@@ -773,7 +781,7 @@ export class SecureChannelClient {
 
   async resetTimer() {
     try {
-      return await nativeMessaging.sendRequest('resetTimer')
+      return await this._sessionRequest('resetTimer')
     } catch (error) {
       logger.error('Failed to reset timer:', error?.message || error)
       throw error

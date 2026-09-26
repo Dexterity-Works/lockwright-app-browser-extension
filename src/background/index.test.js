@@ -8,7 +8,8 @@ jest.mock('./clientKeyStore', () => ({
 jest.mock('./secureChannel', () => ({
   secureChannel: {
     isPaired: jest.fn(async () => false),
-    hasActiveSession: () => false
+    hasActiveSession: () => false,
+    resetTimer: jest.fn()
   }
 }))
 
@@ -169,6 +170,20 @@ describe('auto-lock and clipboard controls', () => {
     })
     expect(chrome.storage.local.set).not.toHaveBeenCalled()
     expect(chrome.alarms.create).not.toHaveBeenCalled()
+  })
+
+  it('makes the popup heartbeat a no-op while there is no session', async () => {
+    const { secureChannel } = await import('./secureChannel')
+    const sendResponse = await send(
+      { type: MESSAGE_TYPES.RESET_TIMER },
+      popupSender
+    )
+
+    expect(sendResponse).toHaveBeenCalledWith({
+      ok: false,
+      error: 'SESSION_NOT_READY'
+    })
+    expect(secureChannel.resetTimer).not.toHaveBeenCalled()
   })
 })
 

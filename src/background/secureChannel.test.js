@@ -205,43 +205,51 @@ describe('SecureChannelClient', () => {
     expect(global.chrome.runtime.sendMessage).not.toHaveBeenCalled()
   })
 
-  describe('auto-lock passthrough', () => {
-    it('getAutoLockSettings sends request and returns settings', async () => {
-      mockSendRequest.mockResolvedValueOnce({
-        autoLockEnabled: true,
-        autoLockTimeoutMs: 1234
-      })
-
-      const result = await secureChannel.getAutoLockSettings()
-
-      expect(mockSendRequest).toHaveBeenCalledWith('getAutoLockSettings')
-      expect(result).toEqual({ autoLockEnabled: true, autoLockTimeoutMs: 1234 })
+  describe('auto-lock over the secure channel', () => {
+    let client
+    beforeEach(() => {
+      client = new SecureChannelClient()
+      client.ensureSession = jest.fn()
+      client.secureRequest = jest.fn().mockResolvedValue({ ok: true })
     })
 
-    it('setAutoLockEnabled sends request and resolves', async () => {
-      mockSendRequest.mockResolvedValueOnce({ ok: true })
-      await expect(secureChannel.setAutoLockEnabled(true)).resolves.toEqual({
-        ok: true
-      })
-      expect(mockSendRequest).toHaveBeenCalledWith('setAutoLockEnabled', {
-        autoLockEnabled: true
-      })
-    })
+    it.each([
+      [
+        'getAutoLockSettings',
+        [],
+        { method: 'getAutoLockSettings', params: {} }
+      ],
+      [
+        'setAutoLockEnabled',
+        [true],
+        { method: 'setAutoLockEnabled', params: { autoLockEnabled: true } }
+      ],
+      [
+        'setAutoLockTimeout',
+        [1234],
+        { method: 'setAutoLockTimeout', params: { autoLockTimeoutMs: 1234 } }
+      ],
+      ['resetTimer', [], { method: 'resetTimer', params: {} }]
+    ])(
+      '%s goes through secureRequest, never plaintext',
+      async (name, args, expected) => {
+        await expect(client[name](...args)).resolves.toEqual({ ok: true })
+        expect(client.ensureSession).toHaveBeenCalled()
+        expect(client.secureRequest).toHaveBeenCalledWith(expected)
+        expect(mockSendRequest).not.toHaveBeenCalledWith(
+          name,
+          expect.anything()
+        )
+        expect(mockSendRequest).not.toHaveBeenCalledWith(name)
+      }
+    )
 
-    it('setAutoLockTimeout sends request and resolves', async () => {
-      mockSendRequest.mockResolvedValueOnce({ ok: true })
-      await expect(secureChannel.setAutoLockTimeout(1234)).resolves.toEqual({
-        ok: true
-      })
-      expect(mockSendRequest).toHaveBeenCalledWith('setAutoLockTimeout', {
-        autoLockTimeoutMs: 1234
-      })
-    })
+    it('surfaces NOT_PAIRED instead of falling back to plaintext', async () => {
+      const unpaired = new SecureChannelClient()
+      unpaired.isPaired = jest.fn(async () => false)
 
-    it('resetTimer sends request and resolves', async () => {
-      mockSendRequest.mockResolvedValueOnce({ ok: true })
-      await expect(secureChannel.resetTimer()).resolves.toEqual({ ok: true })
-      expect(mockSendRequest).toHaveBeenCalledWith('resetTimer')
+      await expect(unpaired.resetTimer()).rejects.toThrow('NOT_PAIRED')
+      expect(mockSendRequest).not.toHaveBeenCalledWith('resetTimer')
     })
   })
 })

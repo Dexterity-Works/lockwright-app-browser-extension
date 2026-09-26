@@ -254,6 +254,13 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 
     case MESSAGE_TYPES.RESET_TIMER: {
+      // Popup heartbeat, once a second. Without a session it is a no-op
+      // rather than a handshake attempt per tick.
+      if (!secureChannel.hasActiveSession()) {
+        sendResponse({ ok: false, error: 'SESSION_NOT_READY' })
+        return false
+      }
+
       void (async () => {
         try {
           await secureChannel.resetTimer()
