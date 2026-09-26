@@ -57,7 +57,7 @@
     "lockwright-utils-validator": "git+https://github.com/Dexterity-Works/lockwright-utils-validator.git#95488f2c385ec7b09619c587417baf454134dd7b",
     "lockwright-lib-constants": "git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#f6142c9554e9f972519dd8115b2b73f02b73d5fb",
     "lockwright-lib-ui-react-native-components": "git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#82167746355a4d1b931dae2c3d4abe10a7e10b7e",
-    "lockwright-lib-vault": "git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#fd4dd5859d0bd9a23f90c7ae9f2346fdb3d72cf8",
+    "lockwright-lib-vault": "git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#01f479348d18c7d6883dae354bc96337e776c34e",
     "lockwright-utils-password-check": "git+https://github.com/Dexterity-Works/lockwright-utils-password-check.git#dc56473c03d574ddb80a98f2560cea69d01b1cca",
     "lockwright-utils-password-generator": "git+https://github.com/Dexterity-Works/lockwright-utils-password-generator.git#e3f4b7689ff3eef247a64bff0790357d4bee793a",
     "qrcode": "1.5.4",
