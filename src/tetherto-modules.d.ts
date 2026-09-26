@@ -2,10 +2,6 @@
 // Untyped JS dependencies — keeps strict TS files importable project-wide
 declare module 'lockwright-lib-ui-react-hooks'
 declare module 'lockwright-utils-validator'
-declare module 'lockwright-utils-avatar-initials' {
-  export function generateAvatarInitials(text?: string): string
-}
-declare module 'lockwright-utils-date'
 declare module 'lockwright-lib-constants' {
   export const UNSUPPORTED: boolean
   export const EXTENSION_DESIGN_VERSION: number
@@ -30,11 +26,14 @@ declare module 'lockwright-lib-constants' {
   export const VALID_WORD_COUNTS: number[]
   export const DEFAULT_SELECTED_TYPE: number
 }
-declare module 'lockwright-utils-qr' {
-  export function generateQRCodeSVG(
-    data: string,
-    options?: { type?: string; margin?: number }
-  ): Promise<string>
+declare module 'qrcode' {
+  const QRCode: {
+    toString(
+      data: string,
+      options?: { type?: string; margin?: number }
+    ): Promise<string>
+  }
+  export default QRCode
 }
 declare module 'lockwright-lib-vault' {
   export interface VaultDevice {

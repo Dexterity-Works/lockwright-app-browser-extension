@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { useCountDown } from 'lockwright-lib-ui-react-hooks'
-import { generateQRCodeSVG } from 'lockwright-utils-qr'
+import QRCode from 'qrcode'
 import {
   Button,
   Dialog,
@@ -50,7 +50,7 @@ export const AddDeviceModalContent = () => {
 
   useEffect(() => {
     if (data?.publicKey) {
-      generateQRCodeSVG(data.publicKey, { type: 'svg', margin: 0 }).then(
+      QRCode.toString(data.publicKey, { type: 'svg', margin: 0 }).then(
         (value: string) => setQrSvg(value)
       )
     }

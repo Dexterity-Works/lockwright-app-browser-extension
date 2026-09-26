@@ -9,7 +9,7 @@ import {
   useInvite,
   useVault
 } from 'lockwright-lib-vault'
-import { generateQRCodeSVG } from 'lockwright-utils-qr'
+import QRCode from 'qrcode'
 
 import { useAutoLockPreferences } from '../../../hooks/useAutoLockPreferences'
 import { ButtonLittle } from '../../../shared/components/ButtonLittle'
@@ -68,9 +68,7 @@ export const AddDevice = () => {
 
   useEffect(() => {
     if (data?.publicKey) {
-      generateQRCodeSVG(data.publicKey, { type: 'svg', margin: 0 }).then(
-        setQrSvg
-      )
+      QRCode.toString(data.publicKey, { type: 'svg', margin: 0 }).then(setQrSvg)
     }
   }, [data])
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { generateQRCodeSVG } from 'lockwright-utils-qr'
+import QRCode from 'qrcode'
 import {
   rawTokens,
   Text,
@@ -32,7 +32,7 @@ export const WifiPasswordQRCode = ({
       return
     }
     const wifiString = `WIFI:T:${encryptionType};S:${ssid};P:${password};H:${isHidden};;`
-    generateQRCodeSVG(wifiString, { type: 'svg', margin: 0 })
+    QRCode.toString(wifiString, { type: 'svg', margin: 0 })
       .then((svg: string) => setQrCodeSvg(svg))
       .catch((err: unknown) => logger.error('Error generating QR code:', err))
   }, [ssid, password, encryptionType, isHidden])

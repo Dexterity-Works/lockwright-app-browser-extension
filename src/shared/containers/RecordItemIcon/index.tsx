@@ -1,9 +1,9 @@
-import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
 import { Text, useTheme } from 'lockwright-lib-ui-react-native-components'
 import { useFavicon } from 'lockwright-lib-vault'
 
 import { createStyles } from './RecordItemIcon.styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
+import { generateAvatarInitials } from '../../utils/generateAvatarInitials'
 import { isFetchableFaviconUrl } from '../../utils/isFetchableFaviconUrl'
 
 type RecordLike = {

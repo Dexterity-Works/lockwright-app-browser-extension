@@ -1,10 +1,10 @@
 import { formatPasskeyDate } from './formatPasskeyDate'
 
-jest.mock('lockwright-utils-date', () => ({
+jest.mock('./date', () => ({
   formatDate: jest.fn()
 }))
 
-const { formatDate } = require('lockwright-utils-date')
+const { formatDate } = require('./date')
 
 describe('formatPasskeyDate', () => {
   beforeEach(() => {

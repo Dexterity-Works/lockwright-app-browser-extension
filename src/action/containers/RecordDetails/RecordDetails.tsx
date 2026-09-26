@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
 import {
   Button,
   ContextMenu,
@@ -23,6 +22,7 @@ import {
 // @ts-expect-error - declaration file is incomplete
 import { useRecordById } from 'lockwright-lib-vault'
 
+import { generateAvatarInitials } from '../../../shared/utils/generateAvatarInitials'
 import { RecordAvatar } from '../../../shared/components/RecordAvatar'
 import { RECORD_COLOR_BY_TYPE } from '../../../shared/constants/recordColorByType'
 import { useRouter } from '../../../shared/context/RouterContext'

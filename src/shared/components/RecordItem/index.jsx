@@ -1,9 +1,8 @@
 import React from 'react'
 
-import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
-
 import { RecordAvatar } from '../../../shared/components/RecordAvatar'
 import { RECORD_COLOR_BY_TYPE } from '../../../shared/constants/recordColorByType'
+import { generateAvatarInitials } from '../../../shared/utils/generateAvatarInitials'
 
 /**
  * @param {{

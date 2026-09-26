@@ -41,7 +41,7 @@ jest.mock('../../utils/logger', () => ({
   logger: { error: jest.fn() }
 }))
 
-jest.mock('lockwright-utils-avatar-initials', () => ({
+jest.mock('../../utils/generateAvatarInitials', () => ({
   __esModule: true,
   generateAvatarInitials: (title?: string) =>
     (title ?? '').slice(0, 2).toUpperCase()

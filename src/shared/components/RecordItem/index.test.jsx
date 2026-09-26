@@ -10,7 +10,7 @@ jest.mock('../../../shared/components/RecordAvatar', () => ({
   RecordAvatar: jest.fn(() => <div data-testid="record-avatar" />)
 }))
 
-jest.mock('lockwright-utils-avatar-initials', () => ({
+jest.mock('../../../shared/utils/generateAvatarInitials', () => ({
   generateAvatarInitials: jest.fn(() => 'TI')
 }))
 

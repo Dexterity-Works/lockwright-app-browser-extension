@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { generateAvatarInitials } from 'lockwright-utils-avatar-initials'
 import {
   AlertMessage,
   Button,
@@ -17,6 +16,7 @@ import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
 import { useLoadingContext } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'
 import { useScrollOverflow } from '../../hooks/useScrollOverflow'
+import { generateAvatarInitials } from '../../utils/generateAvatarInitials'
 import { logger } from '../../utils/logger'
 import { sortByName } from '../../utils/sortByName'
 import { FADE_GRADIENT_HEIGHT } from '../Sidebar/Sidebar.styles'

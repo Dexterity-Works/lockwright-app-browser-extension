@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
-import { formatDate } from 'lockwright-utils-date'
 import {
   Button,
   ContextMenu,
@@ -23,6 +22,7 @@ import {
 import { getMyDeviceId, useVault } from 'lockwright-lib-vault'
 
 import { useModal } from '../../context/ModalContext'
+import { formatDate } from '../../utils/date'
 import { logger } from '../../utils/logger'
 import { RevokeAccessModalContent } from '../RevokeAccessModalContent'
 

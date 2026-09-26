@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { useForm } from 'lockwright-lib-ui-react-hooks'
-import { isBefore, subtractDateUnits } from 'lockwright-utils-date'
 import {
   AlertMessage,
   Button,
@@ -22,6 +21,7 @@ import {
   type UriMatchType
 } from '../../../shared/constants/uriMatch'
 import { addHttps } from '../../../shared/utils/addHttps'
+import { isBefore, subtractDateUnits } from '../../../shared/utils/date'
 import { formatPasskeyDate } from '../../../shared/utils/formatPasskeyDate'
 import { isPasswordChangeReminderDisabled } from '../../../shared/utils/isPasswordChangeReminderDisabled'
 import { resolveUriMatchType } from '../../../shared/utils/uriMatchSetting'

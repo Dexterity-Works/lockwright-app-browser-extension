@@ -1,5 +1,3 @@
-import EventEmitter from 'events'
-
 import { COMMAND_NAMES, getCommandParams } from '../shared/commandDefinitions'
 import {
   AVAILABILITY_CHECK,
@@ -15,6 +13,7 @@ import {
   VAULT_CLIENT_ERRORS,
   VAULT_CLIENT_EVENTS
 } from '../shared/constants/nativeMessaging'
+import { Emitter } from '../shared/utils/emitter'
 import { isExpectedQuietError } from '../shared/utils/isExpectedQuietError'
 import { logger } from '../shared/utils/logger'
 import { decodeNmFile, encodeNmFile } from '../shared/utils/nmFile'
@@ -30,7 +29,7 @@ import { runtime } from '../shared/utils/runtime'
  * @param {Object} options - Configuration options for the client.
  * @param {boolean} [options.debugMode=false] - Whether to enable debug mode for logging.
  */
-export class PearpassVaultClient extends EventEmitter {
+export class PearpassVaultClient extends Emitter {
   constructor({ debugMode = false } = {}) {
     super()
 

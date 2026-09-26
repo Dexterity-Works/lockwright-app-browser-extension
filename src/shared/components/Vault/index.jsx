@@ -1,11 +1,10 @@
 import React from 'react'
 
-import { formatDate } from 'lockwright-utils-date'
-
 import { BrushIcon } from '../../../shared/icons/BrushIcon'
 import { DeleteIcon } from '../../../shared/icons/DeleteIcon'
 import { LockCircleIcon } from '../../../shared/icons/LockCircleIcon'
 import { ShareIcon } from '../../../shared/icons/ShareIcon'
+import { formatDate } from '../../../shared/utils/date'
 
 /**
  * @param {{
