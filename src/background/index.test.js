@@ -114,6 +114,22 @@ describe('passkey requests', () => {
     )
   })
 
+  it('rejects a shared-hosting suffix as rpId from a tenant subdomain', async () => {
+    const sendResponse = await send(
+      {
+        type: MESSAGE_TYPES.GET_PASSKEY,
+        requestId: 'r-psl',
+        publicKey: { challenge: 'c', rpId: 'github.io' }
+      },
+      pageSender('https://evil.github.io/login')
+    )
+
+    expect(chrome.windows.create).not.toHaveBeenCalled()
+    expect(sendResponse).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    )
+  })
+
   it('binds the request to the sender origin, not the requestOrigin in the message', async () => {
     await send(
       {

@@ -1,7 +1,6 @@
-import { getDomain } from 'tldts'
-
 import { URI_MATCH_TYPES, type UriMatchType } from '../constants/uriMatch'
 import { getHostname } from './getHostname'
+import { getRegistrableDomain } from './getRegistrableDomain'
 import { normalizeUrl } from './normalizeUrl'
 import { resolveUriMatchType } from './uriMatchSetting'
 
@@ -36,8 +35,8 @@ const matchesDomain = (pageUrl: string, website: string): boolean => {
 
   if (pageHost === recordHost) return true
 
-  const pageDomain = getDomain(pageHost)
-  const recordDomain = getDomain(recordHost)
+  const pageDomain = getRegistrableDomain(pageHost)
+  const recordDomain = getRegistrableDomain(recordHost)
   return Boolean(pageDomain && recordDomain && pageDomain === recordDomain)
 }
 

@@ -39,6 +39,26 @@ describe('doesWebsiteMatchPage', () => {
       ).toBe(true)
     })
 
+    it('matches a subdomain under a multi-part public suffix', () => {
+      expect(
+        doesWebsiteMatchPage('https://login.example.co.uk', 'example.co.uk')
+      ).toBe(true)
+    })
+
+    it('keeps sibling tenants on a shared-hosting suffix apart', () => {
+      for (const suffix of [
+        'vercel.app',
+        'github.io',
+        'netlify.app',
+        'pages.dev',
+        'herokuapp.com'
+      ]) {
+        expect(
+          doesWebsiteMatchPage(`https://evil.${suffix}`, `myapp.${suffix}`)
+        ).toBe(false)
+      }
+    })
+
     it('matches equal hostnames even when getDomain is unavailable', () => {
       expect(
         doesWebsiteMatchPage('http://192.168.1.10/login', '192.168.1.10')

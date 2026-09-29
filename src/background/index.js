@@ -1,7 +1,5 @@
 import './nativeMessaging'
 
-import { getDomain } from 'tldts'
-
 import {
   ensureClientKeypairUnlocked,
   commitPendingClientKeystore
@@ -29,6 +27,7 @@ import {
   loadDebugLogging,
   watchDebugLogging
 } from '../shared/utils/debugLogging'
+import { getRegistrableDomain } from '../shared/utils/getRegistrableDomain'
 import { logger } from '../shared/utils/logger'
 import { runtime } from '../shared/utils/runtime'
 
@@ -665,7 +664,7 @@ const bindPasskeyRequest = async (sender, publicKey) => {
   }
 
   const rpId = publicKey?.rpId ?? publicKey?.rp?.id ?? host
-  const domain = getDomain(host)
+  const domain = getRegistrableDomain(host)
   const isRegistrableParent =
     typeof rpId === 'string' &&
     host.endsWith(`.${rpId}`) &&
