@@ -20,7 +20,6 @@ allowBuilds:
   "esbuild@0.21.5": true
   "esbuild@0.25.12": true
   "lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e": true
-  "@tetherto/tether-dev-docs@https://codeload.github.com/Dexterity-Works/tether-dev-docs/tar.gz/64c264c34e8255360ca6c805457119168c789583": true
 
 patchedDependencies:
   "lockwright-utils-validator@0.0.10": patches/pear-apps-utils-validator@0.0.10.patch
