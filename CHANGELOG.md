@@ -13,6 +13,10 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 - Domain matching and passkey rpId checks count the private Public Suffix List section, so tenants on shared hosts like vercel.app or github.io are separate sites.
 
+### Changed
+
+- The popup build runs Babel once over src/. The StyleX pass covers only react-strict-dom and the UI kit.
+
 ## [0.0.30] - 2026-09-26
 
 `4d21c4e0aa275dc27e65a84179f1de0c604926cd`

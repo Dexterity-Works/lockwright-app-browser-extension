@@ -21,8 +21,10 @@ export default defineConfig({
       }
     }),
     // The React plugin skips node_modules; this compiles react-strict-dom and UI kit css.create.
+    // src/ stays with the React plugin so it gets one Babel pass.
     viteBabel({
-      filter: /\.[jt]sx?$/,
+      filter:
+        /[\\/]node_modules[\\/](?:react-strict-dom|lockwright-lib-ui-react-native-components)[\\/].*\.[jt]sx?$/
     }),
     tailwindcss(),
     lingui()
