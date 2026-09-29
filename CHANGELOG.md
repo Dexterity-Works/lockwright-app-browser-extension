@@ -11,7 +11,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ### Security
 
-- Domain matching and passkey rpId checks count the private Public Suffix List section, so tenants on shared hosts like vercel.app or github.io are separate sites.
+- Domain matching, passkey rpId checks and the passkey save list count the private Public Suffix List section, so tenants on shared hosts like vercel.app or github.io are separate sites.
 
 ### Changed
 

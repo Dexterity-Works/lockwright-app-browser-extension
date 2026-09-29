@@ -19,10 +19,10 @@ import {
   MESSAGE_TYPES,
   passkeyMessages
 } from '../../../shared/services/messageBridge'
-import { getHostname } from '../../../shared/utils/getHostname'
 import { getRecordSubtitle } from '../../../shared/utils/getRecordSubtitle'
 import { logger } from '../../../shared/utils/logger'
 import { PasskeyContainer } from '../../containers/PasskeyContainer/PasskeyContainer'
+import { filterPasskeyRecords } from './filterPasskeyRecords'
 
 type RecordEntry = {
   id: string
@@ -143,44 +143,7 @@ export const CreatePasskey = () => {
       (record) => (record as { type?: string })?.type === RECORD_TYPES.LOGIN
     )
 
-    if (!serializedPublicKey) return loginRecords
-
-    let publicKeyData: {
-      rp?: { id?: string }
-      user?: { name?: string }
-    } | null = null
-    try {
-      publicKeyData = JSON.parse(serializedPublicKey)
-    } catch {
-      return loginRecords
-    }
-
-    const passkeyHostname = getHostname(publicKeyData?.rp?.id)
-    if (!passkeyHostname) return []
-
-    const passkeyUsername = (publicKeyData?.user?.name ?? '').trim()
-    if (!passkeyUsername) return []
-
-    const stripWww = (h: string) => h.replace(/^www\./i, '')
-    const target = stripWww(passkeyHostname)
-
-    return loginRecords.filter((record) => {
-      const recordUsername = (record?.data?.username ?? '').trim()
-      const usernameMatches = recordUsername === passkeyUsername
-      if (!usernameMatches) return false
-
-      const websites = record?.data?.websites ?? []
-      return websites.some((w) => {
-        const recordHost = getHostname(w)
-        if (!recordHost) return false
-        const candidate = stripWww(recordHost)
-        return (
-          candidate === target ||
-          candidate.endsWith(`.${target}`) ||
-          target.endsWith(`.${candidate}`)
-        )
-      })
-    })
+    return filterPasskeyRecords(loginRecords, serializedPublicKey)
   }, [records, serializedPublicKey])
 
   const hasRecords = recordsFiltered.length > 0
