@@ -9,6 +9,10 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+### Changed
+
+- With an item type selected in the sidebar, + opens that type's add form instead of the type menu.
+
 ### Fixed
 
 - Generator history shows the vault entries that use each password, even ones never stamped.

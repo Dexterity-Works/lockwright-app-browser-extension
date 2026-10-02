@@ -7,7 +7,9 @@ import { ImportItemOrVaultModalContent } from '../../../shared/containers/Import
 import { useAppHeaderContext } from '../../../shared/context/AppHeaderContext'
 import { useModal } from '../../../shared/context/ModalContext'
 import { useRouter } from '../../../shared/context/RouterContext'
+import { useRecordMenuItems } from '../../../shared/hooks/useRecordMenuItems'
 import { isFavorite } from '../../../shared/utils/isFavorite'
+import { useCreateOrEditRecord } from '../../hooks/useCreateOrEditRecord'
 
 export const AppHeaderContainer = () => {
   const { currentPage, state: routerState } = useRouter() as {
@@ -23,6 +25,8 @@ export const AppHeaderContainer = () => {
     setIsSidebarCollapsed
   } = useAppHeaderContext()
   const { setModal } = useModal()
+  const { defaultItems } = useRecordMenuItems()
+  const { handleCreateOrEditRecord } = useCreateOrEditRecord()
 
   const { refetch: refetchVault } = useVault()
   const { refetch: refetchMasterVault } = useVaults()
@@ -38,6 +42,12 @@ export const AppHeaderContainer = () => {
   const isFavoritesView = isFavorite(routerState?.folder ?? '')
   const selectedFolder =
     routerState?.folder && !isFavoritesView ? routerState.folder : undefined
+
+  // A sidebar category picks the type, so + skips the type menu.
+  const selectedRecordType =
+    currentPage === 'vault'
+      ? defaultItems.find((item) => item.type === routerState?.recordType)?.type
+      : undefined
 
   const onSavedForOtp =
     AUTHENTICATOR_ENABLED && currentPage === 'authenticator'
@@ -58,7 +68,18 @@ export const AppHeaderContainer = () => {
     setIsSidebarCollapsed((value) => !value)
   }
 
-  const addItemControl = (
+  const addItemControl = selectedRecordType ? (
+    <AppHeaderAddItemTrigger
+      testID="main-plus-button"
+      onClick={() =>
+        handleCreateOrEditRecord({
+          recordType: selectedRecordType,
+          selectedFolder,
+          isFavorite: isFavoritesView || undefined
+        })
+      }
+    />
+  ) : (
     <AddItemContextMenu
       isOpen={isAddMenuOpen}
       onOpenChange={setIsAddMenuOpen}
