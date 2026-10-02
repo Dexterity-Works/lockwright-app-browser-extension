@@ -11,6 +11,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ### Changed
 
+- Build the UI kit from source; pnpm no longer runs the kit's install script.
 - With an item type selected in the sidebar, + opens that type's add form instead of the type menu.
 
 ### Fixed

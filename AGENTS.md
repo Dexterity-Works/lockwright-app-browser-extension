@@ -102,7 +102,7 @@ Required props have no `?`. **Always include a test ID on interactive components
 - **TextArea** — `value`, `onChange?`, `label?`, `placeholder?`, `error?`, `disabled?`, `testID?`.
 - **Link** — `children`, `href?`, `isExternal?`, `onClick?`, `data-testid?` (and standard `<a>` attributes).
 
-For components not listed, open `node_modules/lockwright-lib-ui-react-native-components/dist/components/<Name>/types.d.ts`.
+For components not listed, open `node_modules/lockwright-lib-ui-react-native-components/src/components/<Name>/types.ts`.
 
 ### Test IDs — `testID` vs `data-testid`
 
@@ -185,7 +185,7 @@ import { Add, Download, Folder, OpenInNew } from 'lockwright-lib-ui-react-native
 - **Security:** `LockFilled`, `Key`, `SecurityFilled`, `Fingerprint`, `TwoFactorAuthenticationFilled`
 - **External / misc:** `ImportOutlined`, `OpenInNew`
 
-**Discovering others:** `ls node_modules/lockwright-lib-ui-react-native-components/dist/icons/components/ | grep -i <keyword>` — names are PascalCase, grep is case-insensitive friendly.
+**Discovering others:** `ls node_modules/lockwright-lib-ui-react-native-components/src/icons/components/ | grep -i <keyword>` — names are PascalCase, grep is case-insensitive friendly.
 
 Product-specific illustrations (e.g. [src/shared/svgs/logoLock/](src/shared/svgs/logoLock/)) are not design-system icons and may stay under `src/`.
 
@@ -203,6 +203,6 @@ Do **not**:
 
 ## When the kit truly lacks something
 
-1. Confirm by grepping `node_modules/lockwright-lib-ui-react-native-components/dist/components/` for the concept.
+1. Confirm by grepping `node_modules/lockwright-lib-ui-react-native-components/src/components/` for the concept.
 2. Check if a composition of existing kit primitives covers it (e.g. `Pressable` + `Text` + tokens).
 3. If still missing, surface it to the user: "The kit doesn't export X — options are (a) compose from Y + Z, (b) request X be added upstream, (c) temporary local component. Which?" Do not silently create (c).

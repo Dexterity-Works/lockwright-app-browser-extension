@@ -204,7 +204,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  lockwright-lib-ui-react-native-components: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#82167746355a4d1b931dae2c3d4abe10a7e10b7e
+  lockwright-lib-ui-react-native-components: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#5a4ed69feda9b76c0de6f40cb12df72569beb9b4
   react-native: 0.79.5
   react-native>@types/react: 18.3.0
   react-native-windows>react: 19.1.0
@@ -244,8 +244,8 @@ importers:
         specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-hooks.git#8552ca7b1bd06a077c3f97b78634cb1014839ba3
         version: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-hooks/tar.gz/8552ca7b1bd06a077c3f97b78634cb1014839ba3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       lockwright-lib-ui-react-native-components:
-        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#82167746355a4d1b931dae2c3d4abe10a7e10b7e
-        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)
+        specifier: git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#5a4ed69feda9b76c0de6f40cb12df72569beb9b4
+        version: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/5a4ed69feda9b76c0de6f40cb12df72569beb9b4(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0)
       lockwright-lib-vault:
         specifier: git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#494e041382f017f3fa06c4f34aedd498dd8cc58b
         version: https://codeload.github.com/Dexterity-Works/lockwright-lib-vault/tar.gz/494e041382f017f3fa06c4f34aedd498dd8cc58b(@types/react@19.0.0)(lockwright-lib-constants@https://codeload.github.com/Dexterity-Works/lockwright-lib-constants/tar.gz/f6142c9554e9f972519dd8115b2b73f02b73d5fb)(lockwright-utils-generate-unique-id@https://codeload.github.com/Dexterity-Works/lockwright-utils-generate-unique-id/tar.gz/b1cec22b12b85bb1186aafa05223be64b7aea2cc)(lockwright-utils-password-check@https://codeload.github.com/Dexterity-Works/lockwright-utils-password-check/tar.gz/dc56473c03d574ddb80a98f2560cea69d01b1cca)(lockwright-utils-validator@https://codeload.github.com/Dexterity-Works/lockwright-utils-validator/tar.gz/95488f2c385ec7b09619c587417baf454134dd7b(patch_hash=2101adc8996f6508d8daa3999a1509102041de68e63a74a37dc851ed1f3ccbe6))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(redux@5.0.1)
@@ -4042,9 +4042,9 @@ packages:
       react: '>=18.3.1'
       react-dom: '>=18.3.1'
 
-  lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e:
-    resolution: {gitHosted: true, integrity: sha512-lHKgJXRtwyMIlRx1fYkvpSe9IcuDwcNKOcHlzniO6J+mIn3L4KbTNq6qNiCwlU0i+6kDEflDwM+1DycpKs+Uqw==, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e}
-    version: 0.0.40
+  lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/5a4ed69feda9b76c0de6f40cb12df72569beb9b4:
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/5a4ed69feda9b76c0de6f40cb12df72569beb9b4}
+    version: 0.0.41
     peerDependencies:
       '@gorhom/bottom-sheet': ^5.1.1
       '@react-native-community/datetimepicker': ^8.4.4
@@ -9661,7 +9661,7 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/82167746355a4d1b931dae2c3d4abe10a7e10b7e(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0):
+  lockwright-lib-ui-react-native-components@https://codeload.github.com/Dexterity-Works/lockwright-lib-ui-react-native-components/tar.gz/5a4ed69feda9b76c0de6f40cb12df72569beb9b4(postcss@8.5.8)(react-dom@19.1.0(react@19.1.0))(react-native@0.79.5(@babel/core@7.26.10)(@types/react@19.0.0)(react@19.1.0))(react@19.1.0):
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
