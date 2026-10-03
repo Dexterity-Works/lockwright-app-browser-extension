@@ -54,6 +54,11 @@ const newestFirst = (a, b) =>
   (b.createdAt ?? 0) - (a.createdAt ?? 0) ||
   (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
 
+// After the newest stored entry, so a clock that is behind cannot sort a new
+// password last and prune it. `current` is newest first.
+const nextCreatedAt = (current) =>
+  Math.max(Date.now(), (current[0]?.createdAt ?? 0) + 1)
+
 const isCleared = (value) =>
   typeof value?.cleared === 'string' && !!value.cleared
 
@@ -167,7 +172,7 @@ export const appendHistory = serial(async (value) => {
   }
 
   return addEntry(
-    { id: crypto.randomUUID(), value, createdAt: Date.now() },
+    { id: crypto.randomUUID(), value, createdAt: nextCreatedAt(current) },
     current
   )
 })
@@ -335,7 +340,7 @@ export const markHistoryUsed = serial(async (value, context = {}) => {
         {
           id: crypto.randomUUID(),
           value,
-          createdAt: usedAt
+          createdAt: nextCreatedAt(current)
         },
         mergeUses([], uses, usedAt),
         usedAt

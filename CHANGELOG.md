@@ -22,6 +22,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 - Generator history shows the vault entries that use each password, even ones never stamped.
 - Generator history no longer loses entries when another device writes at the same time or has not synced yet.
+- A password generated on a device whose clock is behind another device's stays at the top of generator history instead of dropping out.
 - Cleared generator history stays cleared when another device or an older app version has not caught up. Generating and using a password at once no longer adds it twice.
 
 ## [0.0.31] - 2026-09-30
