@@ -4,7 +4,10 @@ import '@testing-library/jest-dom'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 const mockHandleCreateOrEditRecord = jest.fn()
-const mockSetIsAddMenuOpen = jest.fn()
+let mockIsAddMenuOpen = false
+const mockSetIsAddMenuOpen = jest.fn((open: boolean) => {
+  mockIsAddMenuOpen = open
+})
 let mockRouterState: { recordType?: string; folder?: string } = {}
 
 jest.mock('lockwright-lib-constants', () => ({
@@ -50,7 +53,7 @@ jest.mock('../../../shared/context/AppHeaderContext', () => ({
   useAppHeaderContext: () => ({
     searchValue: '',
     setSearchValue: jest.fn(),
-    isAddMenuOpen: false,
+    isAddMenuOpen: mockIsAddMenuOpen,
     setIsAddMenuOpen: mockSetIsAddMenuOpen,
     isSidebarCollapsed: false,
     setIsSidebarCollapsed: jest.fn()
@@ -74,7 +77,10 @@ jest.mock('../../hooks/useCreateOrEditRecord', () => ({
 import { AppHeaderContainer } from './index'
 
 describe('AppHeaderContainer + button', () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsAddMenuOpen = false
+  })
 
   it('opens the create view for the selected item type', () => {
     mockRouterState = { recordType: 'note', folder: 'Work' }
@@ -96,5 +102,18 @@ describe('AppHeaderContainer + button', () => {
 
     expect(mockSetIsAddMenuOpen).toHaveBeenCalledWith(true)
     expect(mockHandleCreateOrEditRecord).not.toHaveBeenCalled()
+  })
+
+  it('closes the type menu when a type is selected while it is open', () => {
+    mockIsAddMenuOpen = true
+    mockRouterState = { recordType: 'all' }
+    const { rerender } = render(<AppHeaderContainer />)
+
+    mockRouterState = { recordType: 'note' }
+    rerender(<AppHeaderContainer />)
+    mockRouterState = { recordType: 'all' }
+    rerender(<AppHeaderContainer />)
+
+    expect(mockIsAddMenuOpen).toBe(false)
   })
 })

@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
 import { useUserData, useVault, useVaults } from 'lockwright-lib-vault'
 
@@ -32,6 +34,17 @@ export const AppHeaderContainer = () => {
   const { refetch: refetchMasterVault } = useVaults()
   const { refetch: refetchUserData } = useUserData()
 
+  // A sidebar category picks the type, so + skips the type menu.
+  const selectedRecordType =
+    currentPage === 'vault'
+      ? defaultItems.find((item) => item.type === routerState?.recordType)?.type
+      : undefined
+
+  // The typed + replaces the menu, so close it or it reopens on All Items.
+  useEffect(() => {
+    if (selectedRecordType && isAddMenuOpen) setIsAddMenuOpen(false)
+  }, [selectedRecordType, isAddMenuOpen, setIsAddMenuOpen])
+
   if (
     currentPage !== 'vault' &&
     !(AUTHENTICATOR_ENABLED && currentPage === 'authenticator')
@@ -42,12 +55,6 @@ export const AppHeaderContainer = () => {
   const isFavoritesView = isFavorite(routerState?.folder ?? '')
   const selectedFolder =
     routerState?.folder && !isFavoritesView ? routerState.folder : undefined
-
-  // A sidebar category picks the type, so + skips the type menu.
-  const selectedRecordType =
-    currentPage === 'vault'
-      ? defaultItems.find((item) => item.type === routerState?.recordType)?.type
-      : undefined
 
   const onSavedForOtp =
     AUTHENTICATOR_ENABLED && currentPage === 'authenticator'
