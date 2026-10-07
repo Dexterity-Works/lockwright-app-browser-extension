@@ -11,6 +11,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [0.0.33] - 2026-10-07
 
+`30a0113db31dd2ad8bf0c0c76d72b9fafcb77c2b`
+
 ### Fixed
 
 - Chrome no longer logs "cross-world extension resource mismatch" preload warnings on the popup, onboarding and in-page popups, and loads each script once.
