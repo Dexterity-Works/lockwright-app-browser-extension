@@ -52,6 +52,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: false,
+    // Chrome never uses a modulepreload on an extension page ("cross-world
+    // extension resource mismatch"), so each chunk loaded twice and warned.
+    // Every file is local to the extension; preloading gains nothing.
+    modulePreload: false,
     rollupOptions: {
       input: {
         action: path.resolve(__dirname, 'index.html'),
