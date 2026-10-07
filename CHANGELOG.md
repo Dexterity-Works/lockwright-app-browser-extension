@@ -9,6 +9,13 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.33] - 2026-10-07
+
+### Fixed
+
+- Chrome no longer logs "cross-world extension resource mismatch" preload warnings on the popup, onboarding and in-page popups, and loads each script once.
+- With an item type selected in the sidebar, the type menu closes instead of reopening on All Items.
+
 ## [0.0.32] - 2026-10-03
 
 `85e789267cc7e834a2087ee5db56f8cfddc8e975`
