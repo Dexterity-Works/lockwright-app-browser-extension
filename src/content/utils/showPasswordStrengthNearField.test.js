@@ -4,14 +4,14 @@ import path from 'path'
 import {
   checkPasswordStrength,
   PASSWORD_STRENGTH
-} from 'lockwright-utils-password-check'
+} from 'lockwright-lib-utils/password-check'
 
 import { showPasswordStrengthNearField } from './showPasswordStrengthNearField'
 
 jest.mock('./contentI18n.js', () => ({}))
 
-jest.mock('lockwright-utils-password-check', () => {
-  const actual = jest.requireActual('lockwright-utils-password-check')
+jest.mock('lockwright-lib-utils/password-check', () => {
+  const actual = jest.requireActual('lockwright-lib-utils/password-check')
   return {
     ...actual,
     checkPasswordStrength: jest.fn()

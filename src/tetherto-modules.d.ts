@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- ambient stubs for untyped JS packages */
 // Untyped JS dependencies — keeps strict TS files importable project-wide
 declare module 'lockwright-lib-ui-react-hooks'
-declare module 'lockwright-utils-validator'
+declare module 'lockwright-lib-utils/validator'
 declare module 'lockwright-lib-constants' {
   export const UNSUPPORTED: boolean
   export const EXTENSION_DESIGN_VERSION: number
@@ -365,7 +365,7 @@ declare module 'lockwright-lib-constants' {
   export const PASSPHRASE_TYPE_OPTIONS: unknown
 }
 
-declare module 'lockwright-utils-password-generator' {
+declare module 'lockwright-lib-utils/password-generator' {
   export function generatePassphrase(
     capitalLetters: boolean,
     symbols: boolean,
@@ -384,7 +384,7 @@ declare module 'lockwright-utils-password-generator' {
   ): string
 }
 
-declare module 'lockwright-utils-password-check' {
+declare module 'lockwright-lib-utils/password-check' {
   export const PASSWORD_STRENGTH: {
     WEAK: string
     VULNERABLE: string

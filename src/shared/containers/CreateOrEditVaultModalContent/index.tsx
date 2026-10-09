@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { useForm } from 'lockwright-lib-ui-react-hooks'
-import { Validator } from 'lockwright-utils-validator'
+import { Validator } from 'lockwright-lib-utils/validator'
 import { useCreateVault, useVault, type Vault } from 'lockwright-lib-vault'
 import {
   AlertMessage,

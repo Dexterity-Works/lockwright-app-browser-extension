@@ -29,7 +29,7 @@ jest.mock('lockwright-lib-ui-react-native-components', () => ({
   })
 }))
 
-jest.mock('lockwright-utils-validator', () => ({
+jest.mock('lockwright-lib-utils/validator', () => ({
   Validator: {
     object: () => ({ validate: () => ({}) }),
     string: () => ({ required: () => ({}) }),
@@ -37,7 +37,7 @@ jest.mock('lockwright-utils-validator', () => ({
   }
 }))
 
-jest.mock('lockwright-utils-password-check', () => ({
+jest.mock('lockwright-lib-utils/password-check', () => ({
   checkPasswordStrength: () => ({ success: false }),
   checkPassphraseStrength: () => ({ success: false }),
   PASSWORD_STRENGTH: { SAFE: 'safe', VULNERABLE: 'vulnerable', WEAK: 'weak' }

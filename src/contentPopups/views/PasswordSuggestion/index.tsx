@@ -4,7 +4,7 @@ import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useLingui } from '@lingui/react'
 import { useVault } from 'lockwright-lib-vault'
-import { generatePassword } from 'lockwright-utils-password-generator'
+import { generatePassword } from 'lockwright-lib-utils/password-generator'
 import { Text, useTheme } from 'lockwright-lib-ui-react-native-components'
 import {
   Close,

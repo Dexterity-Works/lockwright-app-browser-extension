@@ -11,9 +11,6 @@
     "scripts/*.mjs",
     "lingui.config.js"
   ],
-  "ignoreDependencies": [
-    "lockwright-utils-generate-unique-id"
-  ],
   "tags": [
     "-lintignore"
   ]

@@ -4,11 +4,11 @@ import { t } from '@lingui/core/macro'
 import {
   generatePassphrase,
   generatePassword
-} from 'lockwright-utils-password-generator'
+} from 'lockwright-lib-utils/password-generator'
 import {
   checkPassphraseStrength,
   checkPasswordStrength
-} from 'lockwright-utils-password-check'
+} from 'lockwright-lib-utils/password-check'
 import {
   Button,
   InputField,

@@ -9,8 +9,8 @@ import React, {
 import { t } from '@lingui/core/macro'
 import { useForm } from 'lockwright-lib-ui-react-hooks'
 import { AlertMessage, Button } from 'lockwright-lib-ui-react-native-components'
+import { Validator } from 'lockwright-lib-utils/validator'
 import { useCreateRecord, useRecords, useVault } from 'lockwright-lib-vault'
-import { Validator } from 'lockwright-utils-validator'
 
 import { buildLoginDetectCreatePayload } from './buildLoginDetectCreatePayload'
 import { isLoginDetectReady } from './isLoginDetectReady'

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { useForm } from 'lockwright-lib-ui-react-hooks'
-import { Validator } from 'lockwright-utils-validator'
+import { Validator } from 'lockwright-lib-utils/validator'
 import { AUTHENTICATOR_ENABLED } from 'lockwright-lib-constants'
 import {
   Button,
@@ -18,7 +18,7 @@ import {
   rawTokens,
   useTheme
 } from 'lockwright-lib-ui-react-native-components'
-import { checkPasswordStrength } from 'lockwright-utils-password-check'
+import { checkPasswordStrength } from 'lockwright-lib-utils/password-check'
 import {
   Add,
   ArrowBackOutined,

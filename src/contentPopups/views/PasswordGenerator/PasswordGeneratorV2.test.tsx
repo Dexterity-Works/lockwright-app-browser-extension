@@ -25,12 +25,12 @@ jest.mock('@lingui/react/macro', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }))
 
-jest.mock('lockwright-utils-password-generator', () => ({
+jest.mock('lockwright-lib-utils/password-generator', () => ({
   generatePassword: () => 'MockedPwd1!aa',
   generatePassphrase: () => ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 }))
 
-jest.mock('lockwright-utils-password-check', () => ({
+jest.mock('lockwright-lib-utils/password-check', () => ({
   checkPasswordStrength: () => ({ type: 'weak' }),
   checkPassphraseStrength: () => ({ type: 'vulnerable' })
 }))

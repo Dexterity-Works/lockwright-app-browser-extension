@@ -22,7 +22,7 @@ jest.mock('@lingui/react/macro', () => ({
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }))
 
-jest.mock('lockwright-utils-password-generator', () => ({
+jest.mock('lockwright-lib-utils/password-generator', () => ({
   generatePassword: () => 'SUGGESTED_PASSWORD_24___'
 }))
 

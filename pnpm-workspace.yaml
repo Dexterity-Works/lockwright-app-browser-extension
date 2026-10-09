@@ -19,6 +19,3 @@ overrides:
 allowBuilds:
   "esbuild@0.21.5": true
   "esbuild@0.25.12": true
-
-patchedDependencies:
-  "lockwright-utils-validator@0.0.10": patches/pear-apps-utils-validator@0.0.10.patch

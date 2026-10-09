@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useForm } from 'lockwright-lib-ui-react-hooks'
-import { Validator } from 'lockwright-utils-validator'
+import { Validator } from 'lockwright-lib-utils/validator'
 
 import { ButtonPrimary } from '../../../shared/components/ButtonPrimary'
 import { InputPasswordPearPass } from '../../../shared/components/InputPasswordPearPass'

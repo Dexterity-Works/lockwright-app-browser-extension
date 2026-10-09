@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { useForm } from 'lockwright-lib-ui-react-hooks'
-import { Validator } from 'lockwright-utils-validator'
+import { Validator } from 'lockwright-lib-utils/validator'
 
 import { ButtonPrimary } from '../../components/ButtonPrimary'
 import { FormModalHeaderWrapper } from '../../components/FormModalHeaderWrapper'
