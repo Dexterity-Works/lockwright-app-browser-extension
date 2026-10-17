@@ -167,6 +167,28 @@ describe('useVaultAccessRevoked', () => {
     )
   })
 
+  it('handles a vault announced twice (desktop and epoch status) once', async () => {
+    let finishDelete: () => void = () => {}
+    deleteVaultLocal.mockReturnValue(
+      new Promise<void>((resolve) => {
+        finishDelete = resolve
+      })
+    )
+
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () => {
+      const first = revokedHandler({ vaultId: 'v-active', actor: 'd1' })
+      const second = revokedHandler({ vaultId: 'v-active', reason: 'epoch' })
+      finishDelete()
+      await Promise.all([first, second])
+    })
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(1)
+    expect(switchVault).toHaveBeenCalledTimes(1)
+    expect(setModal).toHaveBeenCalledTimes(1)
+  })
+
   it('still shows the access-removed modal when delete fails locally', async () => {
     deleteVaultLocal.mockRejectedValue(new Error('disk-full'))
 
@@ -176,5 +198,8 @@ describe('useVaultAccessRevoked', () => {
     expect(setModal).toHaveBeenCalledTimes(1)
     expect(switchVault).not.toHaveBeenCalled()
     expect(createVault).not.toHaveBeenCalled()
+
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(2)
   })
 })
