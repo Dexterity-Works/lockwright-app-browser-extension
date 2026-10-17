@@ -235,6 +235,9 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
+    expect(closeModal).toHaveBeenCalledTimes(1)
+    expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
+
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
