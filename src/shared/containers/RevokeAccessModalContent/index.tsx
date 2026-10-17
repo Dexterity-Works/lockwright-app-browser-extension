@@ -143,6 +143,7 @@ export const RevokeAccessModalContent = ({
     <Dialog
       title={t`Revoke access for ${deviceName}?`}
       onClose={isLoading ? undefined : closeModal}
+      hideCloseButton={isLoading}
       testID="revoke-access-dialog"
       closeButtonTestID="revoke-access-close"
       footer={

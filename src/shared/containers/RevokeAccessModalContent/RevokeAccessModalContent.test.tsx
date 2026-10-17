@@ -41,9 +41,16 @@ jest.mock('lockwright-lib-ui-react-native-components', () => {
         </button>
       )
     ),
-    Dialog: ({ children, footer, onClose, closeButtonTestID }: any) => (
+    // Like the kit's Panel: the X renders unless hideCloseButton is set.
+    Dialog: ({
+      children,
+      footer,
+      onClose,
+      hideCloseButton,
+      closeButtonTestID
+    }: any) => (
       <div>
-        {onClose && (
+        {!hideCloseButton && (
           <button
             type="button"
             onClick={onClose}
