@@ -182,11 +182,46 @@ describe('useVaultAccessRevoked', () => {
       finishDelete()
       await Promise.all([first, second])
     })
-    await act(async () => revokedHandler({ vaultId: 'v-active' }))
 
     expect(deleteVaultLocal).toHaveBeenCalledTimes(1)
     expect(switchVault).toHaveBeenCalledTimes(1)
     expect(setModal).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles the same vault again once the first wipe has finished', async () => {
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(2)
+  })
+
+  it('forgets a vault that left the list while its wipe was running', async () => {
+    let finishDelete: () => void = () => {}
+    deleteVaultLocal.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishDelete = resolve
+      })
+    )
+
+    const { rerender } = renderHook(() => useVaultAccessRevoked())
+    let first: Promise<unknown> = Promise.resolve()
+    await act(async () => {
+      first = Promise.resolve(revokedHandler({ vaultId: 'v-active' }))
+    })
+
+    mockUseVaults.mockReturnValue({ data: [otherVault] })
+    rerender()
+    mockUseVaults.mockReturnValue({ data: [activeVault, otherVault] })
+    rerender()
+
+    await act(async () => {
+      await revokedHandler({ vaultId: 'v-active' })
+      finishDelete()
+      await first
+    })
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(2)
   })
 
   it('still shows the access-removed modal when delete fails locally', async () => {

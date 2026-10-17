@@ -61,14 +61,10 @@ export const useVaultAccessRevoked = () => {
     }
   })
 
-  // The desktop forwards its own announcement and the lib derives one from
-  // epoch status, so the same vault can arrive twice.
-  const handledVaultIds = useRef(new Set<string>())
-
-  const handleAccessRevoked = useCallback(
+  const wipeRevokedVault = useCallback(
     async (payload: { vaultId?: string; actor?: string } = {}) => {
       const { vaultId, actor } = payload
-      if (!vaultId || handledVaultIds.current.has(vaultId)) return
+      if (!vaultId) return
       const {
         vaults,
         activeVault,
@@ -83,7 +79,6 @@ export const useVaultAccessRevoked = () => {
 
       const vault = (vaults ?? []).find((v: Vault) => v.id === vaultId)
       if (!vault) return
-      handledVaultIds.current.add(vaultId)
       const vaultName = vault.name ?? vaultId
       const deviceName = (vault.devices ?? []).find(
         (d: { id?: string }) => d?.id === actor
@@ -94,7 +89,6 @@ export const useVaultAccessRevoked = () => {
         await deleteVaultLocal(vaultId)
       } catch (error) {
         logger.error('useVaultAccessRevoked', 'deleteVaultLocal failed:', error)
-        handledVaultIds.current.delete(vaultId)
         setModal(
           <AccessRemovedModalContent
             vaultName={vaultName}
@@ -137,6 +131,30 @@ export const useVaultAccessRevoked = () => {
       )
     },
     []
+  )
+
+  // The desktop forwards its own announcement and the lib derives one from
+  // epoch status, so the same vault can arrive twice while it is handled.
+  const handlingVaultIds = useRef(new Set<string>())
+  useEffect(() => {
+    const listed = new Set((vaults ?? []).map((v: Vault) => v.id))
+    for (const id of handlingVaultIds.current) {
+      if (!listed.has(id)) handlingVaultIds.current.delete(id)
+    }
+  }, [vaults])
+
+  const handleAccessRevoked = useCallback(
+    async (payload: { vaultId?: string; actor?: string } = {}) => {
+      const { vaultId } = payload
+      if (!vaultId || handlingVaultIds.current.has(vaultId)) return
+      handlingVaultIds.current.add(vaultId)
+      try {
+        await wipeRevokedVault(payload)
+      } finally {
+        handlingVaultIds.current.delete(vaultId)
+      }
+    },
+    [wipeRevokedVault]
   )
 
   useEffect(() => {
