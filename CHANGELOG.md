@@ -11,7 +11,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [0.0.34] - 2026-10-17
 
-`TBD`
+`b8939c34d49f84ef068190622a0a0cd8871d52bc`
 
 ### Added
 
