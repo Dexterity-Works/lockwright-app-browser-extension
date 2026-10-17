@@ -140,6 +140,31 @@ describe('PearpassVaultClient', () => {
       }
     })
 
+    it('keeps checkAvailability on the 10 s floor, not its 3 s background budget', async () => {
+      jest.useFakeTimers()
+      try {
+        const client = createMockClient()
+        runtime.sendMessage.mockImplementation(() => {})
+
+        let settled = false
+        const pending = client
+          ._sendMessage({
+            type: NATIVE_MESSAGE_TYPES.REQUEST,
+            command: 'checkAvailability'
+          })
+          .finally(() => {
+            settled = true
+          })
+        const assertion = expect(pending).rejects.toThrow(/timeout/i)
+        await jest.advanceTimersByTimeAsync(3_000)
+        expect(settled).toBe(false)
+        await jest.advanceTimersByTimeAsync(7_000)
+        await assertion
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
     it('gives activeVaultEnsureEpoch the longer budget, not the 10 s default', async () => {
       jest.useFakeTimers()
       try {
