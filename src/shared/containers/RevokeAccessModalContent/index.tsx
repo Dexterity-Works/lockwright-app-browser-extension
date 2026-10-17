@@ -14,6 +14,21 @@ export type RevokeAccessModalContentProps = {
   deviceName: string
 }
 
+// Fixed copy per known reason. Anything else, including a thrown error's
+// message, gets the generic sentence; the raw reason only goes to the log.
+const rotationWarningFor = (reason: string | undefined, deviceName: string) => {
+  switch (reason) {
+    case 'not-writable':
+      return t`This device can't write to the vault. "${deviceName}" can still read new items.`
+    case 'self-not-in-roster':
+      return t`This device isn't on the vault's member list. "${deviceName}" can still read new items.`
+    case 'legacy':
+      return t`The vault doesn't use rotating keys yet. "${deviceName}" can still read new items.`
+    default:
+      return t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
+  }
+}
+
 export const RevokeAccessModalContent = ({
   vaultId,
   targetDeviceId,
@@ -64,7 +79,8 @@ export const RevokeAccessModalContent = ({
         targetDeviceId
       })
       const unreachable = failures.filter(({ kind }) => !kind)
-      const epochFailed = failures.some(({ kind }) => kind === 'epoch')
+      const epochFailure = failures.find(({ kind }) => kind === 'epoch')
+      const epochFailed = !!epochFailure
 
       try {
         await refetchVault(vaultId)
@@ -96,9 +112,11 @@ export const RevokeAccessModalContent = ({
           epoch.reason !== 'pending')
       ) {
         const reason = epoch?.reason
-        const warning = reason
-          ? t`Couldn't rotate the vault key (${reason}). "${deviceName}" can still read new items.`
-          : t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
+        logger.warn('RevokeAccessModalContent', 'vault key not rotated:', {
+          reason,
+          error: epochFailure?.error?.message
+        })
+        const warning = rotationWarningFor(reason, deviceName)
         if (mounted.current) setRotationWarning(warning)
         else setToast({ message: warning })
         return

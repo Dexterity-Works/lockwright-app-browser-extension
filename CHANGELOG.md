@@ -21,6 +21,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 - The five utils now come from one package, `lockwright-lib-utils`.
 - Revoking a device rotates the vault key, so the device can no longer read items added or changed afterwards. The revoke dialog says what stays on the device and that devices on older versions must update.
+- The revoke dialog's key rotation warning says why in plain words (this device can't write to the vault, isn't on the member list, or the vault doesn't use rotating keys yet) instead of showing an internal reason code.
 
 ## [0.0.33] - 2026-10-07
 

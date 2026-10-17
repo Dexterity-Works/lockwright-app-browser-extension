@@ -4,6 +4,7 @@ import { kickDevice, useVault } from 'lockwright-lib-vault'
 import { RevokeAccessModalContent } from './index'
 import { useModal } from '../../context/ModalContext'
 import { useToast } from '../../context/ToastContext'
+import { logger } from '../../utils/logger'
 
 jest.mock('lockwright-lib-vault', () => ({
   kickDevice: jest.fn(),
@@ -20,7 +21,7 @@ jest.mock('../../context/ToastContext', () => ({
 }))
 
 jest.mock('../../utils/logger', () => ({
-  logger: { error: jest.fn() }
+  logger: { error: jest.fn(), warn: jest.fn() }
 }))
 
 jest.mock('lockwright-lib-ui-react-native-components', () => {
@@ -246,9 +247,7 @@ describe('RevokeAccessModalContent', () => {
     expect(closeModal).not.toHaveBeenCalled()
     expect(setCloseable).not.toHaveBeenCalled()
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(
-        /Couldn't rotate the vault key \(not-writable\)/
-      )
+      message: expect.stringMatching(/^This device can't write to the vault\. /)
     })
   })
 
@@ -304,7 +303,111 @@ describe('RevokeAccessModalContent', () => {
       message: expect.stringMatching(/can no longer edit this vault/)
     })
     await expectInlineRotationWarning(
-      /Couldn't rotate the vault key \(not-writable\)/
+      /^This device can't write to the vault\. "iPhone" can still read new items\.$/
+    )
+    expect(screen.queryByText(/not-writable/)).toBeNull()
+  })
+
+  it.each([
+    ['not-writable', "This device can't write to the vault."],
+    ['self-not-in-roster', "This device isn't on the vault's member list."],
+    ['legacy', "The vault doesn't use rotating keys yet."]
+  ])(
+    'when the key did not rotate (%s): shows that reason as a sentence, not the token',
+    async (reason, sentence) => {
+      mockedKickDevice.mockResolvedValue({
+        results: [],
+        failures: [
+          {
+            targetDeviceId: 'd2',
+            kind: 'epoch',
+            error: new Error(`epoch rotation failed: ${reason}`)
+          }
+        ],
+        epoch: { rotated: false, reason, uncovered: [] }
+      } as any)
+
+      renderModal()
+      await submit()
+
+      const warning = screen.getByTestId('revoke-access-warning').textContent
+      expect(warning).toBe(`${sentence} "iPhone" can still read new items.`)
+      expect(warning).not.toContain(reason)
+      expect(logger.warn).toHaveBeenCalledWith(
+        'RevokeAccessModalContent',
+        expect.any(String),
+        expect.objectContaining({ reason })
+      )
+    }
+  )
+
+  it.each([
+    [
+      'an unknown reason',
+      'some-new-reason',
+      'epoch rotation failed: some-new-reason'
+    ],
+    [
+      'a thrown message as the reason',
+      'activeVaultEnsureEpoch is not a function',
+      'epoch rotation failed: activeVaultEnsureEpoch is not a function'
+    ]
+  ])(
+    'when the key did not rotate with %s: shows the generic sentence without the raw text',
+    async (_label, reason, message) => {
+      mockedKickDevice.mockResolvedValue({
+        results: [],
+        failures: [
+          { targetDeviceId: 'd2', kind: 'epoch', error: new Error(message) }
+        ],
+        epoch: { rotated: false, reason, uncovered: [] }
+      } as any)
+
+      renderModal()
+      await submit()
+
+      const warning = screen.getByTestId('revoke-access-warning').textContent
+      expect(warning).toBe(
+        `Couldn't rotate the vault key. "iPhone" can still read new items.`
+      )
+      expect(warning).not.toContain(reason)
+      expect(logger.warn).toHaveBeenCalledWith(
+        'RevokeAccessModalContent',
+        expect.any(String),
+        expect.objectContaining({ reason })
+      )
+    }
+  )
+
+  it('when the rotation threw "activeVaultEnsureEpoch is not a function": the warning never shows it', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [
+        {
+          targetDeviceId: 'd2',
+          kind: 'epoch',
+          error: new Error(
+            'epoch rotation failed: activeVaultEnsureEpoch is not a function'
+          )
+        }
+      ],
+      epoch: null
+    } as any)
+
+    renderModal()
+    await submit()
+
+    const warning = screen.getByTestId('revoke-access-warning').textContent
+    expect(warning).toBe(
+      `Couldn't rotate the vault key. "iPhone" can still read new items.`
+    )
+    expect(warning).not.toMatch(/activeVaultEnsureEpoch|not a function/)
+    expect(logger.warn).toHaveBeenCalledWith(
+      'RevokeAccessModalContent',
+      expect.any(String),
+      expect.objectContaining({
+        error: 'epoch rotation failed: activeVaultEnsureEpoch is not a function'
+      })
     )
   })
 
