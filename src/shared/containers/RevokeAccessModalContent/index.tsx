@@ -97,11 +97,7 @@ export const RevokeAccessModalContent = ({
         return
       }
 
-      setToast({
-        message: unreachable.length
-          ? t`Couldn't reach the device. It will lose access next time it comes online.`
-          : t`"${deviceName}" can no longer edit this vault`
-      })
+      const unreachableMessage = t`Couldn't reach the device. It will lose access next time it comes online.`
 
       // 'current': the latest key already leaves this device out.
       // 'pending': another member rotates when it syncs.
@@ -117,10 +113,19 @@ export const RevokeAccessModalContent = ({
           error: epochFailure?.error?.message
         })
         const warning = rotationWarningFor(reason, deviceName)
+        // No success toast beside the warning; an unreachable device still
+        // gets its toast.
+        if (unreachable.length) setToast({ message: unreachableMessage })
         if (mounted.current) setRotationWarning(warning)
         else setToast({ message: warning })
         return
       }
+
+      setToast({
+        message: unreachable.length
+          ? unreachableMessage
+          : t`"${deviceName}" can no longer edit this vault`
+      })
 
       if (mounted.current) closeModal()
 

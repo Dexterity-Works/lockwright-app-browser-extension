@@ -298,10 +298,7 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
-    expect(setToast).toHaveBeenCalledTimes(1)
-    expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/can no longer edit this vault/)
-    })
+    expect(setToast).not.toHaveBeenCalled()
     await expectInlineRotationWarning(
       /^This device can't write to the vault\. "iPhone" can still read new items\.$/
     )
@@ -427,11 +424,64 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
+    expect(setToast).not.toHaveBeenCalled()
+    await expectInlineRotationWarning(/^Couldn't rotate the vault key\. /)
+  })
+
+  it('shows the success toast only when the dialog closes as a success, never beside the warning', async () => {
+    mockedKickDevice.mockResolvedValueOnce({
+      results: [],
+      failures: [
+        { targetDeviceId: 'd2', kind: 'epoch', error: new Error('x') }
+      ],
+      epoch: { rotated: false, reason: 'not-writable', uncovered: [] }
+    } as any)
+
+    const { unmount } = renderModal()
+    await submit()
+
+    expect(screen.getByTestId('revoke-access-warning')).toBeTruthy()
+    expect(closeModal).not.toHaveBeenCalled()
+    expect(setToast).not.toHaveBeenCalledWith({
+      message: expect.stringMatching(/can no longer edit this vault/)
+    })
+    unmount()
+
+    mockedKickDevice.mockResolvedValueOnce({
+      results: [],
+      failures: [],
+      epoch: rotated
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
+    expect(closeModal).toHaveBeenCalledWith('m1')
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
     })
-    await expectInlineRotationWarning(/^Couldn't rotate the vault key\. /)
+  })
+
+  it('with an unreachable device and a failed rotation: keeps the unreachable toast beside the warning', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [
+        { targetDeviceId: 'd2', error: new Error('offline') },
+        { targetDeviceId: 'd2', kind: 'epoch', error: new Error('x') }
+      ],
+      epoch: { rotated: false, reason: 'not-writable', uncovered: [] }
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(setToast).toHaveBeenCalledTimes(1)
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/lose access next time it comes online/)
+    })
+    await expectInlineRotationWarning(/^This device can't write to the vault\./)
   })
 
   it('when epoch is null with no epoch failure: says the revoke did not finish instead of success', async () => {
