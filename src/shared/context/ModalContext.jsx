@@ -10,6 +10,8 @@ import { BASE_TRANSITION_DURATION } from '../constants/transitions'
 import { Overlay } from '../containers/Overlay'
 
 const ModalContext = createContext()
+// The id of the modal entry a component is rendered in.
+const ModalIdContext = createContext(undefined)
 
 const getDefaultModalParams = () => ({
   hasOverlay: false,
@@ -33,23 +35,32 @@ export const ModalProvider = ({ children }) => {
   const isOpen = !!modalStack.length
 
   const setModal = useCallback((content, params) => {
-    setModalStack((prev) => [...prev, createModalConfig(content, params)])
+    const modal = createModalConfig(content, params)
+    setModalStack((prev) => [...prev, modal])
+    return modal.id
   }, [])
 
+  // With a string id, closes that entry only (no-op once it is gone).
+  // Otherwise closes the top modal; event arguments from onClick land here.
   const closeModal = useCallback(
-    () =>
+    (id) =>
       new Promise((resolve) => {
+        const byId = typeof id === 'string'
         setModalStack((prev) => {
           const newStack = [...prev]
-          const topModal = getTopModal(newStack)
-          if (topModal?.isOpen) {
-            topModal.isOpen = false
+          const modal = byId
+            ? newStack.find((entry) => entry.id === id)
+            : getTopModal(newStack)
+          if (modal?.isOpen) {
+            modal.isOpen = false
           }
           return newStack
         })
 
         setTimeout(() => {
-          setModalStack((prev) => prev.slice(0, -1))
+          setModalStack((prev) =>
+            byId ? prev.filter((entry) => entry.id !== id) : prev.slice(0, -1)
+          )
           resolve()
         }, BASE_TRANSITION_DURATION)
       }),
@@ -58,16 +69,16 @@ export const ModalProvider = ({ children }) => {
 
   const closeAllModals = useCallback(() => setModalStack([]), [])
 
-  // Lets the open modal block Escape and overlay clicks while it is busy.
-  const setCloseable = useCallback((closeable) => {
-    setModalStack((prev) => {
-      const topModal = getTopModal(prev)
-      if (!topModal || topModal.params.closeable === closeable) return prev
-      return [
-        ...prev.slice(0, -1),
-        { ...topModal, params: { ...topModal.params, closeable } }
-      ]
-    })
+  // Lets a modal block Escape and overlay clicks on its own entry while it
+  // is busy. No-op once the entry is gone.
+  const setCloseable = useCallback((id, closeable) => {
+    setModalStack((prev) =>
+      prev.map((entry) =>
+        entry.id === id && entry.params.closeable !== closeable
+          ? { ...entry, params: { ...entry.params, closeable } }
+          : entry
+      )
+    )
   }, [])
 
   useEffect(() => {
@@ -107,7 +118,9 @@ export const ModalProvider = ({ children }) => {
             <div
               className={`relative z-[10000] ${params.fullScreen ? 'h-full w-full' : ''}`}
             >
-              {content}
+              <ModalIdContext.Provider value={id}>
+                {content}
+              </ModalIdContext.Provider>
             </div>
           )}
         </div>
@@ -127,10 +140,15 @@ export const ModalProvider = ({ children }) => {
  *       closeable?: boolean,
  *       fullScreen?: boolean,
  *     }
- *   ) => void,
- *   closeModal: () => Promise<void>,
+ *   ) => string,
+ *   closeModal: (id?: string) => Promise<void>,
  *   closeAllModals: () => void,
- *   setCloseable: (closeable: boolean) => void
+ *   setCloseable: (id: string, closeable: boolean) => void
  * }}
  */
 export const useModal = () => useContext(ModalContext)
+
+/**
+ * @returns {string | undefined} id of the modal entry this component is in
+ */
+export const useModalId = () => useContext(ModalIdContext)

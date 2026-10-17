@@ -11,7 +11,8 @@ jest.mock('lockwright-lib-vault', () => ({
 }))
 
 jest.mock('../../context/ModalContext', () => ({
-  useModal: jest.fn()
+  useModal: jest.fn(),
+  useModalId: jest.fn(() => 'm1')
 }))
 
 jest.mock('../../context/ToastContext', () => ({
@@ -148,7 +149,7 @@ describe('RevokeAccessModalContent', () => {
       targetDeviceId: 'd2'
     })
     expect(refetchVault).toHaveBeenCalledWith('v1')
-    expect(closeModal).toHaveBeenCalled()
+    expect(closeModal).toHaveBeenCalledWith('m1')
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
@@ -167,6 +168,7 @@ describe('RevokeAccessModalContent', () => {
       fireEvent.click(screen.getByTestId('revoke-access-done'))
     })
     expect(closeModal).toHaveBeenCalledTimes(1)
+    expect(closeModal).toHaveBeenCalledWith('m1')
     expect(mockedKickDevice).toHaveBeenCalledTimes(1)
   }
 
@@ -191,7 +193,7 @@ describe('RevokeAccessModalContent', () => {
     await submit()
 
     expect(screen.queryByTestId('revoke-access-close')).toBeNull()
-    expect(setCloseable).toHaveBeenLastCalledWith(false)
+    expect(setCloseable).toHaveBeenLastCalledWith('m1', false)
 
     await finishKick({
       results: [],
@@ -201,7 +203,7 @@ describe('RevokeAccessModalContent', () => {
       epoch: null
     })
 
-    expect(setCloseable).toHaveBeenLastCalledWith(true)
+    expect(setCloseable).toHaveBeenLastCalledWith('m1', true)
     expect(screen.getByTestId('revoke-access-close')).toBeTruthy()
   })
 
@@ -339,6 +341,7 @@ describe('RevokeAccessModalContent', () => {
     await submit()
 
     expect(closeModal).toHaveBeenCalledTimes(1)
+    expect(closeModal).toHaveBeenCalledWith('m1')
     expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
 
     expect(setToast).toHaveBeenCalledTimes(1)
@@ -373,7 +376,7 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
-    expect(closeModal).toHaveBeenCalled()
+    expect(closeModal).toHaveBeenCalledWith('m1')
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
     })
@@ -394,7 +397,7 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
-    expect(closeModal).toHaveBeenCalled()
+    expect(closeModal).toHaveBeenCalledWith('m1')
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/lose access next time it comes online/)

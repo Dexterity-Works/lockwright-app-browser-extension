@@ -4,7 +4,7 @@ import { t } from '@lingui/core/macro'
 import { Button, Dialog, Text } from 'lockwright-lib-ui-react-native-components'
 import { kickDevice, useVault } from 'lockwright-lib-vault'
 
-import { useModal } from '../../context/ModalContext'
+import { useModal, useModalId } from '../../context/ModalContext'
 import { useToast } from '../../context/ToastContext'
 import { logger } from '../../utils/logger'
 
@@ -19,10 +19,17 @@ export const RevokeAccessModalContent = ({
   targetDeviceId,
   deviceName
 }: RevokeAccessModalContentProps) => {
-  const { closeModal, setCloseable } = useModal() as {
-    closeModal: () => void
-    setCloseable: (closeable: boolean) => void
-  }
+  const { closeModal: closeModalEntry, setCloseable: setEntryCloseable } =
+    useModal() as {
+      closeModal: (id?: string) => void
+      setCloseable: (id: string | undefined, closeable: boolean) => void
+    }
+  // Act on this dialog's own entry; another modal may be on top by the time
+  // a slow revoke returns.
+  const modalId = useModalId() as string | undefined
+  const closeModal = () => closeModalEntry(modalId)
+  const setCloseable = (closeable: boolean) =>
+    setEntryCloseable(modalId, closeable)
   const { setToast } = useToast() as {
     setToast: (toast: { message: string }) => void
   }

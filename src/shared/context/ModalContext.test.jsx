@@ -2,7 +2,7 @@ import React from 'react'
 
 import { render, fireEvent, screen } from '@testing-library/react'
 
-import { ModalProvider, useModal } from './ModalContext'
+import { ModalProvider, useModal, useModalId } from './ModalContext'
 import { BASE_TRANSITION_DURATION } from '../constants/transitions'
 import '@testing-library/jest-dom'
 
@@ -56,15 +56,55 @@ describe('ModalContext', () => {
     expect(screen.queryByText('Modal Content')).not.toBeInTheDocument()
   })
 
+  // Stands in for the revoke dialog: blocks closing, and a second modal can
+  // land on top before its work finishes.
+  const Busy = () => {
+    const { setModal, closeModal, setCloseable } = useModal()
+    const id = useModalId()
+    return (
+      <div>
+        <button onClick={() => setCloseable(id, false)}>Start work</button>
+        <button onClick={() => setModal(<div>Top modal</div>)}>Push top</button>
+        <button onClick={() => setCloseable(id, true)}>Allow close</button>
+        <button onClick={() => closeModal(id)}>Finish work</button>
+      </div>
+    )
+  }
+  const Opener = () => {
+    const { setModal } = useModal()
+    return <button onClick={() => setModal(<Busy />)}>Open Busy</button>
+  }
+
+  it('closes only its own entry when another modal was pushed on top', () => {
+    renderWithProvider(<Opener />)
+
+    fireEvent.click(screen.getByText('Open Busy'))
+    fireEvent.click(screen.getByText('Push top'))
+    fireEvent.click(screen.getByText('Finish work'))
+    jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
+
+    expect(screen.queryByText('Start work')).not.toBeInTheDocument()
+    expect(screen.getByText('Top modal')).toBeInTheDocument()
+  })
+
+  it('sets closeable on its own entry, not the modal on top', () => {
+    renderWithProvider(<Opener />)
+
+    fireEvent.click(screen.getByText('Open Busy'))
+    fireEvent.click(screen.getByText('Start work'))
+    fireEvent.click(screen.getByText('Push top'))
+    fireEvent.click(screen.getByText('Allow close'))
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+    jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
+    expect(screen.queryByText('Top modal')).not.toBeInTheDocument()
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+    jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
+    expect(screen.queryByText('Start work')).not.toBeInTheDocument()
+  })
+
   it('ignores Escape while the open modal marks itself not closeable', () => {
-    const Busy = () => {
-      const { setCloseable } = useModal()
-      return <button onClick={() => setCloseable(false)}>Start work</button>
-    }
-    const Opener = () => {
-      const { setModal } = useModal()
-      return <button onClick={() => setModal(<Busy />)}>Open Busy</button>
-    }
     renderWithProvider(<Opener />)
 
     fireEvent.click(screen.getByText('Open Busy'))
