@@ -13,14 +13,14 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 `TBD`
 
+### Added
+
+- After a revoke, a warning when the vault key could not be rotated, or names the devices that cannot read new items until they update.
+
 ### Changed
 
 - The five utils now come from one package, `lockwright-lib-utils`.
 - Revoking a device rotates the vault key, so the device can no longer read items added or changed afterwards. The revoke dialog says what stays on the device and that devices on older versions must update.
-
-### Added
-
-- After a revoke, a warning when the vault key could not be rotated, or names the devices that cannot read new items until they update.
 
 ## [0.0.33] - 2026-10-07
 
