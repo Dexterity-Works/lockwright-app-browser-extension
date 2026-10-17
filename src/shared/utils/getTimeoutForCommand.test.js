@@ -2,7 +2,7 @@ import { getTimeoutForCommand } from './getTimeoutForCommand'
 
 describe('getTimeoutForCommand', () => {
   it.each([
-    ['activeVaultEnsureEpoch', 60_000],
+    ['activeVaultEnsureEpoch', 40_000],
     ['pairActiveVault', 30_000],
     ['checkAvailability', 3_000],
     ['activeVaultList', 10_000]

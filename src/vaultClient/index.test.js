@@ -183,7 +183,9 @@ describe('PearpassVaultClient', () => {
         const assertion = expect(pending).rejects.toThrow(/timeout/i)
         await jest.advanceTimersByTimeAsync(10_000)
         expect(settled).toBe(false)
-        await jest.advanceTimersByTimeAsync(50_000)
+        await jest.advanceTimersByTimeAsync(29_999)
+        expect(settled).toBe(false)
+        await jest.advanceTimersByTimeAsync(1)
         await assertion
       } finally {
         jest.useRealTimers()
