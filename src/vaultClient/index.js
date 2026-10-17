@@ -14,6 +14,7 @@ import {
   VAULT_CLIENT_EVENTS
 } from '../shared/constants/nativeMessaging'
 import { Emitter } from '../shared/utils/emitter'
+import { getTimeoutForCommand } from '../shared/utils/getTimeoutForCommand'
 import { isExpectedQuietError } from '../shared/utils/isExpectedQuietError'
 import { logger } from '../shared/utils/logger'
 import { decodeNmFile, encodeNmFile } from '../shared/utils/nmFile'
@@ -109,13 +110,19 @@ export class PearpassVaultClient extends Emitter {
   _sendMessage(message) {
     return new Promise((resolve, reject) => {
       let settled = false
+      // Never below the default, so the background's own shorter timeout
+      // (availability check) answers before this one fires.
+      const timeoutMs = Math.max(
+        REQUEST_TIMEOUT.DEFAULT_MS,
+        getTimeoutForCommand(message?.command)
+      )
       const timeoutId = setTimeout(() => {
         finish(
           new Error(
             `${NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT}: ${message?.type || 'runtime'}`
           )
         )
-      }, REQUEST_TIMEOUT.DEFAULT_MS)
+      }, timeoutMs)
 
       const finish = (err, response) => {
         if (settled) return

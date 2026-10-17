@@ -67,7 +67,8 @@ export const REQUEST_TIMEOUT = {
   DEFAULT_MS: MS_PER_SECOND * 10, // 10 seconds default timeout
   AVAILABILITY_CHECK_MS: MS_PER_SECOND * 3, // 3 seconds for availability check
   CONNECT_MS: MS_PER_SECOND * 5, // 5 seconds for connection
-  PAIRING_MS: MS_PER_SECOND * 30 // 30 seconds for pairing
+  PAIRING_MS: MS_PER_SECOND * 30, // 30 seconds for pairing
+  EPOCH_MS: MS_PER_SECOND * 60 // 60 seconds to seal and append a new vault key
 }
 
 /**

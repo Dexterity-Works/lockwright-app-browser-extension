@@ -140,6 +140,31 @@ describe('PearpassVaultClient', () => {
       }
     })
 
+    it('gives activeVaultEnsureEpoch the longer budget, not the 10 s default', async () => {
+      jest.useFakeTimers()
+      try {
+        const client = createMockClient()
+        runtime.sendMessage.mockImplementation(() => {})
+
+        let settled = false
+        const pending = client
+          ._sendMessage({
+            type: NATIVE_MESSAGE_TYPES.REQUEST,
+            command: 'activeVaultEnsureEpoch'
+          })
+          .finally(() => {
+            settled = true
+          })
+        const assertion = expect(pending).rejects.toThrow(/timeout/i)
+        await jest.advanceTimersByTimeAsync(10_000)
+        expect(settled).toBe(false)
+        await jest.advanceTimersByTimeAsync(50_000)
+        await assertion
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
     it('should not connect twice', async () => {
       const client = createMockClient()
       client.connected = true
