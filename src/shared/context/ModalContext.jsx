@@ -41,26 +41,33 @@ export const ModalProvider = ({ children }) => {
   }, [])
 
   // With a string id, closes that entry only (no-op once it is gone).
-  // Otherwise closes the top modal; event arguments from onClick land here.
+  // Otherwise closes the top modal unless it is not closeable; event
+  // arguments from onClick land here.
   const closeModal = useCallback(
     (id) =>
       new Promise((resolve) => {
         const byId = typeof id === 'string'
+        let targetId = byId ? id : null
         setModalStack((prev) => {
-          const newStack = [...prev]
           const modal = byId
-            ? newStack.find((entry) => entry.id === id)
-            : getTopModal(newStack)
+            ? prev.find((entry) => entry.id === id)
+            : getTopModal(prev)
+          if (!byId) {
+            if (modal?.params?.closeable === false) return prev
+            targetId = modal?.id ?? null
+          }
           if (modal?.isOpen) {
             modal.isOpen = false
           }
-          return newStack
+          return [...prev]
         })
 
         setTimeout(() => {
-          setModalStack((prev) =>
-            byId ? prev.filter((entry) => entry.id !== id) : prev.slice(0, -1)
-          )
+          if (targetId) {
+            setModalStack((prev) =>
+              prev.filter((entry) => entry.id !== targetId)
+            )
+          }
           resolve()
         }, BASE_TRANSITION_DURATION)
       }),

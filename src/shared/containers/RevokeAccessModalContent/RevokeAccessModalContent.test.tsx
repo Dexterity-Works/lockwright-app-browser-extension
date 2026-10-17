@@ -24,7 +24,7 @@ jest.mock('../../utils/logger', () => ({
 }))
 
 jest.mock('lockwright-lib-ui-react-native-components', () => {
-  const { forwardRef } = jest.requireActual('react')
+  const { forwardRef, useEffect } = jest.requireActual('react')
   const liftTestID = ({ testID, ...rest }: any) =>
     testID ? { ...rest, 'data-testid': testID } : rest
   return {
@@ -41,26 +41,38 @@ jest.mock('lockwright-lib-ui-react-native-components', () => {
         </button>
       )
     ),
-    // Like the kit's Panel: the X renders unless hideCloseButton is set.
+    // Like the kit: the X renders unless hideCloseButton is set, and Escape
+    // on the document calls onClose when there is one.
     Dialog: ({
       children,
       footer,
       onClose,
       hideCloseButton,
       closeButtonTestID
-    }: any) => (
-      <div>
-        {!hideCloseButton && (
-          <button
-            type="button"
-            onClick={onClose}
-            data-testid={closeButtonTestID}
-          />
-        )}
-        {children}
-        {footer}
-      </div>
-    ),
+    }: any) => {
+      useEffect(() => {
+        if (!onClose) return
+        const onKeyDown = (event: KeyboardEvent) => {
+          if (event.key === 'Escape') onClose()
+        }
+        globalThis.document.addEventListener('keydown', onKeyDown)
+        return () =>
+          globalThis.document.removeEventListener('keydown', onKeyDown)
+      }, [onClose])
+      return (
+        <div>
+          {!hideCloseButton && (
+            <button
+              type="button"
+              onClick={onClose}
+              data-testid={closeButtonTestID}
+            />
+          )}
+          {children}
+          {footer}
+        </div>
+      )
+    },
     Text: ({ children }: any) => <span>{children}</span>
   }
 })
@@ -201,6 +213,8 @@ describe('RevokeAccessModalContent', () => {
 
     expect(screen.queryByTestId('revoke-access-close')).toBeNull()
     expect(setCloseable).toHaveBeenLastCalledWith('m1', false)
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(closeModal).not.toHaveBeenCalled()
 
     await finishKick({
       results: [],

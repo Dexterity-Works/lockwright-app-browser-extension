@@ -67,6 +67,7 @@ describe('ModalContext', () => {
         <button onClick={() => setModal(<div>Top modal</div>)}>Push top</button>
         <button onClick={() => setCloseable(id, true)}>Allow close</button>
         <button onClick={() => closeModal(id)}>Finish work</button>
+        <button onClick={() => closeModal()}>Close top</button>
       </div>
     )
   }
@@ -100,6 +101,21 @@ describe('ModalContext', () => {
     expect(screen.queryByText('Top modal')).not.toBeInTheDocument()
 
     fireEvent.keyDown(window, { key: 'Escape' })
+    jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
+    expect(screen.queryByText('Start work')).not.toBeInTheDocument()
+  })
+
+  it('an untargeted closeModal leaves a busy top modal open until it allows closing', () => {
+    renderWithProvider(<Opener />)
+
+    fireEvent.click(screen.getByText('Open Busy'))
+    fireEvent.click(screen.getByText('Start work'))
+    fireEvent.click(screen.getByText('Close top'))
+    jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
+    expect(screen.getByText('Start work')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('Allow close'))
+    fireEvent.click(screen.getByText('Close top'))
     jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
     expect(screen.queryByText('Start work')).not.toBeInTheDocument()
   })
