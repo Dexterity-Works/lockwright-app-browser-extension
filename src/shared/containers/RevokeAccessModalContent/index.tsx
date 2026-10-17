@@ -31,15 +31,12 @@ export const RevokeAccessModalContent = ({
     if (isLoading) return
     setIsLoading(true)
     try {
-      const { failures, epoch } = await kickDevice({ vaultId, targetDeviceId })
-      // 'current' means the latest key already leaves this device out.
-      const rotationFailed =
-        !epoch || (!epoch.rotated && epoch.reason !== 'current')
-      // kickDevice reports a failed rotation in `failures` too; that one is
-      // not an unreachable device, the warning below covers it.
-      const unreachable = failures?.filter(
-        ({ error }) => !error?.message?.startsWith('epoch rotation failed')
-      )
+      const { failures = [], epoch } = await kickDevice({
+        vaultId,
+        targetDeviceId
+      })
+      const unreachable = failures.filter(({ kind }) => !kind)
+      const epochFailed = failures.some(({ kind }) => kind === 'epoch')
 
       try {
         await refetchVault(vaultId)
@@ -47,24 +44,54 @@ export const RevokeAccessModalContent = ({
         logger.error('RevokeAccessModalContent', 'refetch failed:', error)
       }
 
+      // No epoch and no epoch failure: kickDevice returned before the
+      // rotation step, so the device was not removed.
+      if (!epoch && !epochFailed) {
+        setToast({ message: t`Couldn't revoke access. Please try again.` })
+        setIsLoading(false)
+        return
+      }
+
       closeModal()
       setToast({
-        message: unreachable?.length
+        message: unreachable.length
           ? t`Couldn't reach the device. It will lose access next time it comes online.`
           : t`"${deviceName}" can no longer edit this vault`
       })
 
-      if (rotationFailed) {
+      // 'current': the latest key already leaves this device out.
+      // 'pending': another member rotates when it syncs.
+      if (
+        !epoch ||
+        (!epoch.rotated &&
+          epoch.reason !== 'current' &&
+          epoch.reason !== 'pending')
+      ) {
         const reason = epoch?.reason
         setToast({
           message: reason
             ? t`Couldn't rotate the vault key (${reason}). "${deviceName}" can still read new items.`
             : t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
         })
-      } else if (epoch.uncovered?.length) {
-        const names = epoch.uncovered
-          .map((id) => vault?.devices?.find((d) => d?.id === id)?.name ?? id)
-          .join(', ')
+        return
+      }
+
+      if (epoch.reason === 'pending') {
+        setToast({
+          message: t`Another device will rotate the vault key when it next syncs.`
+        })
+      }
+
+      if (epoch.uncovered?.length) {
+        const names = [
+          ...new Set(
+            epoch.uncovered.map(
+              (id) =>
+                vault?.devices?.find((d) => d?.id === id)?.name ||
+                t`Unknown Device`
+            )
+          )
+        ].join(', ')
         setToast({
           message: t`${names} can't read new items until they update Lockwright and open this vault.`
         })

@@ -326,13 +326,18 @@ declare module 'lockwright-lib-vault' {
     targetDeviceId: string
   }): Promise<{
     results: Array<{ targetDeviceId: string; channel: 'outbox' }>
-    failures: Array<{ targetDeviceId: string; error: Error }>
+    failures: Array<{ targetDeviceId: string; kind?: 'epoch'; error: Error }>
     epoch: {
       rotated: boolean
       id?: string
       seq?: number
       members?: string[]
-      reason?: 'current' | 'legacy' | 'not-writable' | 'self-not-in-roster'
+      reason?:
+        | 'current'
+        | 'pending'
+        | 'legacy'
+        | 'not-writable'
+        | 'self-not-in-roster'
       uncovered: string[]
     } | null
   }>

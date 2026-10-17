@@ -65,7 +65,9 @@ describe('RevokeAccessModalContent', () => {
         devices: [
           { id: 'd1', name: 'Laptop' },
           { id: 'd2', name: 'iPhone' },
-          { id: 'd3', name: 'Old Pixel' }
+          { id: 'd3', name: 'Old Pixel' },
+          { id: 'd3b', name: 'Old Pixel' },
+          { id: 'd4' }
         ]
       },
       refetch: refetchVault
@@ -146,7 +148,8 @@ describe('RevokeAccessModalContent', () => {
       failures: [
         {
           targetDeviceId: 'd2',
-          error: new Error('epoch rotation failed: not-writable')
+          kind: 'epoch',
+          error: new Error('not-writable')
         }
       ],
       epoch: { rotated: false, reason: 'not-writable', uncovered: [] }
@@ -172,7 +175,8 @@ describe('RevokeAccessModalContent', () => {
       failures: [
         {
           targetDeviceId: 'd2',
-          error: new Error('epoch rotation failed: boom')
+          kind: 'epoch',
+          error: new Error('boom')
         }
       ],
       epoch: null
@@ -182,15 +186,70 @@ describe('RevokeAccessModalContent', () => {
     await submit()
 
     expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/can no longer edit this vault/)
+    })
+    expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/Couldn't rotate the vault key/)
     })
+  })
+
+  it('when epoch is null with no epoch failure: says the revoke did not complete instead of success', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [{ targetDeviceId: 'd2', error: new Error('append failed') }],
+      epoch: null
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(setToast).toHaveBeenCalledTimes(1)
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/Couldn't revoke access/)
+    })
+    expect(closeModal).not.toHaveBeenCalled()
+    expect(
+      (screen.getByTestId('revoke-access-submit') as HTMLButtonElement).disabled
+    ).toBe(false)
+  })
+
+  it('when the key is already current: shows only the success toast', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [],
+      epoch: { rotated: false, reason: 'current', uncovered: [] }
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(setToast).toHaveBeenCalledTimes(1)
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/can no longer edit this vault/)
+    })
+  })
+
+  it('when another member will rotate: shows success, then the pending info', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [],
+      epoch: { rotated: false, reason: 'pending', uncovered: [] }
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(setToast.mock.calls.map(([toast]) => toast.message)).toEqual([
+      expect.stringMatching(/can no longer edit this vault/),
+      'Another device will rotate the vault key when it next syncs.'
+    ])
   })
 
   it('when roster devices are uncovered: names them in a warning', async () => {
     mockedKickDevice.mockResolvedValue({
       results: [],
       failures: [],
-      epoch: { ...rotated, uncovered: ['d3', 'd9'] }
+      epoch: { ...rotated, uncovered: ['d3', 'd3b', 'd4'] }
     } as any)
 
     renderModal()
@@ -201,7 +260,9 @@ describe('RevokeAccessModalContent', () => {
       message: expect.stringMatching(/can no longer edit this vault/)
     })
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/Old Pixel, d9.*update Lockwright/)
+      message: expect.stringMatching(
+        /^Old Pixel, Unknown Device can't read new items.*update Lockwright/
+      )
     })
   })
 
@@ -216,6 +277,7 @@ describe('RevokeAccessModalContent', () => {
     await submit()
 
     expect(closeModal).toHaveBeenCalled()
+    expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/lose access next time it comes online/)
     })
