@@ -142,7 +142,22 @@ describe('RevokeAccessModalContent', () => {
     })
   })
 
-  it('when the key did not rotate: warns with the reason and does not blame the device', async () => {
+  const expectInlineRotationWarning = async (pattern: RegExp) => {
+    expect(closeModal).not.toHaveBeenCalled()
+    expect(screen.getByTestId('revoke-access-warning').textContent).toMatch(
+      pattern
+    )
+    expect(screen.queryByTestId('revoke-access-submit')).toBeNull()
+    expect(screen.queryByTestId('revoke-access-cancel')).toBeNull()
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('revoke-access-done'))
+    })
+    expect(closeModal).toHaveBeenCalledTimes(1)
+    expect(mockedKickDevice).toHaveBeenCalledTimes(1)
+  }
+
+  it('when the key did not rotate: keeps the dialog open with the reason inline, Done closes it', async () => {
     mockedKickDevice.mockResolvedValue({
       results: [],
       failures: [
@@ -158,18 +173,16 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
-    expect(closeModal).toHaveBeenCalled()
+    expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(
-        /Couldn't rotate the vault key.*not-writable/
-      )
+      message: expect.stringMatching(/can no longer edit this vault/)
     })
-    expect(setToast).not.toHaveBeenCalledWith({
-      message: expect.stringMatching(/Couldn't reach the device/)
-    })
+    await expectInlineRotationWarning(
+      /Couldn't rotate the vault key \(not-writable\)/
+    )
   })
 
-  it('when the rotation threw (epoch null): warns that the key could not be rotated', async () => {
+  it('when the rotation threw (epoch null): keeps the dialog open with a reason-less warning inline', async () => {
     mockedKickDevice.mockResolvedValue({
       results: [],
       failures: [
@@ -185,15 +198,14 @@ describe('RevokeAccessModalContent', () => {
     renderModal()
     await submit()
 
+    expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
     })
-    expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/Couldn't rotate the vault key/)
-    })
+    await expectInlineRotationWarning(/^Couldn't rotate the vault key\. /)
   })
 
-  it('when epoch is null with no epoch failure: says the revoke did not complete instead of success', async () => {
+  it('when epoch is null with no epoch failure: says the revoke did not finish instead of success', async () => {
     mockedKickDevice.mockResolvedValue({
       results: [],
       failures: [{ targetDeviceId: 'd2', error: new Error('append failed') }],
@@ -205,7 +217,7 @@ describe('RevokeAccessModalContent', () => {
 
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/Couldn't revoke access/)
+      message: "Couldn't finish revoking access. Please try again."
     })
     expect(closeModal).not.toHaveBeenCalled()
     expect(
