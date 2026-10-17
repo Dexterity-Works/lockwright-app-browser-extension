@@ -56,6 +56,25 @@ describe('ModalContext', () => {
     expect(screen.queryByText('Modal Content')).not.toBeInTheDocument()
   })
 
+  it('ignores Escape while the open modal marks itself not closeable', () => {
+    const Busy = () => {
+      const { setCloseable } = useModal()
+      return <button onClick={() => setCloseable(false)}>Start work</button>
+    }
+    const Opener = () => {
+      const { setModal } = useModal()
+      return <button onClick={() => setModal(<Busy />)}>Open Busy</button>
+    }
+    renderWithProvider(<Opener />)
+
+    fireEvent.click(screen.getByText('Open Busy'))
+    fireEvent.click(screen.getByText('Start work'))
+    fireEvent.keyDown(window, { key: 'Escape' })
+    jest.advanceTimersByTime(BASE_TRANSITION_DURATION)
+
+    expect(screen.getByText('Start work')).toBeInTheDocument()
+  })
+
   it('should close the modal when Escape key is pressed', () => {
     renderWithProvider(<TestComponent />)
 

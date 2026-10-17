@@ -58,6 +58,18 @@ export const ModalProvider = ({ children }) => {
 
   const closeAllModals = useCallback(() => setModalStack([]), [])
 
+  // Lets the open modal block Escape and overlay clicks while it is busy.
+  const setCloseable = useCallback((closeable) => {
+    setModalStack((prev) => {
+      const topModal = getTopModal(prev)
+      if (!topModal || topModal.params.closeable === closeable) return prev
+      return [
+        ...prev.slice(0, -1),
+        { ...topModal, params: { ...topModal.params, closeable } }
+      ]
+    })
+  }, [])
+
   useEffect(() => {
     const handleKeydown = (event) => {
       if (event.key === 'Escape' && isOpen) {
@@ -74,7 +86,7 @@ export const ModalProvider = ({ children }) => {
 
   return (
     <ModalContext.Provider
-      value={{ isOpen, setModal, closeModal, closeAllModals }}
+      value={{ isOpen, setModal, closeModal, closeAllModals, setCloseable }}
     >
       {children}
 
@@ -117,7 +129,8 @@ export const ModalProvider = ({ children }) => {
  *     }
  *   ) => void,
  *   closeModal: () => Promise<void>,
- *   closeAllModals: () => void
+ *   closeAllModals: () => void,
+ *   setCloseable: (closeable: boolean) => void
  * }}
  */
 export const useModal = () => useContext(ModalContext)

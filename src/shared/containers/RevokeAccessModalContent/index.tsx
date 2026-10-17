@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { Button, Dialog, Text } from 'lockwright-lib-ui-react-native-components'
@@ -19,7 +19,10 @@ export const RevokeAccessModalContent = ({
   targetDeviceId,
   deviceName
 }: RevokeAccessModalContentProps) => {
-  const { closeModal } = useModal() as { closeModal: () => void }
+  const { closeModal, setCloseable } = useModal() as {
+    closeModal: () => void
+    setCloseable: (closeable: boolean) => void
+  }
   const { setToast } = useToast() as {
     setToast: (toast: { message: string }) => void
   }
@@ -29,10 +32,25 @@ export const RevokeAccessModalContent = ({
   // Set once the device is removed but the key did not rotate. The dialog
   // stays open with this warning and only offers Done.
   const [rotationWarning, setRotationWarning] = useState<string | null>(null)
+  const doneRef = useRef<HTMLButtonElement>(null)
+  // A late kickDevice result must not touch state or close whatever modal
+  // is on top once this one is gone.
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (rotationWarning) doneRef.current?.focus()
+  }, [rotationWarning])
 
   const onRevoke = async () => {
     if (isLoading) return
     setIsLoading(true)
+    setCloseable(false)
     try {
       const { failures = [], epoch } = await kickDevice({
         vaultId,
@@ -53,7 +71,6 @@ export const RevokeAccessModalContent = ({
         setToast({
           message: t`Couldn't finish revoking access. Please try again.`
         })
-        setIsLoading(false)
         return
       }
 
@@ -72,16 +89,15 @@ export const RevokeAccessModalContent = ({
           epoch.reason !== 'pending')
       ) {
         const reason = epoch?.reason
-        setRotationWarning(
-          reason
-            ? t`Couldn't rotate the vault key (${reason}). "${deviceName}" can still read new items.`
-            : t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
-        )
-        setIsLoading(false)
+        const warning = reason
+          ? t`Couldn't rotate the vault key (${reason}). "${deviceName}" can still read new items.`
+          : t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
+        if (mounted.current) setRotationWarning(warning)
+        else setToast({ message: warning })
         return
       }
 
-      closeModal()
+      if (mounted.current) closeModal()
 
       if (epoch.reason === 'pending') {
         setToast({
@@ -108,20 +124,25 @@ export const RevokeAccessModalContent = ({
       setToast({
         message: t`Couldn't revoke access. Please try again.`
       })
-      setIsLoading(false)
+    } finally {
+      if (mounted.current) {
+        setIsLoading(false)
+        setCloseable(true)
+      }
     }
   }
 
   return (
     <Dialog
       title={t`Revoke access for ${deviceName}?`}
-      onClose={closeModal}
+      onClose={isLoading ? undefined : closeModal}
       testID="revoke-access-dialog"
       closeButtonTestID="revoke-access-close"
       footer={
         <div className="flex w-full justify-end gap-[var(--spacing8)]">
           {rotationWarning ? (
             <Button
+              ref={doneRef}
               variant="primary"
               size="small"
               type="button"
