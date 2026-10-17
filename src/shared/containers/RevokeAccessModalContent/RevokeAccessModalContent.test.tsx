@@ -60,6 +60,14 @@ describe('RevokeAccessModalContent', () => {
     jest.clearAllMocks()
     refetchVault.mockResolvedValue(undefined)
     mockedUseVault.mockReturnValue({
+      data: {
+        id: 'v1',
+        devices: [
+          { id: 'd1', name: 'Laptop' },
+          { id: 'd2', name: 'iPhone' },
+          { id: 'd3', name: 'Old Pixel' }
+        ]
+      },
       refetch: refetchVault
     } as unknown as ReturnType<typeof useVault>)
     mockedUseModal.mockReturnValue({
@@ -85,8 +93,37 @@ describe('RevokeAccessModalContent', () => {
     })
   }
 
+  const rotated = {
+    rotated: true,
+    id: 'e1',
+    seq: 1,
+    members: ['d1'],
+    uncovered: []
+  }
+
+  it('says revoking rotates the key, what stays on the device, and that old versions must update', () => {
+    renderModal()
+
+    const body = screen.getByTestId('revoke-access-body').textContent
+    expect(body).toMatch(
+      /removes this device from the vault and rotates the vault key\. It can no longer read items added or changed from now on\./
+    )
+    expect(body).toMatch(
+      /Anything it synced before now stays on that device\. Revoking cannot delete it\. Change passwords the device could see, especially if it was lost or stolen\./
+    )
+    expect(body).toMatch(
+      /Devices still on an older Lockwright version must update before they can read new items\./
+    )
+    expect(body).not.toMatch(/anything synced later/)
+    expect(body).not.toMatch(/new vault/)
+  })
+
   it('on success: closes the modal and shows the success toast', async () => {
-    mockedKickDevice.mockResolvedValue({ results: [], failures: [] } as any)
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [],
+      epoch: rotated
+    } as any)
 
     renderModal()
     await submit()
@@ -97,15 +134,82 @@ describe('RevokeAccessModalContent', () => {
     })
     expect(refetchVault).toHaveBeenCalledWith('v1')
     expect(closeModal).toHaveBeenCalled()
+    expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
+    })
+  })
+
+  it('when the key did not rotate: warns with the reason and does not blame the device', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [
+        {
+          targetDeviceId: 'd2',
+          error: new Error('epoch rotation failed: not-writable')
+        }
+      ],
+      epoch: { rotated: false, reason: 'not-writable', uncovered: [] }
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(closeModal).toHaveBeenCalled()
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(
+        /Couldn't rotate the vault key.*not-writable/
+      )
+    })
+    expect(setToast).not.toHaveBeenCalledWith({
+      message: expect.stringMatching(/Couldn't reach the device/)
+    })
+  })
+
+  it('when the rotation threw (epoch null): warns that the key could not be rotated', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [
+        {
+          targetDeviceId: 'd2',
+          error: new Error('epoch rotation failed: boom')
+        }
+      ],
+      epoch: null
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/Couldn't rotate the vault key/)
+    })
+  })
+
+  it('when roster devices are uncovered: names them in a warning', async () => {
+    mockedKickDevice.mockResolvedValue({
+      results: [],
+      failures: [],
+      epoch: { ...rotated, uncovered: ['d3', 'd9'] }
+    } as any)
+
+    renderModal()
+    await submit()
+
+    expect(closeModal).toHaveBeenCalled()
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/can no longer edit this vault/)
+    })
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/Old Pixel, d9.*update Lockwright/)
     })
   })
 
   it('on partial failure: closes the modal and shows the unreachable-device toast', async () => {
     mockedKickDevice.mockResolvedValue({
       results: [],
-      failures: [{ targetDeviceId: 'd2', error: new Error('offline') }]
+      failures: [{ targetDeviceId: 'd2', error: new Error('offline') }],
+      epoch: rotated
     } as any)
 
     renderModal()

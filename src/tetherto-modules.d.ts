@@ -327,6 +327,14 @@ declare module 'lockwright-lib-vault' {
   }): Promise<{
     results: Array<{ targetDeviceId: string; channel: 'outbox' }>
     failures: Array<{ targetDeviceId: string; error: Error }>
+    epoch: {
+      rotated: boolean
+      id?: string
+      seq?: number
+      members?: string[]
+      reason?: 'current' | 'legacy' | 'not-writable' | 'self-not-in-roster'
+      uncovered: string[]
+    } | null
   }>
 
   export function getMyDeviceId(): Promise<string | null>
