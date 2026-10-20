@@ -254,7 +254,7 @@ export const RevokeAccessModalContent = ({
         )}
         <div className="flex flex-col">
           <Text as="p" variant="caption">
-            {t`Revoking removes this device from the vault and rotates the vault key. It can no longer read items added or changed from now on.`}
+            {t`Revoking removes this device from the vault and rotates the vault key. Once the key rotates, the device can't read items added or changed after that.`}
           </Text>
           <Text as="p" variant="caption">
             {t`Before you proceed, please note:`}
