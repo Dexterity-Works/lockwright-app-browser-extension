@@ -26,7 +26,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ### Fixed
 
-- A key rotation that finishes after the revoke dialog stops waiting is reported as done instead of failed.
+- A key rotation that finishes after the revoke dialog stops waiting is reported as done when it has landed by the time the dialog checks again.
 - A vault revoked from another device is wiped once, without a second switch, "Personal" vault or access-removed dialog.
 
 ## [0.0.33] - 2026-10-07
