@@ -321,6 +321,9 @@ describe('RevokeAccessModalContent', () => {
       renderModal()
       await submit()
 
+      expect(mockedGetEpochStatus.mock.invocationCallOrder[0]).toBeLessThan(
+        mockedKickDevice.mock.invocationCallOrder[0]
+      )
       expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
       expect(closeModal).toHaveBeenCalledWith('m1')
       expect(setToast).toHaveBeenCalledTimes(1)
