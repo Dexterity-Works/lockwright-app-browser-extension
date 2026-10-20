@@ -114,7 +114,11 @@ export class PearpassVaultClient extends Emitter {
       // (availability check) answers before this one fires. A key rotation
       // gets the background's budget plus a handshake on top: the background
       // starts its timer only after ensureSession, so an equal one here
-      // would report a rotation the desktop finished as failed.
+      // would report a rotation the desktop finished as failed. The
+      // background stays inside this when the session already exists, as
+      // kickDevice makes secure calls just before. A fresh handshake or a
+      // re-handshake retry can outlast it; the popup then times out and the
+      // revoke dialog's epoch status check decides.
       const commandTimeoutMs = getTimeoutForCommand(message?.command)
       const timeoutMs =
         message?.command === 'activeVaultEnsureEpoch'
