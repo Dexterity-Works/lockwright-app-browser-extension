@@ -24,6 +24,11 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 - The revoke dialog's key rotation warning says why in plain words (this device can't write to the vault, isn't on the member list, or the vault doesn't use rotating keys yet) instead of showing an internal reason code.
 - When the vault key could not be rotated, the revoke dialog no longer also shows a success toast next to the warning.
 
+### Fixed
+
+- A key rotation that finishes after the revoke dialog stops waiting is reported as done instead of failed.
+- A vault revoked from another device is wiped once, without a second switch, "Personal" vault or access-removed dialog.
+
 ## [0.0.33] - 2026-10-07
 
 `30a0113db31dd2ad8bf0c0c76d72b9fafcb77c2b`
