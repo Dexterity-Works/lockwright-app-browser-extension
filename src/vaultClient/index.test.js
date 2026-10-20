@@ -165,7 +165,7 @@ describe('PearpassVaultClient', () => {
       }
     })
 
-    it('gives activeVaultEnsureEpoch the longer budget, not the 10 s default', async () => {
+    it('waits past the background 40 s activeVaultEnsureEpoch budget, plus the handshake', async () => {
       jest.useFakeTimers()
       try {
         const client = createMockClient()
@@ -181,12 +181,31 @@ describe('PearpassVaultClient', () => {
             settled = true
           })
         const assertion = expect(pending).rejects.toThrow(/timeout/i)
-        await jest.advanceTimersByTimeAsync(10_000)
+        await jest.advanceTimersByTimeAsync(40_000)
         expect(settled).toBe(false)
-        await jest.advanceTimersByTimeAsync(29_999)
+        await jest.advanceTimersByTimeAsync(9_999)
         expect(settled).toBe(false)
         await jest.advanceTimersByTimeAsync(1)
         await assertion
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it('resolves an activeVaultEnsureEpoch answer that lands just after 40 s', async () => {
+      jest.useFakeTimers()
+      try {
+        const client = createMockClient()
+        runtime.sendMessage.mockImplementation((message, callback) => {
+          setTimeout(() => callback({ success: true, result: 'r' }), 40_500)
+        })
+
+        const pending = client._sendMessage({
+          type: NATIVE_MESSAGE_TYPES.REQUEST,
+          command: 'activeVaultEnsureEpoch'
+        })
+        await jest.advanceTimersByTimeAsync(40_500)
+        await expect(pending).resolves.toEqual({ success: true, result: 'r' })
       } finally {
         jest.useRealTimers()
       }

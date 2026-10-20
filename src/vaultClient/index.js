@@ -111,11 +111,15 @@ export class PearpassVaultClient extends Emitter {
     return new Promise((resolve, reject) => {
       let settled = false
       // Never below the default, so the background's own shorter timeout
-      // (availability check) answers before this one fires.
-      const timeoutMs = Math.max(
-        REQUEST_TIMEOUT.DEFAULT_MS,
-        getTimeoutForCommand(message?.command)
-      )
+      // (availability check) answers before this one fires. A key rotation
+      // gets the background's budget plus a handshake on top: the background
+      // starts its timer only after ensureSession, so an equal one here
+      // would report a rotation the desktop finished as failed.
+      const commandTimeoutMs = getTimeoutForCommand(message?.command)
+      const timeoutMs =
+        message?.command === 'activeVaultEnsureEpoch'
+          ? commandTimeoutMs + REQUEST_TIMEOUT.DEFAULT_MS
+          : Math.max(REQUEST_TIMEOUT.DEFAULT_MS, commandTimeoutMs)
       const timeoutId = setTimeout(() => {
         finish(
           new Error(
