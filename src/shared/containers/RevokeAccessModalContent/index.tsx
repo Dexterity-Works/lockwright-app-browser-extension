@@ -31,24 +31,38 @@ const rotationWarningFor = (reason: string | undefined, deviceName: string) => {
   }
 }
 
-// A rotation that timed out may still have landed. It counts as done when
-// the vault's latest key no longer seals to the revoked device.
-const epochAfterTimeout = async (vaultId: string, targetDeviceId: string) => {
+type EpochStatus = Awaited<
+  ReturnType<typeof pearpassVaultClient.activeVaultGetEpochStatus>
+>
+
+const readEpochStatus = async (): Promise<EpochStatus | null> => {
   try {
-    const status = await pearpassVaultClient.activeVaultGetEpochStatus()
-    if (
-      status?.vaultId === vaultId &&
-      status.epoch &&
-      !status.legacy &&
-      !status.members?.includes(targetDeviceId)
-    ) {
-      return { rotated: true, uncovered: status.uncovered ?? [] }
-    }
+    return await pearpassVaultClient.activeVaultGetEpochStatus()
   } catch (error) {
     logger.warn('RevokeAccessModalContent', 'epoch status failed:', error)
+    return null
   }
-  return null
 }
+
+// A rotation that timed out may still have landed. It counts as done only
+// when the vault's epoch moved on since before the kick and the new one
+// leaves the device out. An unchanged epoch can leave this device id out
+// while the same peer holds the key under another device row.
+const rotatedSince = (
+  before: EpochStatus | null,
+  after: EpochStatus | null,
+  vaultId: string,
+  targetDeviceId: string
+) =>
+  !!before &&
+  !!after &&
+  before.vaultId === vaultId &&
+  after.vaultId === vaultId &&
+  !!after.epoch &&
+  !after.legacy &&
+  (after.epoch !== before.epoch || after.seq > before.seq) &&
+  Array.isArray(after.members) &&
+  !after.members.includes(targetDeviceId)
 
 export const RevokeAccessModalContent = ({
   vaultId,
@@ -95,6 +109,7 @@ export const RevokeAccessModalContent = ({
     setIsLoading(true)
     setCloseable(false)
     try {
+      const statusBefore = await readEpochStatus()
       const kick = await kickDevice({
         vaultId,
         targetDeviceId
@@ -109,8 +124,11 @@ export const RevokeAccessModalContent = ({
           NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT
         )
       ) {
-        epoch = await epochAfterTimeout(vaultId, targetDeviceId)
-        if (epoch) epochFailure = undefined
+        const statusAfter = await readEpochStatus()
+        if (rotatedSince(statusBefore, statusAfter, vaultId, targetDeviceId)) {
+          epoch = { rotated: true, uncovered: statusAfter?.uncovered ?? [] }
+          epochFailure = undefined
+        }
       }
       const epochFailed = !!epochFailure
 

@@ -99,6 +99,9 @@ describe('RevokeAccessModalContent', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // clearAllMocks keeps queued once-values; a test's unread status must
+    // not reach the next one.
+    mockedGetEpochStatus.mockReset()
     refetchVault.mockResolvedValue(undefined)
     mockedUseVault.mockReturnValue({
       data: {
@@ -274,59 +277,101 @@ describe('RevokeAccessModalContent', () => {
     })
   })
 
-  const timedOut = {
+  const timedOut = (message: string) => ({
     results: [],
     failures: [
       {
         targetDeviceId: 'd2',
         kind: 'epoch',
-        error: new Error(
-          'epoch rotation failed: Request timeout: activeVaultEnsureEpoch'
-        )
+        error: new Error(`epoch rotation failed: ${message}`)
       }
     ],
     epoch: null
-  }
-
-  it('when the rotation timed out but the latest key leaves the device out: reports success', async () => {
-    mockedKickDevice.mockResolvedValue(timedOut as any)
-    mockedGetEpochStatus.mockResolvedValue({
-      vaultId: 'v1',
-      epoch: 'e2',
-      legacy: false,
-      members: ['d1'],
-      uncovered: []
-    })
-
-    renderModal()
-    await submit()
-
-    expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
-    expect(closeModal).toHaveBeenCalledWith('m1')
-    expect(setToast).toHaveBeenCalledTimes(1)
-    expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/can no longer edit this vault/)
-    })
   })
+  const backgroundTimeout = 'Request timeout: nmSecureRequest'
+  const popupTimeout = 'Request timeout: NATIVE_REQUEST'
 
-  it('when the rotation timed out and the latest key still seals to the device: warns', async () => {
-    mockedKickDevice.mockResolvedValue(timedOut as any)
-    mockedGetEpochStatus.mockResolvedValue({
-      vaultId: 'v1',
-      epoch: 'e1',
-      legacy: false,
-      members: ['d1', 'd2'],
-      uncovered: []
-    })
-
-    renderModal()
-    await submit()
-
-    expect(mockedGetEpochStatus).toHaveBeenCalledTimes(1)
-    await expectInlineRotationWarning(
-      /^Couldn't rotate the vault key\. "iPhone" can still read new items\.$/
-    )
+  const status = (overrides: object = {}) => ({
+    vaultId: 'v1',
+    epoch: 'e1',
+    seq: 1,
+    legacy: false,
+    members: ['d1', 'd2'],
+    uncovered: [],
+    ...overrides
   })
+  const rotatedStatus = status({ epoch: 'e2', seq: 2, members: ['d1'] })
+
+  it.each([backgroundTimeout, popupTimeout])(
+    'when the rotation timed out (%s) but the epoch moved on without the device: reports success',
+    async (message) => {
+      mockedGetEpochStatus
+        .mockResolvedValueOnce(status())
+        .mockResolvedValueOnce(rotatedStatus)
+      mockedKickDevice.mockResolvedValue(timedOut(message) as any)
+
+      renderModal()
+      await submit()
+
+      expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
+      expect(closeModal).toHaveBeenCalledWith('m1')
+      expect(setToast).toHaveBeenCalledTimes(1)
+      expect(setToast).toHaveBeenCalledWith({
+        message: expect.stringMatching(/can no longer edit this vault/)
+      })
+    }
+  )
+
+  it.each<[string, object | Error, object | Error]>([
+    [
+      // The peer's other device row (d3) holds the latest key; d2 was never
+      // sealed to, so an unchanged epoch already leaves it out.
+      'the epoch did not change though it leaves the device out',
+      status({ members: ['d1', 'd3'] }),
+      status({ members: ['d1', 'd3'] })
+    ],
+    [
+      'the new epoch still seals to the device',
+      status(),
+      status({ epoch: 'e2', seq: 2 })
+    ],
+    [
+      'the status has no members',
+      status(),
+      status({ epoch: 'e2', seq: 2, members: undefined })
+    ],
+    [
+      'the status is for another vault',
+      status(),
+      { ...rotatedStatus, vaultId: 'v9' }
+    ],
+    [
+      'the status before the kick is for another vault',
+      status({ vaultId: 'v9' }),
+      rotatedStatus
+    ],
+    ['the status has no epoch', status(), { ...rotatedStatus, epoch: null }],
+    ['the vault is legacy', status(), { ...rotatedStatus, legacy: true }],
+    ['the read before the kick failed', new Error('boom'), rotatedStatus],
+    ['the read after the timeout failed', status(), new Error('boom')]
+  ])(
+    'when the rotation timed out and %s: warns',
+    async (_label, before, after) => {
+      for (const value of [before, after]) {
+        if (value instanceof Error) {
+          mockedGetEpochStatus.mockRejectedValueOnce(value)
+        } else mockedGetEpochStatus.mockResolvedValueOnce(value)
+      }
+      mockedKickDevice.mockResolvedValue(timedOut(backgroundTimeout) as any)
+
+      renderModal()
+      await submit()
+
+      await expectInlineRotationWarning(
+        /^Couldn't rotate the vault key\. "iPhone" can still read new items\.$/
+      )
+    }
+  )
 
   it('focuses Done when the inline warning appears', async () => {
     mockedKickDevice.mockResolvedValue({
