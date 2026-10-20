@@ -64,7 +64,7 @@ export const useVaultAccessRevoked = () => {
   const wipeRevokedVault = useCallback(
     async (payload: { vaultId?: string; actor?: string } = {}) => {
       const { vaultId, actor } = payload
-      if (!vaultId) return
+      if (!vaultId) return false
       const {
         vaults,
         activeVault,
@@ -78,7 +78,7 @@ export const useVaultAccessRevoked = () => {
       } = latest.current
 
       const vault = (vaults ?? []).find((v: Vault) => v.id === vaultId)
-      if (!vault) return
+      if (!vault) return false
       const vaultName = vault.name ?? vaultId
       const deviceName = (vault.devices ?? []).find(
         (d: { id?: string }) => d?.id === actor
@@ -95,7 +95,7 @@ export const useVaultAccessRevoked = () => {
             deviceName={deviceName}
           />
         )
-        return
+        return false
       }
 
       if (wasActive) {
@@ -129,29 +129,40 @@ export const useVaultAccessRevoked = () => {
           deviceName={deviceName}
         />
       )
+      return true
     },
     []
   )
 
   // The desktop forwards its own announcement and the lib derives one from
-  // epoch status, so the same vault can arrive twice while it is handled.
-  const handlingVaultIds = useRef(new Set<string>())
+  // epoch status, so the same vault can arrive twice. 'wiping' blocks a
+  // second wipe while one runs. 'wiped' blocks one until the vault leaves
+  // the list, as an announcement can beat the list update. A failed wipe
+  // is forgotten so the next announcement retries it.
+  const handledVaults = useRef(new Map<string, 'wiping' | 'wiped'>())
   useEffect(() => {
     const listed = new Set((vaults ?? []).map((v: Vault) => v.id))
-    for (const id of handlingVaultIds.current) {
-      if (!listed.has(id)) handlingVaultIds.current.delete(id)
+    for (const [id, state] of handledVaults.current) {
+      if (state === 'wiped' && !listed.has(id)) {
+        handledVaults.current.delete(id)
+      }
     }
   }, [vaults])
 
   const handleAccessRevoked = useCallback(
     async (payload: { vaultId?: string; actor?: string } = {}) => {
       const { vaultId } = payload
-      if (!vaultId || handlingVaultIds.current.has(vaultId)) return
-      handlingVaultIds.current.add(vaultId)
+      if (!vaultId || handledVaults.current.has(vaultId)) return
+      handledVaults.current.set(vaultId, 'wiping')
+      let wiped = false
       try {
-        await wipeRevokedVault(payload)
+        wiped = await wipeRevokedVault(payload)
       } finally {
-        handlingVaultIds.current.delete(vaultId)
+        const listed = (latest.current.vaults ?? []).some(
+          (v: Vault) => v.id === vaultId
+        )
+        if (wiped && listed) handledVaults.current.set(vaultId, 'wiped')
+        else handledVaults.current.delete(vaultId)
       }
     },
     [wipeRevokedVault]
