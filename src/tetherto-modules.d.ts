@@ -351,6 +351,16 @@ declare module 'lockwright-lib-vault/src/instances' {
     off?: (event: string, handler: (...args: any[]) => void) => void
     activeVaultGet?: (key: string) => Promise<unknown>
     activeVaultAdd?: (key: string, data: unknown) => Promise<void>
+    activeVaultGetEpochStatus: () => Promise<{
+      vaultId: string | null
+      epoch: string | null
+      seq: number
+      legacy: boolean
+      canRead: boolean
+      revoked: boolean
+      members: string[]
+      uncovered: string[]
+    }>
     recordFailedMasterPassword: () => Promise<unknown>
     getMasterPasswordStatus: () => Promise<{
       isLocked: boolean

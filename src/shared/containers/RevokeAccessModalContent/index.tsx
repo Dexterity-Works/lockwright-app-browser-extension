@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import { Button, Dialog, Text } from 'lockwright-lib-ui-react-native-components'
 import { kickDevice, useVault } from 'lockwright-lib-vault'
+import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
+import { NATIVE_MESSAGING_ERRORS } from '../../constants/nativeMessaging'
 import { useModal, useModalId } from '../../context/ModalContext'
 import { useToast } from '../../context/ToastContext'
 import { logger } from '../../utils/logger'
@@ -27,6 +29,25 @@ const rotationWarningFor = (reason: string | undefined, deviceName: string) => {
     default:
       return t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
   }
+}
+
+// A rotation that timed out may still have landed. It counts as done when
+// the vault's latest key no longer seals to the revoked device.
+const epochAfterTimeout = async (vaultId: string, targetDeviceId: string) => {
+  try {
+    const status = await pearpassVaultClient.activeVaultGetEpochStatus()
+    if (
+      status?.vaultId === vaultId &&
+      status.epoch &&
+      !status.legacy &&
+      !status.members?.includes(targetDeviceId)
+    ) {
+      return { rotated: true, uncovered: status.uncovered ?? [] }
+    }
+  } catch (error) {
+    logger.warn('RevokeAccessModalContent', 'epoch status failed:', error)
+  }
+  return null
 }
 
 export const RevokeAccessModalContent = ({
@@ -74,12 +95,23 @@ export const RevokeAccessModalContent = ({
     setIsLoading(true)
     setCloseable(false)
     try {
-      const { failures = [], epoch } = await kickDevice({
+      const kick = await kickDevice({
         vaultId,
         targetDeviceId
       })
+      const { failures = [] } = kick
+      let { epoch } = kick
       const unreachable = failures.filter(({ kind }) => !kind)
-      const epochFailure = failures.find(({ kind }) => kind === 'epoch')
+      let epochFailure = failures.find(({ kind }) => kind === 'epoch')
+      if (
+        !epoch &&
+        epochFailure?.error?.message?.includes(
+          NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT
+        )
+      ) {
+        epoch = await epochAfterTimeout(vaultId, targetDeviceId)
+        if (epoch) epochFailure = undefined
+      }
       const epochFailed = !!epochFailure
 
       try {

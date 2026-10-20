@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { kickDevice, useVault } from 'lockwright-lib-vault'
+import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { RevokeAccessModalContent } from './index'
 import { useModal } from '../../context/ModalContext'
@@ -9,6 +10,10 @@ import { logger } from '../../utils/logger'
 jest.mock('lockwright-lib-vault', () => ({
   kickDevice: jest.fn(),
   useVault: jest.fn()
+}))
+
+jest.mock('lockwright-lib-vault/src/instances', () => ({
+  pearpassVaultClient: { activeVaultGetEpochStatus: jest.fn() }
 }))
 
 jest.mock('../../context/ModalContext', () => ({
@@ -82,6 +87,9 @@ const mockedKickDevice = jest.mocked(kickDevice)
 const mockedUseVault = jest.mocked(useVault)
 const mockedUseModal = jest.mocked(useModal)
 const mockedUseToast = jest.mocked(useToast)
+const mockedGetEpochStatus = jest.mocked(
+  pearpassVaultClient.activeVaultGetEpochStatus
+) as jest.Mock
 
 describe('RevokeAccessModalContent', () => {
   const refetchVault = jest.fn()
@@ -263,6 +271,60 @@ describe('RevokeAccessModalContent', () => {
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(/can no longer edit this vault/)
     })
+  })
+
+  const timedOut = {
+    results: [],
+    failures: [
+      {
+        targetDeviceId: 'd2',
+        kind: 'epoch',
+        error: new Error(
+          'epoch rotation failed: Request timeout: activeVaultEnsureEpoch'
+        )
+      }
+    ],
+    epoch: null
+  }
+
+  it('when the rotation timed out but the latest key leaves the device out: reports success', async () => {
+    mockedKickDevice.mockResolvedValue(timedOut as any)
+    mockedGetEpochStatus.mockResolvedValue({
+      vaultId: 'v1',
+      epoch: 'e2',
+      legacy: false,
+      members: ['d1'],
+      uncovered: []
+    })
+
+    renderModal()
+    await submit()
+
+    expect(screen.queryByTestId('revoke-access-warning')).toBeNull()
+    expect(closeModal).toHaveBeenCalledWith('m1')
+    expect(setToast).toHaveBeenCalledTimes(1)
+    expect(setToast).toHaveBeenCalledWith({
+      message: expect.stringMatching(/can no longer edit this vault/)
+    })
+  })
+
+  it('when the rotation timed out and the latest key still seals to the device: warns', async () => {
+    mockedKickDevice.mockResolvedValue(timedOut as any)
+    mockedGetEpochStatus.mockResolvedValue({
+      vaultId: 'v1',
+      epoch: 'e1',
+      legacy: false,
+      members: ['d1', 'd2'],
+      uncovered: []
+    })
+
+    renderModal()
+    await submit()
+
+    expect(mockedGetEpochStatus).toHaveBeenCalledTimes(1)
+    await expectInlineRotationWarning(
+      /^Couldn't rotate the vault key\. "iPhone" can still read new items\.$/
+    )
   })
 
   it('focuses Done when the inline warning appears', async () => {
