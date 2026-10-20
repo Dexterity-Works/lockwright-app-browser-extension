@@ -58,8 +58,9 @@ const readRosterIds = async (): Promise<Set<string | undefined> | null> => {
 }
 
 // A rotation that timed out may still have landed. It counts as done only
-// when the vault's epoch moved on since before the kick, the new one leaves
-// the device out, and it seals only to devices still on the roster. An unchanged epoch can leave this device
+// when the vault's epoch moved on since before the kick (a new latest record
+// always has a new id), the new one leaves the device out, and it seals only
+// to devices still on the roster. An unchanged epoch can leave this device
 // id out while the same peer holds the key under another device row, and a
 // member that rotated from an older view can still seal to that row.
 const rotatedSince = (
@@ -76,7 +77,7 @@ const rotatedSince = (
   after.vaultId === vaultId &&
   !!after.epoch &&
   !after.legacy &&
-  (after.epoch !== before.epoch || after.seq > before.seq) &&
+  after.epoch !== before.epoch &&
   Array.isArray(after.members) &&
   !after.members.includes(targetDeviceId) &&
   after.members.every((id) => roster.has(id))
