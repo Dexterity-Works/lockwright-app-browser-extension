@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import { Button, Dialog, Text } from 'lockwright-lib-ui-react-native-components'
 import { kickDevice, useVault } from 'lockwright-lib-vault'
+import { listDevices } from 'lockwright-lib-vault/src/api/listDevices'
 import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { NATIVE_MESSAGING_ERRORS } from '../../constants/nativeMessaging'
@@ -44,25 +45,41 @@ const readEpochStatus = async (): Promise<EpochStatus | null> => {
   }
 }
 
+const readRosterIds = async (): Promise<Set<string | undefined> | null> => {
+  try {
+    const devices = await listDevices()
+    return Array.isArray(devices)
+      ? new Set(devices.map((device: { id?: string }) => device?.id))
+      : null
+  } catch (error) {
+    logger.warn('RevokeAccessModalContent', 'device list failed:', error)
+    return null
+  }
+}
+
 // A rotation that timed out may still have landed. It counts as done only
-// when the vault's epoch moved on since before the kick and the new one
-// leaves the device out. An unchanged epoch can leave this device id out
-// while the same peer holds the key under another device row.
+// when the vault's epoch moved on since before the kick, the new one leaves
+// the device out, and it seals only to devices still on the roster. An unchanged epoch can leave this device
+// id out while the same peer holds the key under another device row, and a
+// member that rotated from an older view can still seal to that row.
 const rotatedSince = (
   before: EpochStatus | null,
   after: EpochStatus | null,
+  roster: Set<string | undefined> | null,
   vaultId: string,
   targetDeviceId: string
 ) =>
   !!before &&
   !!after &&
+  !!roster &&
   before.vaultId === vaultId &&
   after.vaultId === vaultId &&
   !!after.epoch &&
   !after.legacy &&
   (after.epoch !== before.epoch || after.seq > before.seq) &&
   Array.isArray(after.members) &&
-  !after.members.includes(targetDeviceId)
+  !after.members.includes(targetDeviceId) &&
+  after.members.every((id) => roster.has(id))
 
 export const RevokeAccessModalContent = ({
   vaultId,
@@ -125,7 +142,16 @@ export const RevokeAccessModalContent = ({
         )
       ) {
         const statusAfter = await readEpochStatus()
-        if (rotatedSince(statusBefore, statusAfter, vaultId, targetDeviceId)) {
+        const roster = await readRosterIds()
+        if (
+          rotatedSince(
+            statusBefore,
+            statusAfter,
+            roster,
+            vaultId,
+            targetDeviceId
+          )
+        ) {
           epoch = { rotated: true, uncovered: statusAfter?.uncovered ?? [] }
           epochFailure = undefined
         }

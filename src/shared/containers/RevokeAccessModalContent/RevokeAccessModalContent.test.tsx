@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { kickDevice, useVault } from 'lockwright-lib-vault'
+import { listDevices } from 'lockwright-lib-vault/src/api/listDevices'
 import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { RevokeAccessModalContent } from './index'
@@ -14,6 +15,10 @@ jest.mock('lockwright-lib-vault', () => ({
 
 jest.mock('lockwright-lib-vault/src/instances', () => ({
   pearpassVaultClient: { activeVaultGetEpochStatus: jest.fn() }
+}))
+
+jest.mock('lockwright-lib-vault/src/api/listDevices', () => ({
+  listDevices: jest.fn()
 }))
 
 jest.mock('../../context/ModalContext', () => ({
@@ -90,6 +95,7 @@ const mockedUseToast = jest.mocked(useToast)
 const mockedGetEpochStatus = jest.mocked(
   pearpassVaultClient.activeVaultGetEpochStatus
 ) as jest.Mock
+const mockedListDevices = jest.mocked(listDevices) as jest.Mock
 
 describe('RevokeAccessModalContent', () => {
   const refetchVault = jest.fn()
@@ -102,6 +108,8 @@ describe('RevokeAccessModalContent', () => {
     // clearAllMocks keeps queued once-values; a test's unread status must
     // not reach the next one.
     mockedGetEpochStatus.mockReset()
+    mockedListDevices.mockReset()
+    mockedListDevices.mockResolvedValue([{ id: 'd1' }])
     refetchVault.mockResolvedValue(undefined)
     mockedUseVault.mockReturnValue({
       data: {
@@ -322,19 +330,30 @@ describe('RevokeAccessModalContent', () => {
     }
   )
 
-  it.each<[string, object | Error, object | Error]>([
+  it.each<[string, object | Error, object | Error, (string[] | Error)?]>([
     [
-      // The peer's other device row (d3) holds the latest key; d2 was never
-      // sealed to, so an unchanged epoch already leaves it out.
+      // An epoch from before the kick can leave d2 out while the same peer
+      // reads it under another device row; nothing rotated.
       'the epoch did not change though it leaves the device out',
-      status({ members: ['d1', 'd3'] }),
-      status({ members: ['d1', 'd3'] })
+      status({ members: ['d1'] }),
+      status({ members: ['d1'] }),
+      ['d1']
     ],
     [
       'the new epoch still seals to the device',
       status(),
-      status({ epoch: 'e2', seq: 2 })
+      status({ epoch: 'e2', seq: 2 }),
+      ['d1', 'd2']
     ],
+    [
+      // Another member rotated from a view where the peer's other row (d3)
+      // was still bound; the kick swept it.
+      'the new epoch seals to a device no longer on the roster',
+      status({ members: ['d1', 'd2', 'd3'] }),
+      status({ epoch: 'e2', seq: 2, members: ['d1', 'd3'] }),
+      ['d1']
+    ],
+    ['the device list read failed', status(), rotatedStatus, new Error('boom')],
     [
       'the status has no members',
       status(),
@@ -356,7 +375,9 @@ describe('RevokeAccessModalContent', () => {
     ['the read after the timeout failed', status(), new Error('boom')]
   ])(
     'when the rotation timed out and %s: warns',
-    async (_label, before, after) => {
+    async (_label, before, after, roster = ['d1']) => {
+      if (roster instanceof Error) mockedListDevices.mockRejectedValue(roster)
+      else mockedListDevices.mockResolvedValue(roster.map((id) => ({ id })))
       for (const value of [before, after]) {
         if (value instanceof Error) {
           mockedGetEpochStatus.mockRejectedValueOnce(value)

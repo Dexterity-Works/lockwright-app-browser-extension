@@ -345,6 +345,10 @@ declare module 'lockwright-lib-vault' {
   export function getMyDeviceId(): Promise<string | null>
 }
 
+declare module 'lockwright-lib-vault/src/api/listDevices' {
+  export function listDevices(): Promise<Array<{ id?: string }> | null>
+}
+
 declare module 'lockwright-lib-vault/src/instances' {
   export const pearpassVaultClient: {
     on?: (event: string, handler: (...args: any[]) => void) => void
