@@ -176,7 +176,7 @@ export const RevokeAccessModalContent = ({
         return
       }
 
-      const unreachableMessage = t`Couldn't reach the device. It will lose access next time it comes online.`
+      const unreachableMessage = t`Couldn't reach the device. It will stop editing next time it comes online.`
 
       // 'current': the latest key already leaves this device out.
       // 'pending': another member rotates when it syncs.
@@ -229,7 +229,7 @@ export const RevokeAccessModalContent = ({
           )
         ].join(', ')
         setToast({
-          message: t`${names} can't read new items until they update Lockwright and open this vault.`
+          message: t`${names} can't read new items until they open this vault once on a current Lockwright version.`
         })
       }
     } catch (error) {

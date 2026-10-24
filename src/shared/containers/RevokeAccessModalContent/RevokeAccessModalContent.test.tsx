@@ -621,7 +621,9 @@ describe('RevokeAccessModalContent', () => {
 
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/lose access next time it comes online/)
+      message: expect.stringMatching(
+        /^Couldn't reach the device\. It will stop editing next time it comes online\.$/
+      )
     })
     await expectInlineRotationWarning(/^This device can't write to the vault\./)
   })
@@ -698,7 +700,7 @@ describe('RevokeAccessModalContent', () => {
     })
     expect(setToast).toHaveBeenCalledWith({
       message: expect.stringMatching(
-        /^Old Pixel, Unknown Device can't read new items.*update Lockwright/
+        /^Old Pixel, Unknown Device can't read new items until they open this vault once on a current Lockwright version\.$/
       )
     })
   })
@@ -716,7 +718,9 @@ describe('RevokeAccessModalContent', () => {
     expect(closeModal).toHaveBeenCalledWith('m1')
     expect(setToast).toHaveBeenCalledTimes(1)
     expect(setToast).toHaveBeenCalledWith({
-      message: expect.stringMatching(/lose access next time it comes online/)
+      message: expect.stringMatching(
+        /^Couldn't reach the device\. It will stop editing next time it comes online\.$/
+      )
     })
   })
 
