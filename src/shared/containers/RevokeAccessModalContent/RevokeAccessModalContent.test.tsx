@@ -343,6 +343,13 @@ describe('RevokeAccessModalContent', () => {
       ['d1']
     ],
     [
+      // Only the id says the epoch moved on; a seq is not compared.
+      'the epoch id is unchanged though its seq went up',
+      status({ members: ['d1'] }),
+      status({ seq: 2, members: ['d1'] }),
+      ['d1']
+    ],
+    [
       'the new epoch still seals to the device',
       status(),
       status({ epoch: 'e2', seq: 2 }),
