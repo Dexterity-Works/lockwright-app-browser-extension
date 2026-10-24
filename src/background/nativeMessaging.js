@@ -20,6 +20,7 @@ import {
   DISCONNECTION_ERROR_MESSAGES,
   DESKTOP_APP_STATUS
 } from '../shared/constants/nativeMessaging'
+import { getTimeoutForCommand } from '../shared/utils/getTimeoutForCommand'
 import { isAndroidOs } from '../shared/utils/isAndroidOs'
 import { logger } from '../shared/utils/logger'
 import { isNativeHostNotFoundError } from '../shared/utils/nativeHostErrors'
@@ -41,17 +42,6 @@ const log = (...args) => {
 
 const logError = (...args) =>
   logger.error(NATIVE_MESSAGING_CONFIG.LOG_PREFIX, ...args)
-const getTimeoutForCommand = (command) => {
-  switch (command) {
-    case SPECIAL_COMMANDS.CHECK_AVAILABILITY:
-      return REQUEST_TIMEOUT.AVAILABILITY_CHECK_MS
-    case SPECIAL_COMMANDS.PAIR_ACTIVE_VAULT:
-      return REQUEST_TIMEOUT.PAIRING_MS
-    default:
-      return REQUEST_TIMEOUT.DEFAULT_MS
-  }
-}
-
 class NativeMessagingHandler {
   constructor() {
     this.port = null

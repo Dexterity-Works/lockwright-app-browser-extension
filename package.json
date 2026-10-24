@@ -1,7 +1,7 @@
 {
   "name": "lockwright-app-browser-extension",
   "private": true,
-  "version": "0.0.33",
+  "version": "0.0.34",
   "type": "module",
   "license": "Apache-2.0",
   "packageManager": "pnpm@11.10.0",
@@ -56,7 +56,7 @@
     "lockwright-lib-utils": "git+https://github.com/Dexterity-Works/lockwright-lib-utils.git#32ffefed29db8d198f96401c780e09e70719bcc2",
     "lockwright-lib-constants": "git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#f6142c9554e9f972519dd8115b2b73f02b73d5fb",
     "lockwright-lib-ui-react-native-components": "git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#5a4ed69feda9b76c0de6f40cb12df72569beb9b4",
-    "lockwright-lib-vault": "git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#24a94fce0f68a2eb96bd5e0cc42212e0a531c7c4",
+    "lockwright-lib-vault": "git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#b6a008594408a79cc4f461d2c9edc306615239dc",
     "qrcode": "1.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",

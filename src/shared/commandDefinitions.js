@@ -43,6 +43,11 @@ const COMMAND_DEFINITIONS = {
   activeVaultGetFile: { params: ['key'] },
   activeVaultAddFile: { params: ['key', 'data', 'name'] },
   activeVaultGetWriterKey: { params: [] },
+  activeVaultEnsureEpoch: {
+    params: ['options'],
+    extractParams: (options) => options
+  },
+  activeVaultGetEpochStatus: { params: [] },
 
   // Password and encryption key commands
   hashPassword: { params: ['password'] },
