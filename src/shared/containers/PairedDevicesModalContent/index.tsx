@@ -19,16 +19,18 @@ import {
   PhoneIphone,
   Tablet
 } from 'lockwright-lib-ui-react-native-components/icons'
-import { getMyDeviceId, useVault } from 'lockwright-lib-vault'
+import {
+  getMyDeviceId,
+  getVaultKeyState,
+  useVault,
+  type VaultKeyState
+} from 'lockwright-lib-vault'
+import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { useModal } from '../../context/ModalContext'
-import { formatDate } from '../../utils/date'
+import { formatDate, formatDateTime } from '../../utils/date'
 import { logger } from '../../utils/logger'
-import {
-  readEpochStatus,
-  readRosterIds,
-  RevokeAccessModalContent
-} from '../RevokeAccessModalContent'
+import { RevokeAccessModalContent } from '../RevokeAccessModalContent'
 
 const DEVICE_ACTIONS_MENU_WIDTH = 220
 
@@ -89,29 +91,28 @@ export const PairedDevicesModalContent = () => {
   )
 
   const [myDeviceId, setMyDeviceId] = useState<string | null>(null)
-  // The latest key still seals to a device that is off the roster: a
+  // Removed devices stay listed until the vault key rotates past them: a
   // revoke's rotation that timed out and never landed, or one still owed.
-  const [keyNotRotated, setKeyNotRotated] = useState(false)
+  const [keyState, setKeyState] = useState<VaultKeyState | null>(null)
+  const readKeyState = () =>
+    getVaultKeyState()
+      .then((state) => setKeyState(state?.vaultId === vaultId ? state : null))
+      .catch((error: unknown) => {
+        logger.warn('PairedDevicesModalContent', 'key state failed:', error)
+      })
 
   useEffect(() => {
-    if (!vaultId) return
-    let cancelled = false
-    Promise.all([readEpochStatus(), readRosterIds()]).then(
-      ([status, roster]) => {
-        if (cancelled || !status || !roster) return
-        setKeyNotRotated(
-          status.vaultId === vaultId &&
-            !!status.epoch &&
-            !status.legacy &&
-            Array.isArray(status.members) &&
-            status.members.some((id) => !roster.has(id))
-        )
-      }
-    )
-    return () => {
-      cancelled = true
+    if (vaultId) void readKeyState()
+  }, [vaultId, devices])
+
+  const rotateNow = async () => {
+    try {
+      await pearpassVaultClient.activeVaultEnsureEpoch({ start: true })
+    } catch (error) {
+      logger.error('PairedDevicesModalContent', 'rotation failed:', error)
     }
-  }, [vaultId])
+    await readKeyState()
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -142,6 +143,10 @@ export const PairedDevicesModalContent = () => {
     )
   }
 
+  const rotatedAt = keyState?.rotatedAt
+    ? formatDateTime(keyState.rotatedAt)
+    : null
+
   return (
     <Dialog
       title={t`Devices`}
@@ -159,18 +164,7 @@ export const PairedDevicesModalContent = () => {
         </Button>
       }
     >
-      {keyNotRotated && (
-        <div
-          role="alert"
-          className="pb-[var(--spacing12)]"
-          data-testid="paired-devices-epoch-warning"
-        >
-          <Text as="p" variant="caption">
-            {t`A removed device can still read new items. The vault key hasn't rotated since it was removed.`}
-          </Text>
-        </div>
-      )}
-      {devices.length === 0 ? (
+      {devices.length === 0 && !keyState?.removed.length ? (
         <div className="flex items-center justify-center p-[24px]">
           <Text as="p" variant="body" color={theme.colors.colorTextSecondary}>
             {t`No devices synced yet`}
@@ -242,8 +236,50 @@ export const PairedDevicesModalContent = () => {
               />
             )
           })}
+          {keyState?.removed.map((device) => (
+            <ListItem
+              key={device.id}
+              icon={
+                <div className="bg-surface-hover flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-[8px]">
+                  <DoNotDisturb width={16} height={16} />
+                </div>
+              }
+              title={getDeviceDisplayName(device.name ?? undefined)}
+              subtitle={
+                // A device that cannot open the latest key leaves the
+                // rotation to a member that can, on its next sync.
+                keyState.canRead
+                  ? t`Removed · key not rotated`
+                  : t`Removed · key rotating`
+              }
+              testID={`paired-devices-removed-${device.id}`}
+              rightElement={
+                keyState.canRead ? (
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    type="button"
+                    onClick={rotateNow}
+                    data-testid={`paired-devices-rotate-${device.id}`}
+                  >
+                    {t`Rotate key now`}
+                  </Button>
+                ) : undefined
+              }
+            />
+          ))}
         </div>
       )}
+      {keyState?.rotatedAt ? (
+        <Text
+          as="p"
+          variant="caption"
+          color={theme.colors.colorTextSecondary}
+          data-testid="paired-devices-key-rotated"
+        >
+          {t`Vault key last rotated ${rotatedAt}`}
+        </Text>
+      ) : null}
     </Dialog>
   )
 }

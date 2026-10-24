@@ -1,6 +1,5 @@
-import { act, render, screen } from '@testing-library/react'
-import { getMyDeviceId, useVault } from 'lockwright-lib-vault'
-import { listDevices } from 'lockwright-lib-vault/src/api/listDevices'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { getMyDeviceId, getVaultKeyState, useVault } from 'lockwright-lib-vault'
 import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { PairedDevicesModalContent } from './index'
@@ -8,12 +7,16 @@ import { useModal } from '../../context/ModalContext'
 
 jest.mock('lockwright-lib-vault', () => ({
   getMyDeviceId: jest.fn(),
+  getVaultKeyState: jest.fn(),
   kickDevice: jest.fn(),
   useVault: jest.fn()
 }))
 
 jest.mock('lockwright-lib-vault/src/instances', () => ({
-  pearpassVaultClient: { activeVaultGetEpochStatus: jest.fn() }
+  pearpassVaultClient: {
+    activeVaultGetEpochStatus: jest.fn(),
+    activeVaultEnsureEpoch: jest.fn()
+  }
 }))
 
 jest.mock('lockwright-lib-vault/src/api/listDevices', () => ({
@@ -39,8 +42,8 @@ jest.mock('lockwright-lib-ui-react-native-components/icons', () => {
 })
 
 jest.mock('lockwright-lib-ui-react-native-components', () => ({
-  Button: ({ children, onClick }: any) => (
-    <button type="button" onClick={onClick}>
+  Button: ({ children, onClick, 'data-testid': testId }: any) => (
+    <button type="button" onClick={onClick} data-testid={testId}>
       {children}
     </button>
   ),
@@ -51,9 +54,10 @@ jest.mock('lockwright-lib-ui-react-native-components', () => ({
       {footer}
     </div>
   ),
-  ListItem: ({ title, rightElement }: any) => (
-    <div>
+  ListItem: ({ title, subtitle, testID, rightElement }: any) => (
+    <div data-testid={testID}>
       {title}
+      {subtitle && <span data-testid={`${testID}-subtitle`}>{subtitle}</span>}
       {rightElement}
     </div>
   ),
@@ -62,31 +66,35 @@ jest.mock('lockwright-lib-ui-react-native-components', () => ({
       {label}
     </button>
   ),
-  Text: ({ children }: any) => <span>{children}</span>,
+  Text: ({ children, 'data-testid': testId }: any) => (
+    <span data-testid={testId}>{children}</span>
+  ),
   useTheme: () => ({ theme: { colors: {} } })
 }))
 
-const mockedGetEpochStatus = jest.mocked(
-  pearpassVaultClient.activeVaultGetEpochStatus
+const mockedKeyState = jest.mocked(getVaultKeyState)
+const ensureEpoch = jest.mocked(
+  pearpassVaultClient.activeVaultEnsureEpoch
 ) as jest.Mock
-const mockedListDevices = jest.mocked(listDevices) as jest.Mock
 
-const status = (overrides: object = {}) => ({
+// Local time, so the formatted date does not depend on the time zone.
+const ROTATED_AT = new Date(2026, 9, 24, 14, 5).getTime()
+const keyState = (overrides: object = {}) => ({
   vaultId: 'v1',
   epoch: 'e2',
-  seq: 2,
   legacy: false,
-  members: ['d1'],
-  uncovered: [],
+  canRead: true,
+  members: ['d1', 'd2'],
+  rotatedAt: ROTATED_AT,
+  removed: [{ id: 'd2', name: 'Old Phone' }],
   ...overrides
 })
 
 describe('PairedDevicesModalContent', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockedGetEpochStatus.mockReset()
-    mockedListDevices.mockReset()
-    mockedListDevices.mockResolvedValue([{ id: 'd1' }])
+    mockedKeyState.mockReset()
+    mockedKeyState.mockResolvedValue(keyState())
     jest.mocked(getMyDeviceId).mockResolvedValue('d1')
     jest.mocked(useVault).mockReturnValue({
       data: { id: 'v1', devices: [{ id: 'd1', name: 'Laptop' }] }
@@ -102,42 +110,88 @@ describe('PairedDevicesModalContent', () => {
     await act(async () => {})
   }
 
-  // A revoke whose key rotation timed out leaves its dialog unsure. The
-  // removed device is gone from this list, so this is where a rotation that
-  // landed later, or never, shows.
-  it('warns while the latest key still seals to a device no longer on the roster', async () => {
-    mockedGetEpochStatus.mockResolvedValue(status({ members: ['d1', 'd2'] }))
-
+  it('says when the vault key last rotated', async () => {
     await renderModal()
 
-    expect(screen.getByTestId('paired-devices-epoch-warning').textContent).toBe(
-      "A removed device can still read new items. The vault key hasn't rotated since it was removed."
+    expect(screen.getByTestId('paired-devices-key-rotated').textContent).toBe(
+      'Vault key last rotated 24 Oct 2026 14:05'
     )
   })
 
-  it.each<[string, object | Error, (string[] | Error)?]>([
-    ['the key rotated without the removed device', status()],
-    [
-      'the status is for another vault',
-      status({ vaultId: 'v9', members: ['d1', 'd2'] })
-    ],
-    ['the vault has no epoch yet', status({ epoch: null, members: [] })],
-    ['the vault is legacy', status({ legacy: true, members: ['d1', 'd2'] })],
-    ['the status read failed', new Error('boom')],
-    [
-      'the device list read failed',
-      status({ members: ['d1', 'd2'] }),
-      new Error('boom')
-    ]
-  ])('shows no key warning when %s', async (_label, value, roster = ['d1']) => {
-    if (value instanceof Error) mockedGetEpochStatus.mockRejectedValue(value)
-    else mockedGetEpochStatus.mockResolvedValue(value)
-    if (roster instanceof Error) mockedListDevices.mockRejectedValue(roster)
-    else mockedListDevices.mockResolvedValue(roster.map((id) => ({ id })))
+  // A revoke whose key rotation timed out leaves its dialog unsure. The
+  // removed device's row is gone, so this is where a rotation that landed
+  // later, or never, shows.
+  it('keeps a removed device listed as key rotating while another device has to rotate', async () => {
+    mockedKeyState.mockResolvedValue(keyState({ canRead: false }))
+
+    await renderModal()
+
+    expect(
+      screen.getByTestId('paired-devices-removed-d2').textContent
+    ).toContain('Old Phone')
+    expect(
+      screen.getByTestId('paired-devices-removed-d2-subtitle').textContent
+    ).toBe('Removed · key rotating')
+    expect(screen.queryByTestId('paired-devices-rotate-d2')).toBeNull()
+  })
+
+  it('keeps a removed device listed as key not rotated, with Rotate key now', async () => {
+    await renderModal()
+
+    expect(
+      screen.getByTestId('paired-devices-removed-d2-subtitle').textContent
+    ).toBe('Removed · key not rotated')
+
+    ensureEpoch.mockResolvedValue({ rotated: true, uncovered: [] })
+    mockedKeyState.mockResolvedValue(keyState({ members: ['d1'], removed: [] }))
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('paired-devices-rotate-d2'))
+    })
+
+    expect(ensureEpoch).toHaveBeenCalledWith({ start: true })
+    expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
+  })
+
+  it('names a removed device without a name as Unknown Device', async () => {
+    mockedKeyState.mockResolvedValue(
+      keyState({ removed: [{ id: 'd2', name: null }] })
+    )
+
+    await renderModal()
+
+    expect(
+      screen.getByTestId('paired-devices-removed-d2').textContent
+    ).toContain('Unknown Device')
+  })
+
+  it.each<[string, object | null | Error]>([
+    ['the key rotated without the removed device', keyState({ removed: [] })],
+    ['the state is for another vault', keyState({ vaultId: 'v9' })],
+    ['there is no state', null],
+    ['the state read failed', new Error('boom')]
+  ])('lists no removed device when %s', async (_label, value) => {
+    if (value instanceof Error) mockedKeyState.mockRejectedValue(value)
+    else mockedKeyState.mockResolvedValue(value as never)
 
     await renderModal()
 
     expect(screen.getByText('Laptop')).toBeTruthy()
-    expect(screen.queryByTestId('paired-devices-epoch-warning')).toBeNull()
+    expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
+  })
+
+  it('shows no rotation time for a vault without rotating keys', async () => {
+    mockedKeyState.mockResolvedValue(
+      keyState({
+        epoch: null,
+        legacy: true,
+        members: [],
+        rotatedAt: null,
+        removed: []
+      })
+    )
+
+    await renderModal()
+
+    expect(screen.queryByTestId('paired-devices-key-rotated')).toBeNull()
   })
 })
