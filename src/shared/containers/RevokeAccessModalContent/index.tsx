@@ -2,13 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import { Button, Dialog, Text } from 'lockwright-lib-ui-react-native-components'
-import { kickDevice, useVault } from 'lockwright-lib-vault'
+import { kickDevice, useVault, waitForKeyRotation } from 'lockwright-lib-vault'
 import { listDevices } from 'lockwright-lib-vault/src/api/listDevices'
 import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
-import { NATIVE_MESSAGING_ERRORS } from '../../constants/nativeMessaging'
+import {
+  NATIVE_MESSAGING_ERRORS,
+  REQUEST_TIMEOUT
+} from '../../constants/nativeMessaging'
 import { useModal, useModalId } from '../../context/ModalContext'
 import { useToast } from '../../context/ToastContext'
+import { formatDateTime } from '../../utils/date'
 import { logger } from '../../utils/logger'
 
 export type RevokeAccessModalContentProps = {
@@ -17,20 +21,15 @@ export type RevokeAccessModalContentProps = {
   deviceName: string
 }
 
-// Fixed copy per known reason. Anything else, including a thrown error's
-// message, gets the generic sentence; the raw reason only goes to the log.
-const rotationWarningFor = (reason: string | undefined, deviceName: string) => {
-  switch (reason) {
-    case 'not-writable':
-      return t`This device can't write to the vault. "${deviceName}" can still read new items.`
-    case 'self-not-in-roster':
-      return t`This device isn't on the vault's member list. "${deviceName}" can still read new items.`
-    case 'legacy':
-      return t`The vault doesn't use rotating keys yet. "${deviceName}" can still read new items.`
-    default:
-      return t`Couldn't rotate the vault key. "${deviceName}" can still read new items.`
-  }
-}
+type KickResult = Awaited<ReturnType<typeof kickDevice>>
+
+// After the kick the device is out of the roster. It counts as revoked only
+// once the vault's key has rotated past it.
+type Outcome =
+  | { kind: 'rotating' }
+  | { kind: 'rotated'; at: number }
+  | { kind: 'pending' }
+  | { kind: 'failed' }
 
 type EpochStatus = Awaited<
   ReturnType<typeof pearpassVaultClient.activeVaultGetEpochStatus>
@@ -106,10 +105,10 @@ export const RevokeAccessModalContent = ({
   const { data: vault, refetch: refetchVault } = useVault()
 
   const [isLoading, setIsLoading] = useState(false)
-  // Set once the device is removed but the key did not rotate. The dialog
-  // stays open with this warning and only offers Done.
-  const [rotationWarning, setRotationWarning] = useState<string | null>(null)
+  const [outcome, setOutcome] = useState<Outcome | null>(null)
+  const settled = !!outcome && outcome.kind !== 'rotating'
   const doneRef = useRef<HTMLButtonElement>(null)
+  const waitRef = useRef<AbortController | null>(null)
   // A late kickDevice result must not touch state or close whatever modal
   // is on top once this one is gone.
   const mounted = useRef(true)
@@ -117,17 +116,92 @@ export const RevokeAccessModalContent = ({
     mounted.current = true
     return () => {
       mounted.current = false
+      waitRef.current?.abort()
     }
   }, [])
 
   useEffect(() => {
-    if (rotationWarning) doneRef.current?.focus()
-  }, [rotationWarning])
+    if (settled) doneRef.current?.focus()
+  }, [settled])
+
+  const detailFor = (kind: Outcome['kind']) => {
+    switch (kind) {
+      case 'pending':
+        return t`${deviceName} can't change this vault. The vault key will rotate when the vault next syncs. Until then it can still read new items.`
+      case 'failed':
+        return t`${deviceName} can't change this vault, but it can still read new items until the key rotates.`
+      default:
+        return null
+    }
+  }
+  const labelFor = (current: Outcome) => {
+    switch (current.kind) {
+      case 'rotated': {
+        const dateTime = formatDateTime(current.at)
+        return t`Revoked · key rotated ${dateTime}`
+      }
+      case 'failed':
+        return t`Removed · key not rotated`
+      default:
+        return t`Removed · key rotating`
+    }
+  }
+
+  // Shows the outcome, or toasts its warning once the dialog is gone.
+  const show = (next: Outcome) => {
+    const detail = detailFor(next.kind)
+    if (mounted.current) setOutcome(next)
+    else if (detail) setToast({ message: detail })
+  }
+
+  // The device is out of the roster; judge the rotation that followed.
+  // Returns false when the key did not rotate.
+  const settle = async (
+    epoch: KickResult['epoch'],
+    signal: AbortSignal,
+    error?: string
+  ): Promise<boolean> => {
+    // 'current': the latest key already leaves this device out.
+    // 'pending': another member rotates when it syncs.
+    if (
+      !epoch ||
+      (!epoch.rotated &&
+        epoch.reason !== 'current' &&
+        epoch.reason !== 'pending')
+    ) {
+      logger.warn('RevokeAccessModalContent', 'vault key not rotated:', {
+        reason: epoch?.reason,
+        error
+      })
+      show({ kind: 'failed' })
+      return false
+    }
+    if (epoch.reason === 'pending') {
+      show({ kind: 'pending' })
+      return true
+    }
+    show({ kind: 'rotating' })
+    const state = await waitForKeyRotation({
+      vaultId,
+      deviceId: targetDeviceId,
+      timeoutMs: REQUEST_TIMEOUT.EPOCH_MS,
+      signal
+    })
+    if (!state) {
+      show({ kind: 'pending' })
+      return true
+    }
+    show({ kind: 'rotated', at: state.rotatedAt ?? Date.now() })
+    setToast({ message: t`${deviceName} revoked. Vault key rotated.` })
+    return true
+  }
 
   const onRevoke = async () => {
     if (isLoading) return
     setIsLoading(true)
     setCloseable(false)
+    const wait = new AbortController()
+    waitRef.current = wait
     try {
       const statusBefore = await readEpochStatus()
       const kick = await kickDevice({
@@ -176,49 +250,29 @@ export const RevokeAccessModalContent = ({
         return
       }
 
-      const unreachableMessage = t`Couldn't reach the device. It will stop editing next time it comes online.`
+      if (unreachable.length) {
+        setToast({
+          message: t`Couldn't reach the device. It will stop editing next time it comes online.`
+        })
+      }
 
-      // 'current': the latest key already leaves this device out.
-      // 'pending': another member rotates when it syncs.
-      if (
-        !epoch ||
-        (!epoch.rotated &&
-          epoch.reason !== 'current' &&
-          epoch.reason !== 'pending')
-      ) {
-        const reason = epoch?.reason
-        logger.warn('RevokeAccessModalContent', 'vault key not rotated:', {
-          reason,
+      // A timed-out rotation the read above did not see may still land:
+      // the key is rotating, not revoked. The Devices list shows it later.
+      if (timedOut && epochFailed) {
+        logger.warn('RevokeAccessModalContent', 'vault key rotation unseen:', {
           error: epochFailure?.error?.message
         })
-        // A timed-out rotation can still land after the read above; the
-        // Devices list shows whether it did.
-        const warning = timedOut
-          ? t`The vault key rotation didn't finish in time. "${deviceName}" may still read new items. Open Devices again later to check.`
-          : rotationWarningFor(reason, deviceName)
-        // No success toast beside the warning; an unreachable device still
-        // gets its toast.
-        if (unreachable.length) setToast({ message: unreachableMessage })
-        if (mounted.current) setRotationWarning(warning)
-        else setToast({ message: warning })
+        show({ kind: 'pending' })
         return
       }
 
-      setToast({
-        message: unreachable.length
-          ? unreachableMessage
-          : t`"${deviceName}" can no longer edit this vault`
-      })
+      const rotated = await settle(
+        epoch,
+        wait.signal,
+        epochFailure?.error?.message
+      )
 
-      if (mounted.current) closeModal()
-
-      if (epoch.reason === 'pending') {
-        setToast({
-          message: t`Another device will rotate the vault key when it next syncs.`
-        })
-      }
-
-      if (epoch.uncovered?.length) {
+      if (rotated && epoch?.uncovered?.length) {
         const names = [
           ...new Set(
             epoch.uncovered.map(
@@ -254,7 +308,7 @@ export const RevokeAccessModalContent = ({
       closeButtonTestID="revoke-access-close"
       footer={
         <div className="flex w-full justify-end gap-[var(--spacing8)]">
-          {rotationWarning ? (
+          {settled ? (
             <Button
               ref={doneRef}
               variant="primary"
@@ -296,11 +350,19 @@ export const RevokeAccessModalContent = ({
         className="flex w-full flex-col gap-[var(--spacing12)]"
         data-testid="revoke-access-body"
       >
-        {rotationWarning && (
-          <div role="alert" data-testid="revoke-access-warning">
-            <Text as="p" variant="caption">
-              {rotationWarning}
+        {outcome && (
+          <div
+            role={detailFor(outcome.kind) ? 'alert' : 'status'}
+            data-testid="revoke-access-warning"
+          >
+            <Text as="p" variant="labelEmphasized">
+              {labelFor(outcome)}
             </Text>
+            {detailFor(outcome.kind) && (
+              <Text as="p" variant="caption">
+                {detailFor(outcome.kind)}
+              </Text>
+            )}
           </div>
         )}
         <div className="flex flex-col">

@@ -343,6 +343,22 @@ declare module 'lockwright-lib-vault' {
   }>
 
   export function getMyDeviceId(): Promise<string | null>
+  export type VaultKeyState = {
+    vaultId: string
+    epoch: string | null
+    legacy: boolean
+    canRead: boolean
+    members: string[]
+    rotatedAt: number | null
+    removed: Array<{ id: string; name: string | null }>
+  }
+  export function getVaultKeyState(): Promise<VaultKeyState | null>
+  export function waitForKeyRotation(params: {
+    vaultId: string
+    deviceId: string
+    timeoutMs: number
+    signal?: AbortSignal
+  }): Promise<VaultKeyState | null>
 }
 
 declare module 'lockwright-lib-vault/src/api/listDevices' {
