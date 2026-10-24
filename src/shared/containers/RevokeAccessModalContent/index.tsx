@@ -301,7 +301,7 @@ export const RevokeAccessModalContent = ({
 
   return (
     <Dialog
-      title={t`Revoke access for ${deviceName}?`}
+      title={t`Revoke ${deviceName}?`}
       onClose={isLoading ? undefined : closeModal}
       hideCloseButton={isLoading}
       testID="revoke-access-dialog"
@@ -365,26 +365,39 @@ export const RevokeAccessModalContent = ({
             )}
           </div>
         )}
-        <div className="flex flex-col">
-          <Text as="p" variant="caption">
-            {t`Revoking removes this device from the vault and rotates the vault key. Once the key rotates, the device can't read items added or changed after that.`}
-          </Text>
-          <Text as="p" variant="caption">
-            {t`Before you proceed, please note:`}
-          </Text>
-        </div>
-        <ul className="m-0 flex list-outside list-disc flex-col gap-[var(--spacing12)] pl-[var(--spacing20)]">
-          <li className="m-0">
-            <Text as="span" variant="caption">
-              {t`Items from before the key rotates aren't re-encrypted, so the device can still read them. Revoking cannot delete what it already synced. Change passwords the device could see, especially if it was lost or stolen.`}
+        {[
+          {
+            intro: t`Revoking this device:`,
+            items: [
+              t`removes it from the vault, so it can't add or change items`,
+              t`rotates the vault key, so it can't read anything saved or changed after that`
+            ]
+          },
+          {
+            intro: t`It doesn't:`,
+            items: [
+              t`erase what's already on the device. It can still read every item it synced before the key rotated.`
+            ]
+          }
+        ].map(({ intro, items }) => (
+          <div key={intro} className="flex flex-col">
+            <Text as="p" variant="caption">
+              {intro}
             </Text>
-          </li>
-          <li className="m-0">
-            <Text as="span" variant="caption">
-              {t`Devices still on an older Lockwright version must update before they can read new items.`}
-            </Text>
-          </li>
-        </ul>
+            <ul className="m-0 flex list-outside list-disc flex-col gap-[var(--spacing12)] pl-[var(--spacing20)]">
+              {items.map((item) => (
+                <li key={item} className="m-0">
+                  <Text as="span" variant="caption">
+                    {item}
+                  </Text>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <Text as="p" variant="caption">
+          {t`If the device was lost or stolen, change the passwords it could see.`}
+        </Text>
       </div>
     </Dialog>
   )

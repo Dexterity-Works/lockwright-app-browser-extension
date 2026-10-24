@@ -12,6 +12,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 ### Changed
 
 - The revoke dialog says a device is revoked only once the vault key has rotated past it, and shows the time of that rotation. Until then it says "Removed · key rotating", including when the rotation timed out and the dialog did not see it land, and after a failed rotation "Removed · key not rotated". It shows the same text as the desktop app.
+- The revoke dialog lists what revoking does (removes the device, rotates the vault key) and what it doesn't (erase what the device already synced; it can still read every item from before the rotation), and asks to change the passwords a lost or stolen device could see. Same text as the desktop app.
 
 ## [0.0.34] - 2026-10-17
 

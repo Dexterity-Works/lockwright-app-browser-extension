@@ -60,7 +60,8 @@ jest.mock('lockwright-lib-ui-react-native-components', () => {
       footer,
       onClose,
       hideCloseButton,
-      closeButtonTestID
+      closeButtonTestID,
+      title
     }: any) => {
       useEffect(() => {
         if (!onClose) return
@@ -73,6 +74,7 @@ jest.mock('lockwright-lib-ui-react-native-components', () => {
       }, [onClose])
       return (
         <div>
+          <h2 data-testid="revoke-access-title">{title}</h2>
           {!hideCloseButton && (
             <button
               type="button"
@@ -85,7 +87,7 @@ jest.mock('lockwright-lib-ui-react-native-components', () => {
         </div>
       )
     },
-    Text: ({ children }: any) => <span>{children}</span>
+    Text: ({ children, as: As = 'span' }: any) => <As>{children}</As>
   }
 })
 
@@ -183,23 +185,23 @@ describe('RevokeAccessModalContent', () => {
     uncovered: []
   }
 
-  it('says revoking rotates the key, what stays on the device, and that old versions must update', () => {
+  it('says what revoking does and does not do', () => {
     renderModal()
 
-    const body = screen.getByTestId('revoke-access-body').textContent
-    expect(body).toMatch(
-      /removes this device from the vault and rotates the vault key\. Once the key rotates, the device can't read items added or changed after that\./
+    expect(screen.getByTestId('revoke-access-title').textContent).toBe(
+      'Revoke iPhone?'
     )
-    expect(body).not.toMatch(/It can no longer read/)
-    // History is not re-encrypted: the old keys still open older items.
-    expect(body).toMatch(
-      /Items from before the key rotates aren't re-encrypted, so the device can still read them\. Revoking cannot delete what it already synced\. Change passwords the device could see, especially if it was lost or stolen\./
-    )
-    expect(body).toMatch(
-      /Devices still on an older Lockwright version must update before they can read new items\./
-    )
-    expect(body).not.toMatch(/anything synced later/)
-    expect(body).not.toMatch(/new vault/)
+    const paragraphs = Array.from(
+      screen.getByTestId('revoke-access-body').querySelectorAll('p, li')
+    ).map((node) => node.textContent)
+    expect(paragraphs).toEqual([
+      'Revoking this device:',
+      "removes it from the vault, so it can't add or change items",
+      "rotates the vault key, so it can't read anything saved or changed after that",
+      "It doesn't:",
+      "erase what's already on the device. It can still read every item it synced before the key rotated.",
+      'If the device was lost or stolen, change the passwords it could see.'
+    ])
   })
 
   const toasts = () => setToast.mock.calls.map(([toast]) => toast.message)
