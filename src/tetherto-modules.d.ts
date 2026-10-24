@@ -381,6 +381,19 @@ declare module 'lockwright-lib-vault/src/instances' {
       members: string[]
       uncovered: string[]
     }>
+    activeVaultEnsureEpoch: (options: { start: boolean }) => Promise<{
+      rotated: boolean
+      id?: string
+      seq?: number
+      members?: string[]
+      reason?:
+        | 'current'
+        | 'legacy'
+        | 'pending'
+        | 'not-writable'
+        | 'self-not-in-roster'
+      uncovered: string[]
+    }>
     recordFailedMasterPassword: () => Promise<unknown>
     getMasterPasswordStatus: () => Promise<{
       isLocked: boolean

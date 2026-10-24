@@ -15,7 +15,10 @@ jest.mock('lockwright-lib-vault', () => ({
 }))
 
 jest.mock('lockwright-lib-vault/src/instances', () => ({
-  pearpassVaultClient: { activeVaultGetEpochStatus: jest.fn() }
+  pearpassVaultClient: {
+    activeVaultGetEpochStatus: jest.fn(),
+    activeVaultEnsureEpoch: jest.fn()
+  }
 }))
 
 jest.mock('lockwright-lib-vault/src/api/listDevices', () => ({
@@ -638,6 +641,90 @@ describe('RevokeAccessModalContent', () => {
 
     expect(toasts()).toEqual([UNREACHED, ROTATED])
     await expectOutcome(ROTATED_LABEL)
+  })
+
+  describe('Rotate key now', () => {
+    const ensureEpoch = jest.mocked(
+      pearpassVaultClient.activeVaultEnsureEpoch
+    ) as jest.Mock
+    const failRevoke = async () => {
+      mockedKickDevice.mockResolvedValue({
+        results: [],
+        failures: [
+          { targetDeviceId: 'd2', kind: 'epoch', error: new Error('x') }
+        ],
+        epoch: { rotated: false, reason: 'some-new-reason', uncovered: [] }
+      } as any)
+      renderModal()
+      await submit()
+    }
+    const rotateNow = async () => {
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('revoke-access-rotate'))
+      })
+      expect(ensureEpoch).toHaveBeenCalledWith({ start: true })
+    }
+
+    it('is offered only when the key did not rotate', async () => {
+      mockedKickDevice.mockResolvedValue({
+        results: [],
+        failures: [],
+        epoch: { rotated: false, reason: 'pending', uncovered: [] }
+      } as any)
+      renderModal()
+      await submit()
+
+      expect(screen.queryByTestId('revoke-access-rotate')).toBeNull()
+    })
+
+    it('rotates the key and says revoked once the rotation is seen', async () => {
+      await failRevoke()
+      ensureEpoch.mockResolvedValue({ rotated: true, uncovered: [] })
+
+      await rotateNow()
+
+      expect(mockedWait).toHaveBeenCalledWith(
+        expect.objectContaining({ vaultId: 'v1', deviceId: 'd2' })
+      )
+      expect(toasts()).toEqual([ROTATED])
+      expect(screen.queryByTestId('revoke-access-rotate')).toBeNull()
+      await expectOutcome(ROTATED_LABEL)
+    })
+
+    it('says the key is rotating when another device has to rotate it', async () => {
+      await failRevoke()
+      ensureEpoch.mockResolvedValue({
+        rotated: false,
+        reason: 'pending',
+        uncovered: []
+      })
+
+      await rotateNow()
+
+      expect(mockedWait).not.toHaveBeenCalled()
+      await expectOutcome(PENDING)
+    })
+
+    it('stays at key not rotated when the rotation fails again', async () => {
+      await failRevoke()
+      ensureEpoch.mockRejectedValue(new Error('Request timeout: x'))
+
+      await rotateNow()
+
+      expect(toasts()).toEqual([])
+      expect(outcomeText()).toBe(FAILED_LABEL + FAILED)
+      expect(screen.getByTestId('revoke-access-rotate')).toBeTruthy()
+    })
+
+    it('cannot be closed while the rotation runs', async () => {
+      await failRevoke()
+      ensureEpoch.mockReturnValue(new Promise(() => {}))
+
+      fireEvent.click(screen.getByTestId('revoke-access-rotate'))
+
+      expect(setCloseable).toHaveBeenLastCalledWith('m1', false)
+      expect(screen.getByRole('status').textContent).toBe(PENDING_LABEL)
+    })
   })
 
   it('on kickDevice throw: shows the generic error toast, keeps the modal open with submit re-enabled', async () => {

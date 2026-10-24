@@ -196,6 +196,29 @@ export const RevokeAccessModalContent = ({
     return true
   }
 
+  const onRotate = async () => {
+    if (isLoading) return
+    setIsLoading(true)
+    setCloseable(false)
+    const wait = new AbortController()
+    waitRef.current = wait
+    show({ kind: 'rotating' })
+    let epoch: KickResult['epoch'] = null
+    try {
+      epoch = await pearpassVaultClient.activeVaultEnsureEpoch({ start: true })
+    } catch (error) {
+      logger.error('RevokeAccessModalContent', 'rotation failed:', error)
+    }
+    try {
+      await settle(epoch, wait.signal)
+    } finally {
+      if (mounted.current) {
+        setIsLoading(false)
+        setCloseable(true)
+      }
+    }
+  }
+
   const onRevoke = async () => {
     if (isLoading) return
     setIsLoading(true)
@@ -309,16 +332,29 @@ export const RevokeAccessModalContent = ({
       footer={
         <div className="flex w-full justify-end gap-[var(--spacing8)]">
           {settled ? (
-            <Button
-              ref={doneRef}
-              variant="primary"
-              size="small"
-              type="button"
-              onClick={closeModal}
-              data-testid="revoke-access-done"
-            >
-              {t`Done`}
-            </Button>
+            <>
+              {outcome?.kind === 'failed' && (
+                <Button
+                  variant="secondary"
+                  size="small"
+                  type="button"
+                  onClick={onRotate}
+                  data-testid="revoke-access-rotate"
+                >
+                  {t`Rotate key now`}
+                </Button>
+              )}
+              <Button
+                ref={doneRef}
+                variant="primary"
+                size="small"
+                type="button"
+                onClick={closeModal}
+                data-testid="revoke-access-done"
+              >
+                {t`Done`}
+              </Button>
+            </>
           ) : (
             <>
               <Button
