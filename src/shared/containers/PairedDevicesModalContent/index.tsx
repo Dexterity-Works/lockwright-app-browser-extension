@@ -24,7 +24,11 @@ import { getMyDeviceId, useVault } from 'lockwright-lib-vault'
 import { useModal } from '../../context/ModalContext'
 import { formatDate } from '../../utils/date'
 import { logger } from '../../utils/logger'
-import { RevokeAccessModalContent } from '../RevokeAccessModalContent'
+import {
+  readEpochStatus,
+  readRosterIds,
+  RevokeAccessModalContent
+} from '../RevokeAccessModalContent'
 
 const DEVICE_ACTIONS_MENU_WIDTH = 220
 
@@ -85,6 +89,29 @@ export const PairedDevicesModalContent = () => {
   )
 
   const [myDeviceId, setMyDeviceId] = useState<string | null>(null)
+  // The latest key still seals to a device that is off the roster: a
+  // revoke's rotation that timed out and never landed, or one still owed.
+  const [keyNotRotated, setKeyNotRotated] = useState(false)
+
+  useEffect(() => {
+    if (!vaultId) return
+    let cancelled = false
+    Promise.all([readEpochStatus(), readRosterIds()]).then(
+      ([status, roster]) => {
+        if (cancelled || !status || !roster) return
+        setKeyNotRotated(
+          status.vaultId === vaultId &&
+            !!status.epoch &&
+            !status.legacy &&
+            Array.isArray(status.members) &&
+            status.members.some((id) => !roster.has(id))
+        )
+      }
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [vaultId])
 
   useEffect(() => {
     let cancelled = false
@@ -132,6 +159,17 @@ export const PairedDevicesModalContent = () => {
         </Button>
       }
     >
+      {keyNotRotated && (
+        <div
+          role="alert"
+          className="pb-[var(--spacing12)]"
+          data-testid="paired-devices-epoch-warning"
+        >
+          <Text as="p" variant="caption">
+            {t`A removed device can still read new items. The vault key hasn't rotated since it was removed.`}
+          </Text>
+        </div>
+      )}
       {devices.length === 0 ? (
         <div className="flex items-center justify-center p-[24px]">
           <Text as="p" variant="body" color={theme.colors.colorTextSecondary}>

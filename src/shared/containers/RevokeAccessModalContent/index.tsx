@@ -36,7 +36,7 @@ type EpochStatus = Awaited<
   ReturnType<typeof pearpassVaultClient.activeVaultGetEpochStatus>
 >
 
-const readEpochStatus = async (): Promise<EpochStatus | null> => {
+export const readEpochStatus = async (): Promise<EpochStatus | null> => {
   try {
     return await pearpassVaultClient.activeVaultGetEpochStatus()
   } catch (error) {
@@ -45,7 +45,9 @@ const readEpochStatus = async (): Promise<EpochStatus | null> => {
   }
 }
 
-const readRosterIds = async (): Promise<Set<string | undefined> | null> => {
+export const readRosterIds = async (): Promise<Set<
+  string | undefined
+> | null> => {
   try {
     const devices = await listDevices()
     return Array.isArray(devices)
@@ -136,12 +138,12 @@ export const RevokeAccessModalContent = ({
       let { epoch } = kick
       const unreachable = failures.filter(({ kind }) => !kind)
       let epochFailure = failures.find(({ kind }) => kind === 'epoch')
-      if (
+      const timedOut =
         !epoch &&
-        epochFailure?.error?.message?.includes(
+        !!epochFailure?.error?.message?.includes(
           NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT
         )
-      ) {
+      if (timedOut) {
         const statusAfter = await readEpochStatus()
         const roster = await readRosterIds()
         if (
@@ -189,7 +191,11 @@ export const RevokeAccessModalContent = ({
           reason,
           error: epochFailure?.error?.message
         })
-        const warning = rotationWarningFor(reason, deviceName)
+        // A timed-out rotation can still land after the read above; the
+        // Devices list shows whether it did.
+        const warning = timedOut
+          ? t`The vault key rotation didn't finish in time. "${deviceName}" may still read new items. Open Devices again later to check.`
+          : rotationWarningFor(reason, deviceName)
         // No success toast beside the warning; an unreachable device still
         // gets its toast.
         if (unreachable.length) setToast({ message: unreachableMessage })

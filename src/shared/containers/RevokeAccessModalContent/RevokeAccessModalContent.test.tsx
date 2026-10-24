@@ -398,8 +398,10 @@ describe('RevokeAccessModalContent', () => {
       renderModal()
       await submit()
 
+      // The rotation may still land after this read; the Devices list
+      // shows whether it did.
       await expectInlineRotationWarning(
-        /^Couldn't rotate the vault key\. "iPhone" can still read new items\.$/
+        /^The vault key rotation didn't finish in time\. "iPhone" may still read new items\. Open Devices again later to check\.$/
       )
     }
   )
