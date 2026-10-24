@@ -314,7 +314,7 @@ export const RevokeAccessModalContent = ({
         <ul className="m-0 flex list-outside list-disc flex-col gap-[var(--spacing12)] pl-[var(--spacing20)]">
           <li className="m-0">
             <Text as="span" variant="caption">
-              {t`Anything it synced before now stays on that device. Revoking cannot delete it. Change passwords the device could see, especially if it was lost or stolen.`}
+              {t`Items from before the key rotates aren't re-encrypted, so the device can still read them. Revoking cannot delete what it already synced. Change passwords the device could see, especially if it was lost or stolen.`}
             </Text>
           </li>
           <li className="m-0">
