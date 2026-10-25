@@ -74,6 +74,9 @@ describe('useVaultAccessRevoked', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
+    mockClient.on = jest.fn()
+    mockClient.off = jest.fn()
+
     mockClient.on.mockImplementation((event, handler) => {
       if (event === 'vault-access-revoked') revokedHandler = handler
     })
@@ -133,6 +136,31 @@ describe('useVaultAccessRevoked', () => {
 
     expect(deleteVaultLocal).not.toHaveBeenCalled()
     expect(setModal).not.toHaveBeenCalled()
+  })
+
+  it('revokes an inactive vault even when its name and device list are missing', async () => {
+    mockUseVaults.mockReturnValue({ data: [activeVault, { id: 'v-other' }] })
+
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () =>
+      revokedHandler({ vaultId: 'v-other', actor: 'unknown-device' })
+    )
+
+    expect(deleteVaultLocal).toHaveBeenCalledWith('v-other')
+    expect(switchVault).not.toHaveBeenCalled()
+    expect(setModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        props: { vaultName: 'v-other', deviceName: undefined }
+      })
+    )
+  })
+
+  it('does not subscribe when the vault client has no event listener', () => {
+    mockClient.on = undefined as unknown as jest.Mock
+
+    renderHook(() => useVaultAccessRevoked())
+
+    expect(mockClient.off).not.toHaveBeenCalled()
   })
 
   it('wipes the active vault and switches to the next when one exists', async () => {
