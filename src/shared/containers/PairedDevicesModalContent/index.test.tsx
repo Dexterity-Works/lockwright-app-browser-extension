@@ -152,6 +152,50 @@ describe('PairedDevicesModalContent', () => {
     expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
   })
 
+  it('keeps the newest key-state read when an older one resolves last', async () => {
+    type KeyState = Awaited<ReturnType<typeof getVaultKeyState>>
+    let resolveFirst: (value: KeyState) => void = () => {}
+    mockedKeyState.mockReturnValueOnce(
+      new Promise<KeyState>((resolve) => {
+        resolveFirst = resolve
+      })
+    )
+    mockedKeyState.mockResolvedValue(keyState({ members: ['d1'], removed: [] }))
+    const view = render(<PairedDevicesModalContent />)
+    await act(async () => {})
+
+    // The device list changes, so the list reads the key state again.
+    jest.mocked(useVault).mockReturnValue({
+      data: { id: 'v1', devices: [{ id: 'd1', name: 'Laptop' }] }
+    } as unknown as ReturnType<typeof useVault>)
+    await act(async () => {
+      view.rerender(<PairedDevicesModalContent />)
+    })
+    await act(async () => {
+      resolveFirst(keyState() as KeyState)
+    })
+
+    expect(mockedKeyState).toHaveBeenCalledTimes(2)
+    expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
+  })
+
+  it("drops the old vault's rows after a switch, even when the new read fails", async () => {
+    const view = render(<PairedDevicesModalContent />)
+    await act(async () => {})
+    expect(screen.getByTestId('paired-devices-removed-d2')).toBeTruthy()
+
+    jest.mocked(useVault).mockReturnValue({
+      data: { id: 'v2', devices: [{ id: 'd3', name: 'Laptop' }] }
+    } as unknown as ReturnType<typeof useVault>)
+    mockedKeyState.mockRejectedValue(new Error('switching'))
+    await act(async () => {
+      view.rerender(<PairedDevicesModalContent />)
+    })
+
+    expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
+    expect(screen.queryByTestId('paired-devices-key-rotated')).toBeNull()
+  })
+
   it('names a removed device without a name as Unknown Device', async () => {
     mockedKeyState.mockResolvedValue(
       keyState({ removed: [{ id: 'd2', name: null }] })
