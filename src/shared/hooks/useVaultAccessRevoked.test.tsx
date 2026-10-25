@@ -124,6 +124,17 @@ describe('useVaultAccessRevoked', () => {
     expect(setModal).not.toHaveBeenCalled()
   })
 
+  it('ignores missing payloads and revocations while the vault list is unavailable', async () => {
+    mockUseVaults.mockReturnValue({ data: undefined })
+
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () => revokedHandler(undefined))
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).not.toHaveBeenCalled()
+    expect(setModal).not.toHaveBeenCalled()
+  })
+
   it('wipes the active vault and switches to the next when one exists', async () => {
     renderHook(() => useVaultAccessRevoked())
     await act(async () => revokedHandler({ vaultId: 'v-active' }))
