@@ -11,7 +11,29 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ### Changed
 
+- The revoke dialog says a device is revoked only once the vault key has rotated past it, and shows the time of that rotation. Until then it says "Removed · key rotating", including when the rotation timed out and the dialog did not see it land, and after a failed rotation "Removed · key not rotated", with "Rotate key now". It shows the same text as the desktop app.
+- Devices says when the vault key last rotated, and lists each removed device the key still reaches instead of one warning: "Removed · key rotating" while another device has to rotate it, or "Removed · key not rotated" with "Rotate key now".
+- The revoke dialog lists what revoking does (removes the device, rotates the vault key) and what it doesn't (erase what the device already synced; it can still read every item from before the rotation), and asks to change the passwords a lost or stolen device could see. Same text as the desktop app.
+
+## [0.0.34] - 2026-10-17
+
+`b8939c34d49f84ef068190622a0a0cd8871d52bc`
+
+### Added
+
+- After a revoke, a warning when the vault key could not be rotated, or names the devices that cannot read new items until they update.
+
+### Changed
+
 - The five utils now come from one package, `lockwright-lib-utils`.
+- Revoking a device rotates the vault key. Once the key rotates, the device can't read items added or changed after that. The revoke dialog says items from before the rotation aren't re-encrypted, so the device can still read them, and that devices on older versions must update.
+- The revoke dialog's key rotation warning says why in plain words (this device can't write to the vault, isn't on the member list, or the vault doesn't use rotating keys yet) instead of showing an internal reason code.
+- When the vault key could not be rotated, the revoke dialog no longer also shows a success toast next to the warning.
+
+### Fixed
+
+- A key rotation that finishes after the revoke dialog stops waiting is reported as done when it has landed by the time the dialog checks again. Otherwise the dialog says the result isn't known yet, and the Devices list warns while the vault key still reaches a removed device.
+- A vault revoked from another device is wiped once, without a second switch, "Personal" vault or access-removed dialog.
 
 ## [0.0.33] - 2026-10-07
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { t } from '@lingui/core/macro'
 import {
@@ -19,10 +19,16 @@ import {
   PhoneIphone,
   Tablet
 } from 'lockwright-lib-ui-react-native-components/icons'
-import { getMyDeviceId, useVault } from 'lockwright-lib-vault'
+import {
+  getMyDeviceId,
+  getVaultKeyState,
+  useVault,
+  type VaultKeyState
+} from 'lockwright-lib-vault'
+import { pearpassVaultClient } from 'lockwright-lib-vault/src/instances'
 
 import { useModal } from '../../context/ModalContext'
-import { formatDate } from '../../utils/date'
+import { formatDate, formatDateTime } from '../../utils/date'
 import { logger } from '../../utils/logger'
 import { RevokeAccessModalContent } from '../RevokeAccessModalContent'
 
@@ -85,6 +91,36 @@ export const PairedDevicesModalContent = () => {
   )
 
   const [myDeviceId, setMyDeviceId] = useState<string | null>(null)
+  // Removed devices stay listed until the vault key rotates past them: a
+  // revoke's rotation that timed out and never landed, or one still owed.
+  const [readState, setKeyState] = useState<VaultKeyState | null>(null)
+  // Only the latest read counts, and only for the vault on screen: an
+  // older read can resolve last, and a switch can leave the old state.
+  const readSeq = useRef(0)
+  const keyState = readState?.vaultId === vaultId ? readState : null
+  const readKeyState = () => {
+    const seq = ++readSeq.current
+    return getVaultKeyState()
+      .then((state) => {
+        if (seq === readSeq.current) setKeyState(state)
+      })
+      .catch((error: unknown) => {
+        logger.warn('PairedDevicesModalContent', 'key state failed:', error)
+      })
+  }
+
+  useEffect(() => {
+    if (vaultId) void readKeyState()
+  }, [vaultId, devices])
+
+  const rotateNow = async () => {
+    try {
+      await pearpassVaultClient.activeVaultEnsureEpoch({ start: true })
+    } catch (error) {
+      logger.error('PairedDevicesModalContent', 'rotation failed:', error)
+    }
+    await readKeyState()
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -115,6 +151,10 @@ export const PairedDevicesModalContent = () => {
     )
   }
 
+  const rotatedAt = keyState?.rotatedAt
+    ? formatDateTime(keyState.rotatedAt)
+    : null
+
   return (
     <Dialog
       title={t`Devices`}
@@ -132,7 +172,7 @@ export const PairedDevicesModalContent = () => {
         </Button>
       }
     >
-      {devices.length === 0 ? (
+      {devices.length === 0 && !keyState?.removed.length ? (
         <div className="flex items-center justify-center p-[24px]">
           <Text as="p" variant="body" color={theme.colors.colorTextSecondary}>
             {t`No devices synced yet`}
@@ -204,8 +244,50 @@ export const PairedDevicesModalContent = () => {
               />
             )
           })}
+          {keyState?.removed.map((device) => (
+            <ListItem
+              key={device.id}
+              icon={
+                <div className="bg-surface-hover flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-[8px]">
+                  <DoNotDisturb width={16} height={16} />
+                </div>
+              }
+              title={getDeviceDisplayName(device.name ?? undefined)}
+              subtitle={
+                // A device that cannot open the latest key leaves the
+                // rotation to a member that can, on its next sync.
+                keyState.canRead
+                  ? t`Removed · key not rotated`
+                  : t`Removed · key rotating`
+              }
+              testID={`paired-devices-removed-${device.id}`}
+              rightElement={
+                keyState.canRead ? (
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    type="button"
+                    onClick={rotateNow}
+                    data-testid={`paired-devices-rotate-${device.id}`}
+                  >
+                    {t`Rotate key now`}
+                  </Button>
+                ) : undefined
+              }
+            />
+          ))}
         </div>
       )}
+      {keyState?.rotatedAt ? (
+        <Text
+          as="p"
+          variant="caption"
+          color={theme.colors.colorTextSecondary}
+          data-testid="paired-devices-key-rotated"
+        >
+          {t`Vault key last rotated ${rotatedAt}`}
+        </Text>
+      ) : null}
     </Dialog>
   )
 }

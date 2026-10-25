@@ -74,6 +74,9 @@ describe('useVaultAccessRevoked', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
+    mockClient.on = jest.fn()
+    mockClient.off = jest.fn()
+
     mockClient.on.mockImplementation((event, handler) => {
       if (event === 'vault-access-revoked') revokedHandler = handler
     })
@@ -124,6 +127,42 @@ describe('useVaultAccessRevoked', () => {
     expect(setModal).not.toHaveBeenCalled()
   })
 
+  it('ignores missing payloads and revocations while the vault list is unavailable', async () => {
+    mockUseVaults.mockReturnValue({ data: undefined })
+
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () => revokedHandler(undefined))
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).not.toHaveBeenCalled()
+    expect(setModal).not.toHaveBeenCalled()
+  })
+
+  it('revokes an inactive vault even when its name and device list are missing', async () => {
+    mockUseVaults.mockReturnValue({ data: [activeVault, { id: 'v-other' }] })
+
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () =>
+      revokedHandler({ vaultId: 'v-other', actor: 'unknown-device' })
+    )
+
+    expect(deleteVaultLocal).toHaveBeenCalledWith('v-other')
+    expect(switchVault).not.toHaveBeenCalled()
+    expect(setModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        props: { vaultName: 'v-other', deviceName: undefined }
+      })
+    )
+  })
+
+  it('does not subscribe when the vault client has no event listener', () => {
+    mockClient.on = undefined as unknown as jest.Mock
+
+    renderHook(() => useVaultAccessRevoked())
+
+    expect(mockClient.off).not.toHaveBeenCalled()
+  })
+
   it('wipes the active vault and switches to the next when one exists', async () => {
     renderHook(() => useVaultAccessRevoked())
     await act(async () => revokedHandler({ vaultId: 'v-active' }))
@@ -167,6 +206,76 @@ describe('useVaultAccessRevoked', () => {
     )
   })
 
+  it('handles a vault announced twice (desktop and epoch status) once', async () => {
+    let finishDelete: () => void = () => {}
+    deleteVaultLocal.mockReturnValue(
+      new Promise<void>((resolve) => {
+        finishDelete = resolve
+      })
+    )
+
+    renderHook(() => useVaultAccessRevoked())
+    await act(async () => {
+      const first = revokedHandler({ vaultId: 'v-active', actor: 'd1' })
+      const second = revokedHandler({ vaultId: 'v-active', reason: 'epoch' })
+      finishDelete()
+      await Promise.all([first, second])
+    })
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(1)
+    expect(switchVault).toHaveBeenCalledTimes(1)
+    expect(setModal).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not wipe again while the list still shows the wiped vault, and does once it left', async () => {
+    const { rerender } = renderHook(() => useVaultAccessRevoked())
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(1)
+    expect(switchVault).toHaveBeenCalledTimes(1)
+    expect(setModal).toHaveBeenCalledTimes(1)
+
+    mockUseVaults.mockReturnValue({ data: [otherVault] })
+    rerender()
+    mockUseVaults.mockReturnValue({ data: [activeVault, otherVault] })
+    rerender()
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps blocking a vault that left and came back while its wipe was running', async () => {
+    let finishDelete: () => void = () => {}
+    deleteVaultLocal.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishDelete = resolve
+      })
+    )
+
+    const { rerender } = renderHook(() => useVaultAccessRevoked())
+    let first: Promise<unknown> = Promise.resolve()
+    await act(async () => {
+      first = Promise.resolve(revokedHandler({ vaultId: 'v-active' }))
+    })
+
+    mockUseVaults.mockReturnValue({ data: [otherVault] })
+    rerender()
+    mockUseVaults.mockReturnValue({ data: [activeVault, otherVault] })
+    rerender()
+
+    await act(async () => {
+      await revokedHandler({ vaultId: 'v-active' })
+      finishDelete()
+      await first
+    })
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(1)
+    expect(switchVault).toHaveBeenCalledTimes(1)
+    expect(setModal).toHaveBeenCalledTimes(1)
+  })
+
   it('still shows the access-removed modal when delete fails locally', async () => {
     deleteVaultLocal.mockRejectedValue(new Error('disk-full'))
 
@@ -176,5 +285,8 @@ describe('useVaultAccessRevoked', () => {
     expect(setModal).toHaveBeenCalledTimes(1)
     expect(switchVault).not.toHaveBeenCalled()
     expect(createVault).not.toHaveBeenCalled()
+
+    await act(async () => revokedHandler({ vaultId: 'v-active' }))
+    expect(deleteVaultLocal).toHaveBeenCalledTimes(2)
   })
 })
