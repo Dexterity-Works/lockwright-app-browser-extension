@@ -37,8 +37,18 @@ jest.mock('../../utils/logger', () => ({
 }))
 
 jest.mock('lockwright-lib-ui-react-native-components/icons', () => {
-  const Icon = () => null
-  return new Proxy({}, { get: () => Icon })
+  const iconNames = [
+    'Devices',
+    'DoNotDisturb',
+    'LaptopMac',
+    'LaptopWindows',
+    'MoreVert',
+    'PhoneIphone',
+    'Tablet'
+  ]
+  return Object.fromEntries(
+    iconNames.map((name) => [name, () => <span data-testid={`icon-${name}`} />])
+  )
 })
 
 jest.mock('lockwright-lib-ui-react-native-components', () => ({
@@ -47,15 +57,21 @@ jest.mock('lockwright-lib-ui-react-native-components', () => ({
       {children}
     </button>
   ),
-  ContextMenu: ({ children }: any) => <div>{children}</div>,
+  ContextMenu: ({ children, trigger }: any) => (
+    <div>
+      {trigger}
+      {children}
+    </div>
+  ),
   Dialog: ({ children, footer }: any) => (
     <div>
       {children}
       {footer}
     </div>
   ),
-  ListItem: ({ title, subtitle, testID, rightElement }: any) => (
+  ListItem: ({ icon, title, subtitle, testID, rightElement }: any) => (
     <div data-testid={testID}>
+      {icon}
       {title}
       {subtitle && <span data-testid={`${testID}-subtitle`}>{subtitle}</span>}
       {rightElement}
@@ -91,6 +107,8 @@ const keyState = (overrides: object = {}) => ({
 })
 
 describe('PairedDevicesModalContent', () => {
+  const setModal = jest.fn()
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockedKeyState.mockReset()
@@ -101,7 +119,7 @@ describe('PairedDevicesModalContent', () => {
     } as unknown as ReturnType<typeof useVault>)
     jest.mocked(useModal).mockReturnValue({
       closeModal: jest.fn(),
-      setModal: jest.fn()
+      setModal
     } as unknown as ReturnType<typeof useModal>)
   })
 
@@ -259,5 +277,66 @@ describe('PairedDevicesModalContent', () => {
 
     expect(mockedKeyState).not.toHaveBeenCalled()
     expect(screen.getByText('No devices synced yet')).toBeTruthy()
+  })
+
+  it.each([
+    ['iOS phone', 'iPhone', 'PhoneIphone'],
+    ['Android phone', 'Android', 'PhoneIphone'],
+    ['iPad', 'iPad', 'Tablet'],
+    ['MacBook Pro', 'MacBook Pro', 'LaptopMac'],
+    ['Windows PC', 'Windows PC', 'LaptopWindows'],
+    [undefined, 'Unknown Device', 'Devices']
+  ])('shows the right name and icon for %s', async (name, title, icon) => {
+    jest.mocked(useVault).mockReturnValue({
+      data: {
+        id: 'v1',
+        devices: [{ id: 'd2', name, createdAt: '2025-05-06T00:00:00.000Z' }]
+      }
+    } as unknown as ReturnType<typeof useVault>)
+
+    await renderModal()
+
+    expect(screen.getByTestId('paired-devices-item-d2').textContent).toContain(
+      title
+    )
+    expect(
+      screen
+        .getByTestId(`icon-${icon}`)
+        .closest('[data-testid="paired-devices-item-d2"]')
+    ).toBeTruthy()
+    expect(screen.getByTestId('paired-devices-item-d2').textContent).toContain(
+      'Paired on 06 May 2025'
+    )
+  })
+
+  it('opens the revoke dialog for a synced device', async () => {
+    jest.mocked(useVault).mockReturnValue({
+      data: { id: 'v1', devices: [{ id: 'd2', name: 'Android phone' }] }
+    } as unknown as ReturnType<typeof useVault>)
+
+    await renderModal()
+    fireEvent.click(screen.getByText('Revoke Access'))
+
+    expect(setModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        props: {
+          vaultId: 'v1',
+          targetDeviceId: 'd2',
+          deviceName: 'Android'
+        }
+      })
+    )
+  })
+
+  it('uses the row index when a synced device has no id', async () => {
+    jest.mocked(useVault).mockReturnValue({
+      data: { id: 'v1', devices: [{ name: 'Tablet' }] }
+    } as unknown as ReturnType<typeof useVault>)
+
+    await renderModal()
+
+    expect(screen.getByTestId('paired-devices-item-0').textContent).toContain(
+      'Tablet'
+    )
   })
 })
