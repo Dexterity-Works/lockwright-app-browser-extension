@@ -400,9 +400,6 @@ export const clearClientKeypair = async () => {
 
   pendingPersistRecord = null
 
-  // Stop waiting on any unlock in progress
-  unlockInFlight = null
-
   // Delete from IndexedDB
   try {
     const db = await openDb()
