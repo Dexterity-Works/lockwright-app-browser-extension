@@ -12,6 +12,7 @@ import { secureChannelMessages } from '../../../../shared/services/messageBridge
 import { logger } from '../../../../shared/utils/logger'
 import { sortByName } from '../../../../shared/utils/sortByName'
 import {
+  getKeyStoreErrorMessage,
   getUnlockErrorMessage,
   isWrongPasswordError
 } from '../../../../shared/utils/unlockErrors'
@@ -91,6 +92,8 @@ export const EnterMasterPassword = () => {
             'Error initializing secure channel keystore:',
             keystoreErr
           )
+          setError(getKeyStoreErrorMessage(keystoreErr))
+          return
         }
 
         await logIn({ password })

@@ -58,3 +58,14 @@ export const getUnlockErrorMessage = (error) => {
 
   return t`Couldn't unlock. The desktop app failed (${code}): ${reason}`
 }
+
+/**
+ * Copy for the extension's own key store failing for a reason other than a
+ * wrong password (IndexedDB, UnlockInProgress).
+ * @param {unknown} error
+ * @returns {string}
+ */
+export const getKeyStoreErrorMessage = (error) => {
+  const { code, reason } = getErrorDetail(error)
+  return t`Couldn't unlock the extension's key store (${code}): ${reason}`
+}

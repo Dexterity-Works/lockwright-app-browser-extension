@@ -291,6 +291,30 @@ describe('EnterMasterPassword', () => {
     )
   })
 
+  it('stops and names the key store when it fails for another reason', async () => {
+    ;(
+      secureChannelMessages.unlockClientKeystore as jest.Mock
+    ).mockRejectedValue(
+      Object.assign(new Error('Internal error opening backing store'), {
+        code: 'HANDLER_ERROR',
+        originalError: { code: 'UNKNOWN' }
+      })
+    )
+
+    render(<EnterMasterPassword />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('submit'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent(
+        "Couldn't unlock the extension's key store (UNKNOWN): Internal error opening backing store"
+      )
+    })
+    expect(logIn).not.toHaveBeenCalled()
+  })
+
   it('proceeds to logIn when unlock succeeds', async () => {
     ;(
       secureChannelMessages.unlockClientKeystore as jest.Mock

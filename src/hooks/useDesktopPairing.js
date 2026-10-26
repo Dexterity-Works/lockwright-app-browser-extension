@@ -13,6 +13,7 @@ import { pendingPairingStore } from '../shared/services/pendingPairingStore'
 import { logger } from '../shared/utils/logger'
 import {
   getErrorDetail,
+  getKeyStoreErrorMessage,
   getUnlockErrorMessage,
   isWrongPasswordError
 } from '../shared/utils/unlockErrors'
@@ -194,10 +195,7 @@ export const useDesktopPairing = ({
         return false
       }
       logger.error('Error unlocking keystore:', e)
-      const { code, reason } = getErrorDetail(e)
-      setToast({
-        message: t`Couldn't unlock the extension's key store (${code}): ${reason}`
-      })
+      setToast({ message: getKeyStoreErrorMessage(e) })
       return false
     }
   }
