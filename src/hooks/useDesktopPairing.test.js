@@ -387,7 +387,7 @@ describe('usePairing', () => {
         identity: mockIdentity
       })
       secureChannelMessages.unlockClientKeystore.mockRejectedValue(
-        Object.assign(new Error('UnlockInProgress'), {
+        Object.assign(new Error('Internal error opening backing store'), {
           code: 'HANDLER_ERROR',
           originalError: { code: 'UNKNOWN' }
         })
@@ -410,7 +410,7 @@ describe('usePairing', () => {
       expect(mockSetToast).toHaveBeenCalledWith(
         expect.objectContaining({
           message: expect.stringMatching(
-            /key store \(UNKNOWN\): UnlockInProgress/
+            /key store \(UNKNOWN\): Internal error opening backing store/
           )
         })
       )
@@ -420,6 +420,37 @@ describe('usePairing', () => {
         })
       )
       expect(secureChannelMessages.confirmPair).not.toHaveBeenCalled()
+    })
+
+    it('should go on while another unlock of the key store is running', async () => {
+      secureChannelMessages.getIdentity.mockResolvedValue({
+        success: true,
+        identity: { ed25519PublicKey: 'pubKey', x25519PublicKey: 'xKey' }
+      })
+      secureChannelMessages.unlockClientKeystore.mockRejectedValue(
+        new Error('UnlockInProgress')
+      )
+
+      const { result } = renderHook(() => useDesktopPairing(props))
+
+      await act(async () => {
+        result.current.setPairingToken('token-long-enough')
+      })
+
+      await act(async () => {
+        await result.current.fetchIdentity()
+      })
+
+      await act(async () => {
+        await result.current.completePairing('password')
+      })
+
+      expect(mockLogIn).toHaveBeenCalledWith({ password: 'password' })
+      expect(mockSetToast).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('key store')
+        })
+      )
     })
 
     it('should show the desktop error code when vault login fails for another reason', async () => {

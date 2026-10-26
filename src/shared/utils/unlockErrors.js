@@ -61,7 +61,7 @@ export const getUnlockErrorMessage = (error) => {
 
 /**
  * Copy for the extension's own key store failing for a reason other than a
- * wrong password (IndexedDB, UnlockInProgress).
+ * wrong password, such as an IndexedDB failure.
  * @param {unknown} error
  * @returns {string}
  */
