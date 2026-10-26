@@ -13,6 +13,10 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 - The five utils now come from one package, `lockwright-lib-utils`.
 
+### Fixed
+
+- Unlock says "Incorrect password" only when the desktop app rejects the password. Other failures say the desktop app could not be reached or failed, with the error code.
+
 ## [0.0.33] - 2026-10-07
 
 `30a0113db31dd2ad8bf0c0c76d72b9fafcb77c2b`

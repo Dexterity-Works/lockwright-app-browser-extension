@@ -11,6 +11,10 @@ import { useRouter } from '../../../../shared/context/RouterContext'
 import { secureChannelMessages } from '../../../../shared/services/messageBridge'
 import { logger } from '../../../../shared/utils/logger'
 import { sortByName } from '../../../../shared/utils/sortByName'
+import {
+  getUnlockErrorMessage,
+  isWrongPasswordError
+} from '../../../../shared/utils/unlockErrors'
 
 type MasterPasswordStatus = {
   isLocked?: boolean
@@ -118,35 +122,18 @@ export const EnterMasterPassword = () => {
         await refetchVault(firstVault.id)
         navigateAfterVaultOpened()
       } catch (submitError) {
-        let status: MasterPasswordStatus
-        try {
-          status = await refreshMasterPasswordStatus()
-        } catch (refreshError) {
-          logger.error('Error refreshing master password status:', refreshError)
-          setError(
-            typeof submitError === 'string'
-              ? submitError
-              : t`Incorrect password. Please try again.`
-          )
-          logger.error('Error unlocking Lockwright:', submitError)
-          return
-        }
+        logger.error('Error unlocking Lockwright:', submitError)
 
-        const { isLocked } = status || {}
-
-        if (isLocked) {
-          navigate('welcome', {
-            params: { state: NAVIGATION_ROUTES.SCREEN_LOCKED }
-          })
+        if (isWrongPasswordError(submitError)) {
+          await handleIncorrectPassword()
           return
         }
 
         setError(
           typeof submitError === 'string'
             ? submitError
-            : getIncorrectPasswordError(status)
+            : getUnlockErrorMessage(submitError)
         )
-        logger.error('Error unlocking Lockwright:', submitError)
       }
     },
     [
@@ -156,7 +143,6 @@ export const EnterMasterPassword = () => {
       isVaultProtected,
       refetchVault,
       navigateAfterVaultOpened,
-      refreshMasterPasswordStatus,
       navigate,
       currentPage,
       handleIncorrectPassword
