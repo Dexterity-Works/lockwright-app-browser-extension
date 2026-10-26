@@ -10,6 +10,7 @@ const DB_NAME = 'pearpassClientKeyStore'
 const DB_VERSION = 1
 const STORE_NAME = 'clientKeys'
 const KEY_ID = 'client-ed25519'
+const TX_ABORTED = 'IndexedDB transaction aborted'
 const PBKDF2_ITERATIONS = 600000
 // Records written before the `iterations` field existed used this count.
 const LEGACY_PBKDF2_ITERATIONS = 100000
@@ -58,6 +59,9 @@ const getKeyRecord = (db) =>
       request.onerror = () => {
         reject(request.error)
       }
+      tx.onabort = () => {
+        reject(tx.error || new Error(TX_ABORTED))
+      }
     } catch (error) {
       reject(error)
     }
@@ -75,6 +79,10 @@ const putKeyRecord = (db, record) =>
       }
       tx.onerror = () => {
         reject(tx.error)
+      }
+      // A failed commit (QuotaExceededError) fires only abort.
+      tx.onabort = () => {
+        reject(tx.error || new Error(TX_ABORTED))
       }
       request.onerror = () => {
         reject(request.error)
@@ -205,6 +213,10 @@ export const isClientKeypairUnlocked = () => !!inMemoryKeypair
  * @returns {Promise<{ publicKey: Uint8Array, privateKey: Uint8Array }>}
  */
 export const ensureClientKeypairUnlocked = async (masterPassword) => {
+  if (inMemoryKeypair) {
+    return inMemoryKeypair
+  }
+
   // Wait for an unlock already running. If it failed (another page typed a
   // wrong password), go on and try this caller's password.
   while (unlockInFlight) {
@@ -422,6 +434,10 @@ const deleteKeyRecord = (db) =>
       }
       tx.onerror = () => {
         reject(tx.error)
+      }
+      // A failed commit (QuotaExceededError) fires only abort.
+      tx.onabort = () => {
+        reject(tx.error || new Error(TX_ABORTED))
       }
       request.onerror = () => {
         reject(request.error)
