@@ -20,6 +20,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 ### Fixed
 
 - Unlock and pairing no longer report a desktop or connection failure as a wrong password; those now show the error code.
+- Unlocking the extension from two pages at once waits for the first unlock to finish instead of failing, and pairing no longer reports success before its key is saved.
 
 ## [0.0.33] - 2026-10-07
 

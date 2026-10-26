@@ -92,11 +92,8 @@ export const EnterMasterPassword = () => {
             'Error initializing secure channel keystore:',
             keystoreErr
           )
-          // Another unlock of the key store is running and will finish it.
-          if (!message?.includes('UnlockInProgress')) {
-            setError(getKeyStoreErrorMessage(keystoreErr))
-            return
-          }
+          setError(getKeyStoreErrorMessage(keystoreErr))
+          return
         }
 
         await logIn({ password })

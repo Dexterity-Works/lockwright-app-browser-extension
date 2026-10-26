@@ -17,7 +17,7 @@ const LEGACY_PBKDF2_ITERATIONS = 100000
 let inMemoryKeypair = null
 let pendingKeypair = null
 let pendingPersistRecord = null
-let unlocking = false
+let unlockInFlight = null
 
 const textEncoder = new TextEncoder()
 
@@ -205,23 +205,26 @@ export const isClientKeypairUnlocked = () => !!inMemoryKeypair
  * @returns {Promise<{ publicKey: Uint8Array, privateKey: Uint8Array }>}
  */
 export const ensureClientKeypairUnlocked = async (masterPassword) => {
-  if (inMemoryKeypair) {
-    return inMemoryKeypair
+  // Wait for an unlock already running. If it failed (another page typed a
+  // wrong password), go on and try this caller's password.
+  while (unlockInFlight) {
+    await unlockInFlight.catch(() => {})
   }
 
-  if (unlocking) {
-    throw new Error('UnlockInProgress')
+  if (inMemoryKeypair) {
+    return inMemoryKeypair
   }
 
   if (!masterPassword) {
     throw new Error(AUTH_ERROR_PATTERNS.MASTER_PASSWORD_REQUIRED)
   }
 
-  unlocking = true
+  const attempt = unlockKeypair(masterPassword)
+  unlockInFlight = attempt
   try {
-    return await unlockKeypair(masterPassword)
+    return await attempt
   } finally {
-    unlocking = false
+    if (unlockInFlight === attempt) unlockInFlight = null
   }
 }
 
@@ -397,8 +400,8 @@ export const clearClientKeypair = async () => {
 
   pendingPersistRecord = null
 
-  // Reset unlocking flag to cancel any in-progress unlock
-  unlocking = false
+  // Stop waiting on any unlock in progress
+  unlockInFlight = null
 
   // Delete from IndexedDB
   try {

@@ -329,8 +329,7 @@ describe('captured logins', () => {
 describe('client keystore unlock', () => {
   it.each([
     ['MasterPasswordInvalid', 'AUTHENTICATION_FAILED'],
-    ['Internal error opening backing store for indexedDB.open.', 'UNKNOWN'],
-    ['UnlockInProgress', 'UNKNOWN']
+    ['Internal error opening backing store for indexedDB.open.', 'UNKNOWN']
   ])('answers %s with code %s', async (message, code) => {
     const { ensureClientKeypairUnlocked } = await import('./clientKeyStore')
     ensureClientKeypairUnlocked.mockRejectedValueOnce(new Error(message))

@@ -195,8 +195,6 @@ export const useDesktopPairing = ({
         return false
       }
       logger.error('Error unlocking keystore:', e)
-      // Another unlock of the key store is running and will finish it.
-      if (e?.message?.includes('UnlockInProgress')) return true
       setToast({ message: getKeyStoreErrorMessage(e) })
       return false
     }

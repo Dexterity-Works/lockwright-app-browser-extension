@@ -201,3 +201,50 @@ describe('clientKeyStore PBKDF2 iterations', () => {
     expect(store.get(KEY_ID)).toBe(current)
   })
 })
+
+describe('clientKeyStore concurrent unlocks', () => {
+  it('lets a second unlock wait for the first, then commits the key', async () => {
+    const [a, b] = await Promise.all([
+      mod.ensureClientKeypairUnlocked(PASSWORD),
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ])
+
+    expect(bytes(a.publicKey)).toEqual(bytes(b.publicKey))
+    await mod.commitPendingClientKeystore()
+    expect(store.get(KEY_ID)).toBeDefined()
+  })
+
+  it('tries its own password when the unlock it waited for was wrong', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
+    )
+
+    const [wrong, right] = await Promise.allSettled([
+      mod.ensureClientKeypairUnlocked('wrong password'),
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ])
+
+    expect(wrong.status).toBe('rejected')
+    expect(wrong.reason.message).toContain('MasterPasswordInvalid')
+    expect(right.status).toBe('fulfilled')
+    expect(bytes(right.value.privateKey)).toEqual(bytes(privateKey))
+  })
+
+  it('lets a caller without a password wait for an unlock in flight', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
+    )
+
+    const unlocking = mod.ensureClientKeypairUnlocked(PASSWORD)
+    const waiting = mod.ensureClientKeypairUnlocked()
+
+    await expect(waiting).resolves.toMatchObject({
+      privateKey: expect.any(Uint8Array)
+    })
+    await unlocking
+  })
+})
