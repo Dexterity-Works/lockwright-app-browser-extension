@@ -458,10 +458,17 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
           await ensureClientKeypairUnlocked(masterPassword)
           sendResponse({ success: true })
         } catch (e) {
+          // Only a password problem is an authentication failure; IndexedDB
+          // errors and UnlockInProgress are not.
+          const isAuthError = Object.values(AUTH_ERROR_PATTERNS).some(
+            (pattern) => e?.message?.includes(pattern)
+          )
           sendResponse({
             success: false,
             error: e?.message,
-            code: ERROR_CODES.AUTHENTICATION_FAILED
+            code: isAuthError
+              ? ERROR_CODES.AUTHENTICATION_FAILED
+              : ERROR_CODES.UNKNOWN
           })
         }
       })()
