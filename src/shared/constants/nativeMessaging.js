@@ -75,6 +75,8 @@ export const REQUEST_TIMEOUT = {
  */
 export const DISCONNECTION_ERROR_MESSAGES = {
   NATIVE_HOST_DISCONNECTED: 'Native messaging host disconnected',
+  // chrome.runtime.lastError when the desktop's native host process ends
+  NATIVE_HOST_EXITED: 'Native host has exited',
   CONNECTION_FAILED: 'Connection failed',
   IPC_DISCONNECTED: 'IPC disconnected',
   DESKTOP_APP_NOT_AVAILABLE: 'Desktop app not available',

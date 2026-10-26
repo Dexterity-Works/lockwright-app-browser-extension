@@ -463,3 +463,14 @@ describe('NativeMessaging & integration', () => {
     expect(sendRequestSpy).not.toHaveBeenCalled()
   })
 })
+
+describe('getErrorCode', () => {
+  it.each([
+    'Disconnected from native host',
+    'Native host has exited.',
+    'Specified native messaging host not found.'
+  ])('maps %s to DESKTOP_APP_UNAVAILABLE', (message) => {
+    const { getErrorCode } = require('./nativeMessaging')
+    expect(getErrorCode(message)).toBe('DESKTOP_APP_UNAVAILABLE')
+  })
+})

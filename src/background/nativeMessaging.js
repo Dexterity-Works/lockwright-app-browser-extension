@@ -357,6 +357,8 @@ const getErrorCode = (errorMessage) => {
     errorMessage.includes(
       DISCONNECTION_ERROR_MESSAGES.NATIVE_HOST_DISCONNECTED
     ) ||
+    errorMessage.includes(DISCONNECTION_ERROR_MESSAGES.NATIVE_HOST_EXITED) ||
+    errorMessage.includes(NATIVE_MESSAGING_ERRORS.DISCONNECTED) ||
     errorMessage.includes(DISCONNECTION_ERROR_MESSAGES.CONNECTION_FAILED) ||
     errorMessage.includes(
       DISCONNECTION_ERROR_MESSAGES.DESKTOP_APP_NOT_AVAILABLE
@@ -473,4 +475,4 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true
 })
 
-export { nativeMessaging }
+export { nativeMessaging, getErrorCode }
