@@ -11,6 +11,10 @@ import { useToast } from '../shared/context/ToastContext'
 import { secureChannelMessages } from '../shared/services/messageBridge'
 import { pendingPairingStore } from '../shared/services/pendingPairingStore'
 import { logger } from '../shared/utils/logger'
+import {
+  getUnlockErrorMessage,
+  isWrongPasswordError
+} from '../shared/utils/unlockErrors'
 
 export const PAIRING_STEP = {
   TOKEN: 'token',
@@ -173,7 +177,7 @@ export const useDesktopPairing = ({
    * Attempts to unlock the client keystore with the provided password
    * @async
    * @param {string} password - Master password
-   * @returns {Promise<boolean>} True if unlock succeeds or can continue, false if password is incorrect
+   * @returns {Promise<boolean>} True if unlock succeeds, false after showing why it failed
    */
   const unlockKeystore = async (password) => {
     try {
@@ -188,9 +192,9 @@ export const useDesktopPairing = ({
         logger.error('Error unlocking keystore:', e)
         return false
       }
-      logger.error('Keystore error, continuing:', e)
-      // Continue even if other errors occur, consistent with previous logic
-      return true
+      logger.error('Error unlocking keystore:', e)
+      setToast({ message: getUnlockErrorMessage(e) })
+      return false
     }
   }
 
@@ -255,8 +259,12 @@ export const useDesktopPairing = ({
         await logIn({ password })
         await initVaults({ password })
       } catch (err) {
-        logger.error('Invalid master password during pairing:', err)
-        setPasswordError(t(PAIRING_ERROR_MESSAGES.INVALID_PASSWORD))
+        logger.error('Vault login failed during pairing:', err)
+        setPasswordError(
+          isWrongPasswordError(err)
+            ? t(PAIRING_ERROR_MESSAGES.INVALID_PASSWORD)
+            : getUnlockErrorMessage(err)
+        )
         return
       }
 
@@ -270,7 +278,7 @@ export const useDesktopPairing = ({
         error.message === PAIRING_ERROR_MESSAGES.PAIRING_FAILED
       const message = isPairingFailed
         ? t`Pairing failed`
-        : t(PAIRING_ERROR_MESSAGES.INVALID_PASSWORD)
+        : getUnlockErrorMessage(error)
       if (isPairingFailed) {
         setToast({ message })
       } else {

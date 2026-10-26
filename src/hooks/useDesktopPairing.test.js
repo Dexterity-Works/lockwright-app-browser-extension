@@ -207,7 +207,11 @@ describe('usePairing', () => {
         identity: mockIdentity
       })
       secureChannelMessages.pinIdentity.mockResolvedValue({ success: true })
-      mockLogIn.mockRejectedValueOnce(new Error('Invalid master password'))
+      mockLogIn.mockRejectedValueOnce(
+        new Error(
+          'Error initializing with password: Error: Error decrypting vault key'
+        )
+      )
 
       const { result } = renderHook(() => useDesktopPairing(props))
 
@@ -258,7 +262,11 @@ describe('usePairing', () => {
         success: true
       })
       mockLogIn
-        .mockRejectedValueOnce(new Error('Invalid master password'))
+        .mockRejectedValueOnce(
+          new Error(
+            'Error initializing with password: Error: Error decrypting vault key'
+          )
+        )
         .mockResolvedValue(undefined)
 
       const { result } = renderHook(() => useDesktopPairing(props))
@@ -364,6 +372,41 @@ describe('usePairing', () => {
       expect(mockSetToast).toHaveBeenCalledWith(
         expect.objectContaining({
           message: expect.stringContaining('Incorrect password')
+        })
+      )
+      expect(secureChannelMessages.confirmPair).not.toHaveBeenCalled()
+    })
+
+    it('should stop and show the error code when the keystore fails otherwise', async () => {
+      const mockIdentity = {
+        ed25519PublicKey: 'pubKey',
+        x25519PublicKey: 'xKey'
+      }
+      secureChannelMessages.getIdentity.mockResolvedValue({
+        success: true,
+        identity: mockIdentity
+      })
+      secureChannelMessages.unlockClientKeystore.mockRejectedValue(
+        Object.assign(new Error('UnlockInProgress'), { code: 'HANDLER_ERROR' })
+      )
+
+      const { result } = renderHook(() => useDesktopPairing(props))
+
+      await act(async () => {
+        result.current.setPairingToken('token-long-enough')
+      })
+
+      await act(async () => {
+        await result.current.fetchIdentity()
+      })
+
+      await act(async () => {
+        await result.current.completePairing('password')
+      })
+
+      expect(mockSetToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('HANDLER_ERROR')
         })
       )
       expect(secureChannelMessages.confirmPair).not.toHaveBeenCalled()
