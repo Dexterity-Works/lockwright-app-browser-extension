@@ -141,6 +141,21 @@ describe('NativeMessaging & integration', () => {
     expect(runtime.connectNative).toHaveBeenCalledTimes(1)
   })
 
+  test('connect() opens a new port after the host disconnects', async () => {
+    const makePort = () => ({
+      onMessage: { addListener: jest.fn() },
+      onDisconnect: { addListener: jest.fn() }
+    })
+    const first = makePort()
+    runtime.connectNative.mockReturnValueOnce(first).mockReturnValue(makePort())
+
+    await nativeModule.nativeMessaging.connect()
+    first.onDisconnect.addListener.mock.calls[0][0]()
+    await nativeModule.nativeMessaging.connect()
+
+    expect(runtime.connectNative).toHaveBeenCalledTimes(2)
+  })
+
   test('connect() must not open the desktop native host on android', async () => {
     runtime.getPlatformInfo = jest.fn((cb) => cb({ os: 'android' }))
 
