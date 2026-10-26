@@ -125,6 +125,22 @@ describe('NativeMessaging & integration', () => {
     )
   })
 
+  test('connect() opens one port for concurrent callers', async () => {
+    const fakePort = {
+      onMessage: { addListener: jest.fn() },
+      onDisconnect: { addListener: jest.fn() }
+    }
+    runtime.connectNative.mockReturnValue(fakePort)
+
+    await Promise.all([
+      nativeModule.nativeMessaging.connect(),
+      nativeModule.nativeMessaging.connect(),
+      nativeModule.nativeMessaging.connect()
+    ])
+
+    expect(runtime.connectNative).toHaveBeenCalledTimes(1)
+  })
+
   test('connect() must not open the desktop native host on android', async () => {
     runtime.getPlatformInfo = jest.fn((cb) => cb({ os: 'android' }))
 
