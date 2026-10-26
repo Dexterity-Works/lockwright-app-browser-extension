@@ -41,11 +41,22 @@ const makeFakeIndexedDB = (store) => {
               queueMicrotask(() => tx.onabort?.())
               return undefined
             }
+            if (store.heldPuts) {
+              store.heldPuts.push(() => {
+                store.set(record.id, record)
+                complete()
+              })
+              return undefined
+            }
             store.set(record.id, record)
             complete()
           }),
         delete: (id) =>
           request(() => {
+            if (store.abortDeletes) {
+              queueMicrotask(() => tx.onabort?.())
+              return undefined
+            }
             store.delete(id)
             complete()
           })
@@ -279,12 +290,40 @@ describe('clientKeyStore concurrent unlocks', () => {
       await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
     )
 
+    const reads = jest.spyOn(store, 'get')
+
     const first = mod.ensureClientKeypairUnlocked(PASSWORD)
     await mod.clearClientKeypair()
     const second = mod.ensureClientKeypairUnlocked(PASSWORD)
+    await Promise.allSettled([first, second])
 
-    const [a, b] = await Promise.all([first, second])
-    expect(bytes(b.publicKey)).toEqual(bytes(a.publicKey))
+    expect(reads).toHaveBeenCalledTimes(1)
+  })
+
+  it('gives the key to a caller without waiting for its upgrade write', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, LEGACY_ITERATIONS, false)
+    )
+    store.heldPuts = []
+
+    const unlocking = mod.ensureClientKeypairUnlocked(PASSWORD)
+    while (store.heldPuts.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 5))
+    }
+
+    await expect(mod.ensureClientKeypairUnlocked()).resolves.toMatchObject({
+      privateKey: expect.any(Uint8Array)
+    })
+    store.heldPuts.forEach((release) => release())
+    await unlocking
+  })
+
+  it('finishes a clear whose delete aborts', async () => {
+    store.abortDeletes = true
+
+    await expect(mod.clearClientKeypair()).resolves.toBeUndefined()
   })
 
   it('lets a caller without a password wait for an unlock in flight', async () => {
