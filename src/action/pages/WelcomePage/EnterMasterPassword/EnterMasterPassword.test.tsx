@@ -315,6 +315,24 @@ describe('EnterMasterPassword', () => {
     expect(logIn).not.toHaveBeenCalled()
   })
 
+  it('goes on to logIn while another unlock of the key store is running', async () => {
+    ;(
+      secureChannelMessages.unlockClientKeystore as jest.Mock
+    ).mockRejectedValue(new Error('UnlockInProgress'))
+    logIn.mockResolvedValue(undefined)
+    initVaults.mockResolvedValue(undefined)
+
+    render(<EnterMasterPassword />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('submit'))
+    })
+
+    await waitFor(() => {
+      expect(logIn).toHaveBeenCalledWith({ password: expect.any(String) })
+    })
+  })
+
   it('proceeds to logIn when unlock succeeds', async () => {
     ;(
       secureChannelMessages.unlockClientKeystore as jest.Mock
