@@ -132,7 +132,10 @@ describe('PearpassVaultClient', () => {
         runtime.sendMessage.mockImplementation(() => {})
 
         const pending = client.connect()
-        const assertion = expect(pending).rejects.toThrow(/timeout/i)
+        const assertion = expect(pending).rejects.toMatchObject({
+          message: expect.stringMatching(/timeout/i),
+          code: 'REQUEST_TIMEOUT'
+        })
         await jest.advanceTimersByTimeAsync(10_000)
         await assertion
       } finally {

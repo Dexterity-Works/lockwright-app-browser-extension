@@ -22,11 +22,21 @@ describe('isWrongPasswordError', () => {
 describe('getUnlockErrorMessage', () => {
   it('says the desktop app could not be reached for a connection code', () => {
     const error = Object.assign(new Error('Disconnected from native host'), {
-      code: 'NATIVE_HOST_DISCONNECTED'
+      code: 'DESKTOP_APP_UNAVAILABLE'
     })
 
-    expect(getUnlockErrorMessage(error)).toMatch(
-      /^Couldn't unlock\. The desktop app could not be reached \(NATIVE_HOST_DISCONNECTED\): /
+    expect(getUnlockErrorMessage(error)).toBe(
+      "Couldn't unlock. The desktop app could not be reached (DESKTOP_APP_UNAVAILABLE): Disconnected from native host"
+    )
+  })
+
+  it('says the desktop app could not be reached when the popup times out', () => {
+    const error = Object.assign(new Error('Request timeout: NATIVE_REQUEST'), {
+      code: 'REQUEST_TIMEOUT'
+    })
+
+    expect(getUnlockErrorMessage(error)).toBe(
+      "Couldn't unlock. The desktop app could not be reached (REQUEST_TIMEOUT): Request timeout: NATIVE_REQUEST"
     )
   })
 

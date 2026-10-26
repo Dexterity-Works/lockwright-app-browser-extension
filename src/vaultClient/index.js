@@ -110,11 +110,11 @@ export class PearpassVaultClient extends Emitter {
     return new Promise((resolve, reject) => {
       let settled = false
       const timeoutId = setTimeout(() => {
-        finish(
-          new Error(
-            `${NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT}: ${message?.type || 'runtime'}`
-          )
+        const error = new Error(
+          `${NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT}: ${message?.type || 'runtime'}`
         )
+        error.code = ERROR_CODES.REQUEST_TIMEOUT
+        finish(error)
       }, REQUEST_TIMEOUT.DEFAULT_MS)
 
       const finish = (err, response) => {
