@@ -19,7 +19,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ### Fixed
 
-- Unlock and pairing say "Incorrect password" only when the desktop app rejects the password. Other failures say the desktop app could not be reached or failed, with the error code.
+- Unlock and pairing no longer report a desktop or connection failure as a wrong password; those now show the error code.
 
 ## [0.0.33] - 2026-10-07
 
