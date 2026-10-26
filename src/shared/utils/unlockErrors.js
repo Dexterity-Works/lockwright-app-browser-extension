@@ -33,13 +33,23 @@ export const isWrongPasswordError = (error) => {
 }
 
 /**
+ * Code and message to show for a failure. Message bridge errors carry their
+ * transport code on `code` and the background's code on `originalError`.
+ * @param {unknown} error
+ * @returns {{ code: string, reason: string }}
+ */
+export const getErrorDetail = (error) => ({
+  code: error?.originalError?.code || error?.code || ERROR_CODES.UNKNOWN,
+  reason: error?.message || String(error)
+})
+
+/**
  * Copy for an unlock that failed for a reason other than a wrong password.
  * @param {unknown} error
  * @returns {string}
  */
 export const getUnlockErrorMessage = (error) => {
-  const code = error?.code || ERROR_CODES.UNKNOWN
-  const reason = error?.message || String(error)
+  const { code, reason } = getErrorDetail(error)
 
   if (CONNECTION_ERROR_CODES.includes(code)) {
     const detail = resolveNativeHostUserMessage(reason)

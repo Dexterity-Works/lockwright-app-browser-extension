@@ -387,7 +387,10 @@ describe('usePairing', () => {
         identity: mockIdentity
       })
       secureChannelMessages.unlockClientKeystore.mockRejectedValue(
-        Object.assign(new Error('UnlockInProgress'), { code: 'HANDLER_ERROR' })
+        Object.assign(new Error('UnlockInProgress'), {
+          code: 'HANDLER_ERROR',
+          originalError: { code: 'AUTHENTICATION_FAILED' }
+        })
       )
 
       const { result } = renderHook(() => useDesktopPairing(props))
@@ -406,10 +409,79 @@ describe('usePairing', () => {
 
       expect(mockSetToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('HANDLER_ERROR')
+          message: expect.stringMatching(/key store.*AUTHENTICATION_FAILED/)
+        })
+      )
+      expect(mockSetToast).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('desktop')
         })
       )
       expect(secureChannelMessages.confirmPair).not.toHaveBeenCalled()
+    })
+
+    it('should show the desktop error code when vault login fails for another reason', async () => {
+      secureChannelMessages.getIdentity.mockResolvedValue({
+        success: true,
+        identity: { ed25519PublicKey: 'pubKey', x25519PublicKey: 'xKey' }
+      })
+      mockLogIn.mockRejectedValueOnce(
+        Object.assign(
+          new Error('CLIENT_NOT_PAIRED: No client identity registered'),
+          { code: 'NOT_PAIRED' }
+        )
+      )
+
+      const { result } = renderHook(() => useDesktopPairing(props))
+
+      await act(async () => {
+        result.current.setPairingToken('token-long-enough')
+      })
+      await act(async () => {
+        await result.current.fetchIdentity()
+      })
+      await act(async () => {
+        await result.current.completePairing('password')
+      })
+
+      expect(result.current.passwordError).toEqual(
+        expect.stringContaining('NOT_PAIRED')
+      )
+      expect(result.current.passwordError).not.toEqual(
+        expect.stringContaining('Invalid master password')
+      )
+    })
+
+    it('should say pairing failed, with the code, when a pairing step throws', async () => {
+      secureChannelMessages.getIdentity.mockResolvedValue({
+        success: true,
+        identity: { ed25519PublicKey: 'pubKey', x25519PublicKey: 'xKey' }
+      })
+      secureChannelMessages.pinIdentity.mockRejectedValue(
+        Object.assign(new Error("Message 'PIN_IDENTITY' timed out"), {
+          code: 'TIMEOUT'
+        })
+      )
+
+      const { result } = renderHook(() => useDesktopPairing(props))
+
+      await act(async () => {
+        result.current.setPairingToken('token-long-enough')
+      })
+      await act(async () => {
+        await result.current.fetchIdentity()
+      })
+      await act(async () => {
+        await result.current.completePairing('password')
+      })
+
+      expect(result.current.passwordError).toEqual(
+        expect.stringMatching(/Pairing failed.*TIMEOUT/)
+      )
+      expect(result.current.passwordError).not.toEqual(
+        expect.stringContaining('Invalid master password')
+      )
+      expect(mockLogIn).not.toHaveBeenCalled()
     })
   })
 })

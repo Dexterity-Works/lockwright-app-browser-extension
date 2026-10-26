@@ -12,6 +12,7 @@ import { secureChannelMessages } from '../shared/services/messageBridge'
 import { pendingPairingStore } from '../shared/services/pendingPairingStore'
 import { logger } from '../shared/utils/logger'
 import {
+  getErrorDetail,
   getUnlockErrorMessage,
   isWrongPasswordError
 } from '../shared/utils/unlockErrors'
@@ -193,7 +194,10 @@ export const useDesktopPairing = ({
         return false
       }
       logger.error('Error unlocking keystore:', e)
-      setToast({ message: getUnlockErrorMessage(e) })
+      const { code, reason } = getErrorDetail(e)
+      setToast({
+        message: t`Couldn't unlock the extension's key store (${code}): ${reason}`
+      })
       return false
     }
   }
@@ -276,13 +280,11 @@ export const useDesktopPairing = ({
       logger.error('Failed to complete pairing:', error)
       const isPairingFailed =
         error.message === PAIRING_ERROR_MESSAGES.PAIRING_FAILED
-      const message = isPairingFailed
-        ? t`Pairing failed`
-        : getUnlockErrorMessage(error)
       if (isPairingFailed) {
-        setToast({ message })
+        setToast({ message: t`Pairing failed` })
       } else {
-        setPasswordError(message)
+        const { code, reason } = getErrorDetail(error)
+        setPasswordError(t`Pairing failed (${code}): ${reason}`)
       }
     } finally {
       setLoading(false)
