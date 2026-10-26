@@ -37,6 +37,10 @@ const makeFakeIndexedDB = (store) => {
         get: (id) => request(() => store.get(id)),
         put: (record) =>
           request(() => {
+            if (store.abortPuts) {
+              queueMicrotask(() => tx.onabort?.())
+              return undefined
+            }
             store.set(record.id, record)
             complete()
           }),
@@ -252,6 +256,35 @@ describe('clientKeyStore concurrent unlocks', () => {
       'fulfilled'
     ])
     expect(writes).toHaveBeenCalledTimes(1)
+  })
+
+  it('finishes an unlock whose iteration upgrade write aborts', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, LEGACY_ITERATIONS, false)
+    )
+    store.abortPuts = true
+
+    await expect(
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ).resolves.toBeDefined()
+    await expect(mod.ensureClientKeypairUnlocked()).resolves.toBeDefined()
+  })
+
+  it('lets a caller after a clear wait for the unlock still running', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
+    )
+
+    const first = mod.ensureClientKeypairUnlocked(PASSWORD)
+    await mod.clearClientKeypair()
+    const second = mod.ensureClientKeypairUnlocked(PASSWORD)
+
+    const [a, b] = await Promise.all([first, second])
+    expect(bytes(b.publicKey)).toEqual(bytes(a.publicKey))
   })
 
   it('lets a caller without a password wait for an unlock in flight', async () => {
