@@ -389,7 +389,7 @@ describe('usePairing', () => {
       secureChannelMessages.unlockClientKeystore.mockRejectedValue(
         Object.assign(new Error('UnlockInProgress'), {
           code: 'HANDLER_ERROR',
-          originalError: { code: 'AUTHENTICATION_FAILED' }
+          originalError: { code: 'UNKNOWN' }
         })
       )
 
@@ -409,7 +409,9 @@ describe('usePairing', () => {
 
       expect(mockSetToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringMatching(/key store.*AUTHENTICATION_FAILED/)
+          message: expect.stringMatching(
+            /key store \(UNKNOWN\): UnlockInProgress/
+          )
         })
       )
       expect(mockSetToast).not.toHaveBeenCalledWith(

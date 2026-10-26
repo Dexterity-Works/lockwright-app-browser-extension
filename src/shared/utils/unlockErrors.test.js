@@ -1,4 +1,5 @@
 import { getUnlockErrorMessage, isWrongPasswordError } from './unlockErrors'
+import { AVAILABILITY_ERROR_MESSAGES } from '../constants/nativeMessaging'
 
 describe('isWrongPasswordError', () => {
   it.each([
@@ -26,6 +27,17 @@ describe('getUnlockErrorMessage', () => {
 
     expect(getUnlockErrorMessage(error)).toMatch(
       /^Couldn't unlock\. The desktop app could not be reached \(NATIVE_HOST_DISCONNECTED\): /
+    )
+  })
+
+  it('uses the install hint when the native host is missing', () => {
+    const error = Object.assign(
+      new Error('Specified native messaging host not found.'),
+      { code: 'DESKTOP_APP_UNAVAILABLE' }
+    )
+
+    expect(getUnlockErrorMessage(error)).toBe(
+      `Couldn't unlock. The desktop app could not be reached (DESKTOP_APP_UNAVAILABLE): ${AVAILABILITY_ERROR_MESSAGES.HOST_NOT_FOUND}`
     )
   })
 
