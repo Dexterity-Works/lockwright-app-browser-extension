@@ -232,6 +232,28 @@ describe('clientKeyStore concurrent unlocks', () => {
     expect(bytes(right.value.privateKey)).toEqual(bytes(privateKey))
   })
 
+  it('runs one unlock for several waiters after a wrong password', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, LEGACY_ITERATIONS, false)
+    )
+    const writes = jest.spyOn(store, 'set')
+
+    const results = await Promise.allSettled([
+      mod.ensureClientKeypairUnlocked('wrong password'),
+      mod.ensureClientKeypairUnlocked(PASSWORD),
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ])
+
+    expect(results.map((r) => r.status)).toEqual([
+      'rejected',
+      'fulfilled',
+      'fulfilled'
+    ])
+    expect(writes).toHaveBeenCalledTimes(1)
+  })
+
   it('lets a caller without a password wait for an unlock in flight', async () => {
     const privateKey = ed25519.utils.randomPrivateKey()
     store.set(
