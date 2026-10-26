@@ -9,6 +9,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.34] - 2026-10-26
+
 ### Changed
 
 - The five utils now come from one package, `lockwright-lib-utils`.
