@@ -113,6 +113,19 @@ export const PairedDevicesModalContent = () => {
     if (vaultId) void readKeyState()
   }, [vaultId, devices])
 
+  // The desktop bridge pushes epoch-status but no vault updates, so a
+  // rotation that lands while the list is open reaches it only this way.
+  useEffect(() => {
+    if (!vaultId) return
+    const onStatus = (status: { vaultId?: string } | undefined) => {
+      if (status?.vaultId === vaultId) void readKeyState()
+    }
+    pearpassVaultClient.on?.('epoch-status', onStatus)
+    return () => {
+      pearpassVaultClient.off?.('epoch-status', onStatus)
+    }
+  }, [vaultId])
+
   const rotateNow = async () => {
     try {
       await pearpassVaultClient.activeVaultEnsureEpoch({ start: true })

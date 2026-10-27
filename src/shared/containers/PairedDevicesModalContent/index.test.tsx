@@ -15,7 +15,9 @@ jest.mock('lockwright-lib-vault', () => ({
 jest.mock('lockwright-lib-vault/src/instances', () => ({
   pearpassVaultClient: {
     activeVaultGetEpochStatus: jest.fn(),
-    activeVaultEnsureEpoch: jest.fn()
+    activeVaultEnsureEpoch: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn()
   }
 }))
 
@@ -167,6 +169,25 @@ describe('PairedDevicesModalContent', () => {
     })
 
     expect(ensureEpoch).toHaveBeenCalledWith({ start: true })
+    expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
+  })
+
+  it('reads the key state again when a rotation lands while the list is open', async () => {
+    await renderModal()
+    expect(screen.getByTestId('paired-devices-removed-d2')).toBeTruthy()
+
+    mockedKeyState.mockResolvedValue(keyState({ members: ['d1'], removed: [] }))
+    const onStatus = (pearpassVaultClient.on as jest.Mock).mock.calls.find(
+      ([event]) => event === 'epoch-status'
+    )?.[1]
+    await act(async () => {
+      onStatus?.({ vaultId: 'v2', revoked: false })
+    })
+    expect(mockedKeyState).toHaveBeenCalledTimes(1)
+    await act(async () => {
+      onStatus?.({ vaultId: 'v1', revoked: false })
+    })
+
     expect(screen.queryByTestId('paired-devices-removed-d2')).toBeNull()
   })
 
