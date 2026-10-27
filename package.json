@@ -56,7 +56,7 @@
     "lockwright-lib-utils": "git+https://github.com/Dexterity-Works/lockwright-lib-utils.git#32ffefed29db8d198f96401c780e09e70719bcc2",
     "lockwright-lib-constants": "git+https://github.com/Dexterity-Works/lockwright-lib-constants.git#f6142c9554e9f972519dd8115b2b73f02b73d5fb",
     "lockwright-lib-ui-react-native-components": "git+https://github.com/Dexterity-Works/lockwright-lib-ui-react-native-components.git#5a4ed69feda9b76c0de6f40cb12df72569beb9b4",
-    "lockwright-lib-vault": "git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#468af02cc1ed274dc063692570d4bbcbb3e3f9a5",
+    "lockwright-lib-vault": "git+https://github.com/Dexterity-Works/lockwright-lib-vault.git#88c12b18b5907dde178681cdc4bb38a082fe9a25",
     "qrcode": "1.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
