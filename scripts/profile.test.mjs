@@ -262,6 +262,58 @@ describe('profile output check', () => {
     )
   })
 
+  describe('with a symlinked folder pointing outside', () => {
+    let outside
+
+    beforeEach(() => {
+      outside = mkdtempSync(path.join(tmpdir(), 'lockwright-outside-'))
+      writeFileSync(
+        path.join(outside, 'victim.js'),
+        "x='works.dexterity.lockwright'"
+      )
+      symlinkSync(outside, path.join(outDir, 'linkdir'))
+    })
+
+    afterEach(() => {
+      rmSync(outside, { recursive: true, force: true })
+    })
+
+    it('fails the check and deletes only manifest.json', () => {
+      const profile = readProfile({ LOCKWRIGHT_PROFILE: 'qa' })
+      writeOut({
+        'manifest.json': JSON.stringify(
+          profileManifest(publicManifest(), 'qa')
+        ),
+        'inject.js': '(()=>{})()'
+      })
+
+      assert.throws(
+        () => checkProfileOutput(profile, outDir),
+        /profile output must not contain symlinks: linkdir/
+      )
+      assert.equal(existsSync(path.join(outside, 'victim.js')), true)
+      assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+      assert.equal(existsSync(path.join(outDir, 'inject.js')), true)
+    })
+
+    it('does not delete through it when a chunk names the installed host', () => {
+      const bundle = {
+        'linkdir/victim.js': {
+          type: 'chunk',
+          fileName: 'linkdir/victim.js',
+          code: "x='works.dexterity.lockwright'"
+        }
+      }
+
+      assert.throws(
+        () =>
+          plugin.generateBundle.call(pluginContext(), { dir: outDir }, bundle),
+        /linkdir\/victim\.js/
+      )
+      assert.equal(existsSync(path.join(outside, 'victim.js')), true)
+    })
+  })
+
   it('pnpm run build ends with the check', () => {
     const pkg = JSON.parse(
       readFileSync(path.join(repoRoot, 'package.json'), 'utf8')

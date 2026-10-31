@@ -13,7 +13,13 @@
 // LOCKWRIGHT_PROFILE it does nothing. `vite build --watch` (build:watch)
 // refuses a profile, because a watcher keeps writing after a failed check.
 
-import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync
+} from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -69,25 +75,55 @@ export function profileManifest(manifest, name) {
   }
 }
 
+// Every file and symlink under dir, as paths relative to dir. Never
+// descends into a symlink, so nothing outside dir is read or deleted.
+function walkOutput(dir, rel = '') {
+  const entries = []
+  for (const entry of readdirSync(path.join(dir, rel), {
+    withFileTypes: true
+  })) {
+    const file = path.join(rel, entry.name)
+    if (entry.isSymbolicLink()) entries.push({ file, symlink: true })
+    else if (entry.isDirectory()) entries.push(...walkOutput(dir, file))
+    else if (entry.isFile()) entries.push({ file, symlink: false })
+  }
+  return entries
+}
+
 // The .js files under dir that name the installed desktop's native host.
 // Scans the whole folder, so a config built without the plugin is caught
 // by the next one that has it, and by the check after the last build.
 export function filesNamingRealHost(dir) {
-  return readdirSync(dir, { recursive: true })
-    .filter((file) => file.endsWith('.js'))
+  return walkOutput(dir)
+    .filter(({ file, symlink }) => !symlink && file.endsWith('.js'))
+    .map(({ file }) => file)
     .filter((file) =>
       REAL_HOST.test(readFileSync(path.join(dir, file), 'utf8'))
     )
     .sort()
 }
 
+// rmSync unlinks the last path segment without following it, so a path is
+// safe to delete when the folder holding it really is under dir.
+function insideDir(dir, file) {
+  try {
+    const root = realpathSync(dir)
+    const parent = realpathSync(path.dirname(path.join(dir, file)))
+    return parent === root || parent.startsWith(root + path.sep)
+  } catch {
+    return false
+  }
+}
+
 // Deletes the offending files, so an extension already loaded from dir
 // cannot run them, and manifest.json, so the browser cannot load or reload
 // dir. files are paths relative to dir. Returns the message to fail with.
 function refuseOutput(dir, files, reason) {
-  const removed = [...new Set([...files, 'manifest.json'])]
+  const removed = [...new Set([...files, 'manifest.json'])].filter((file) =>
+    insideDir(dir, file)
+  )
   for (const file of removed) rmSync(path.join(dir, file), { force: true })
-  return `${reason} Removed ${removed.join(', ')} from ${path.relative(repoRoot, dir)}`
+  return `${reason} Removed ${removed.join(', ') || 'nothing'} from ${path.relative(repoRoot, dir)}`
 }
 
 function hostError(files) {
@@ -108,6 +144,20 @@ export function checkProfileOutput(
   dir = path.join(repoRoot, profile.outDir),
   { chromeKey = true } = {}
 ) {
+  const links = walkOutput(dir)
+    .filter(({ symlink }) => symlink)
+    .map(({ file }) => file)
+    .sort()
+  if (links.length) {
+    throw new Error(
+      refuseOutput(
+        dir,
+        [],
+        `profile output must not contain symlinks: ${links.join(', ')}.`
+      )
+    )
+  }
+
   const files = filesNamingRealHost(dir)
   if (files.length) throw new Error(refuseOutput(dir, files, hostError(files)))
 
