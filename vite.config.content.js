@@ -5,8 +5,10 @@ import { defineConfig } from 'vite'
 import viteBabel from 'vite-plugin-babel'
 
 import { readGitSha6 } from './scripts/gitSha.mjs'
+import { profilePlugins, readProfile } from './scripts/profile.mjs'
 
 const webOnlyExtensions = ['.web.js', '.web.jsx', '.web.ts', '.web.tsx']
+const profile = readProfile()
 
 export default defineConfig({
   define: {
@@ -19,7 +21,8 @@ export default defineConfig({
       },
       filter: /\.[jt]sx?$/
     }),
-    lingui()
+    lingui(),
+    ...profilePlugins(profile)
   ],
   resolve: {
     preserveSymlinks: false,
@@ -42,7 +45,7 @@ export default defineConfig({
     noExternal: ['react-strict-dom']
   },
   build: {
-    outDir: 'dist',
+    outDir: profile?.outDir ?? 'dist',
     emptyOutDir: false,
     rollupOptions: {
       input: {

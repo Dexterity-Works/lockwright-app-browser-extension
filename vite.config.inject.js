@@ -3,13 +3,16 @@ import path from 'path'
 import { defineConfig } from 'vite'
 
 import { readGitSha6 } from './scripts/gitSha.mjs'
+import { profilePlugins, readProfile } from './scripts/profile.mjs'
 
 const webOnlyExtensions = [".web.js", ".web.jsx", ".web.ts", ".web.tsx"];
+const profile = readProfile()
 
 export default defineConfig({
   define: {
     'globalThis.__LOCKWRIGHT_GIT_SHA__': JSON.stringify(readGitSha6())
   },
+  plugins: profilePlugins(profile),
   resolve: {
     preserveSymlinks: false,
     dedupe: ['react', 'react-dom'],
@@ -31,7 +34,7 @@ export default defineConfig({
     noExternal: ['react-strict-dom']
   },
   build: {
-    outDir: 'dist',
+    outDir: profile?.outDir ?? 'dist',
     emptyOutDir: false,
     rollupOptions: {
       input: {

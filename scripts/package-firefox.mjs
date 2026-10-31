@@ -22,6 +22,9 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { crc32 } from 'node:zlib'
 
+import { isCli } from './isCli.mjs'
+import { checkProfileOutput, readProfile } from './profile.mjs'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const repoRoot = path.resolve(__dirname, '..')
@@ -247,19 +250,36 @@ export function packageFirefox({
   return { outDir, zipPath, manifest: firefoxManifest }
 }
 
+export function firefoxPackagePaths(profile = readProfile()) {
+  if (!profile) return undefined
+  const distDir = path.join(repoRoot, profile.outDir)
+  return {
+    distDir,
+    outDir: `${distDir}-firefox`,
+    zipPath: `${distDir}-firefox.zip`
+  }
+}
+
 function main() {
-  const { outDir, zipPath, manifest } = packageFirefox()
+  const profile = readProfile()
+  const { outDir, zipPath, manifest } = packageFirefox(
+    firefoxPackagePaths(profile)
+  )
+  if (profile) {
+    try {
+      checkProfileOutput(profile, outDir, { chromeKey: false })
+    } catch (err) {
+      rmSync(zipPath, { force: true })
+      throw err
+    }
+  }
   const geckoId = manifest.browser_specific_settings?.gecko?.id ?? '(missing)'
   console.log(`[package-firefox] wrote ${path.relative(repoRoot, outDir)}`)
   console.log(`[package-firefox] wrote ${path.relative(repoRoot, zipPath)}`)
   console.log(`[package-firefox] gecko.id=${geckoId}`)
 }
 
-const isCli =
-  process.argv[1] &&
-  path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1])
-
-if (isCli) {
+if (isCli(import.meta.url)) {
   try {
     main()
   } catch (err) {

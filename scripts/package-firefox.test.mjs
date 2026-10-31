@@ -12,11 +12,13 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, it } from 'node:test'
 
 import {
+  firefoxPackagePaths,
   packageFirefox,
   rewriteFirefoxHtml,
   rewriteInnerHtmlAssignments,
   transformFirefoxManifest
 } from './package-firefox.mjs'
+import { readProfile } from './profile.mjs'
 
 function makeFixtureDist(root) {
   const distDir = path.join(root, 'dist')
@@ -265,5 +267,21 @@ describe('packageFirefox', () => {
         }),
       /run `pnpm run build` first/i
     )
+  })
+})
+
+describe('firefoxPackagePaths', () => {
+  it('packages the profile build, not dist/, when LOCKWRIGHT_PROFILE is set', () => {
+    const repoRoot = path.resolve(import.meta.dirname, '..')
+
+    assert.deepEqual(
+      firefoxPackagePaths(readProfile({ LOCKWRIGHT_PROFILE: 'qa' })),
+      {
+        distDir: path.join(repoRoot, 'dist-profile-qa'),
+        outDir: path.join(repoRoot, 'dist-profile-qa-firefox'),
+        zipPath: path.join(repoRoot, 'dist-profile-qa-firefox.zip')
+      }
+    )
+    assert.equal(firefoxPackagePaths(null), undefined)
   })
 })
