@@ -46,3 +46,6 @@ yalc.lock
 tsconfig.tsbuildinfo
 
 /src/locales
+
+# Test-profile builds (LOCKWRIGHT_PROFILE=<name>)
+dist-profile-*

@@ -27,4 +27,5 @@ run('pnpm', ['exec', 'jest', ...jestArgs])
 if (jestArgs.length === 0) {
   run('node', ['--test', 'scripts/package-firefox.test.mjs'])
   run('node', ['--test', 'scripts/package-chrome.test.mjs'])
+  run('node', ['--test', 'scripts/profile.test.mjs'])
 }

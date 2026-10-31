@@ -22,6 +22,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { crc32 } from 'node:zlib'
 
+import { readProfile } from './profile.mjs'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const repoRoot = path.resolve(__dirname, '..')
@@ -248,7 +250,17 @@ export function packageFirefox({
 }
 
 function main() {
-  const { outDir, zipPath, manifest } = packageFirefox()
+  const profile = readProfile()
+  const base = profile && path.join(repoRoot, profile.outDir)
+  const { outDir, zipPath, manifest } = packageFirefox(
+    profile
+      ? {
+          distDir: base,
+          outDir: `${base}-firefox`,
+          zipPath: `${base}-firefox.zip`
+        }
+      : undefined
+  )
   const geckoId = manifest.browser_specific_settings?.gecko?.id ?? '(missing)'
   console.log(`[package-firefox] wrote ${path.relative(repoRoot, outDir)}`)
   console.log(`[package-firefox] wrote ${path.relative(repoRoot, zipPath)}`)
