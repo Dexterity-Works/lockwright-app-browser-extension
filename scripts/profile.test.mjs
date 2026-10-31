@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -14,7 +15,12 @@ import { fileURLToPath } from 'node:url'
 
 import { loadConfigFromFile } from 'vite'
 
-import { profileManifest, profilePlugins, readProfile } from './profile.mjs'
+import {
+  checkProfileOutput,
+  profileManifest,
+  profilePlugins,
+  readProfile
+} from './profile.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -167,6 +173,7 @@ describe('profile output check', () => {
       () => plugin.writeBundle.call(pluginContext(), { dir: outDir }),
       /assets\/send\.js, background\.js .*works\.dexterity\.lockwright/
     )
+    assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
   })
 
   it('fails when an earlier config built into the folder without the plugin', () => {
@@ -182,6 +189,53 @@ describe('profile output check', () => {
       () => plugin.writeBundle.call(pluginContext(), { dir: outDir }),
       /background\.js/
     )
+    assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+  })
+
+  it('fails a config whose own chunks name the installed host, before writing', () => {
+    // Vite has already copied public/manifest.json into the folder.
+    writeOut({ 'manifest.json': '{}' })
+    const bundle = {
+      'background.js': {
+        type: 'chunk',
+        fileName: 'background.js',
+        code: 'p.connectNative("works.dexterity.lockwright")'
+      },
+      'assets/a.css': { type: 'asset', fileName: 'assets/a.css', source: '' }
+    }
+
+    assert.throws(
+      () =>
+        plugin.generateBundle.call(pluginContext(), { dir: outDir }, bundle),
+      /background\.js/
+    )
+    assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+  })
+
+  it('checkProfileOutput, the step after the last build, fails and removes manifest.json', () => {
+    const profile = readProfile({ LOCKWRIGHT_PROFILE: 'qa' })
+    writeOut({ 'manifest.json': '{}', 'inject.js': '(()=>{})()' })
+    checkProfileOutput(profile, outDir)
+    assert.equal(existsSync(path.join(outDir, 'manifest.json')), true)
+
+    writeOut({ 'background.js': "x='works.dexterity.lockwright'" })
+    assert.throws(() => checkProfileOutput(profile, outDir), /background\.js/)
+    assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+  })
+
+  it('pnpm run build ends with the check', () => {
+    const pkg = JSON.parse(
+      readFileSync(path.join(repoRoot, 'package.json'), 'utf8')
+    )
+    assert.match(pkg.scripts.build, /&& node scripts\/profile\.mjs$/)
+  })
+
+  it('refuses watch mode', () => {
+    assert.throws(
+      () => plugin.configResolved({ build: { watch: {} } }),
+      /watch mode/
+    )
+    plugin.configResolved({ build: { watch: null } })
   })
 })
 

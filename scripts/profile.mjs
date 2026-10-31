@@ -10,9 +10,10 @@
 //
 // `pnpm run build` ends with `node scripts/profile.mjs`, which checks the
 // whole profile output once more after the last config has built. Without
-// LOCKWRIGHT_PROFILE it does nothing.
+// LOCKWRIGHT_PROFILE it does nothing. `vite build --watch` (build:watch)
+// refuses a profile, because a watcher keeps writing after a failed check.
 
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -78,8 +79,19 @@ export function filesNamingRealHost(dir) {
     .sort()
 }
 
-function realHostError(dir, files) {
-  return `${files.join(', ')} in ${path.relative(repoRoot, dir)} name the installed desktop's native host works.dexterity.lockwright; a profile build must not reach it`
+// Removes manifest.json so the browser cannot load or reload the folder,
+// then returns the message to fail with.
+function refuseOutput(dir, files) {
+  rmSync(path.join(dir, 'manifest.json'), { force: true })
+  return `${files.join(', ')} in ${path.relative(repoRoot, dir)} name the installed desktop's native host works.dexterity.lockwright; a profile build must not reach it. Removed its manifest.json`
+}
+
+export function checkProfileOutput(
+  profile,
+  dir = path.join(repoRoot, profile.outDir)
+) {
+  const files = filesNamingRealHost(dir)
+  if (files.length) throw new Error(refuseOutput(dir, files))
 }
 
 // Spread into a vite config's plugins: [] for the normal build.
@@ -90,6 +102,13 @@ export function profilePlugins(profile) {
     {
       name: 'lockwright-profile',
       enforce: 'pre',
+      configResolved(config) {
+        if (config.build.watch) {
+          throw new Error(
+            `LOCKWRIGHT_PROFILE=${profile.name} cannot build in watch mode; use pnpm run build`
+          )
+        }
+      },
       transform(code, id) {
         if (id.split('?')[0] !== HOST_CONSTANTS_FILE) return null
         if (!code.includes(HOST_NAME_SOURCE)) {
@@ -114,9 +133,17 @@ export function profilePlugins(profile) {
           }
         ]
       },
+      // Before anything reaches disk.
+      generateBundle(options, bundle) {
+        const files = Object.values(bundle)
+          .filter((file) => file.type === 'chunk' && REAL_HOST.test(file.code))
+          .map((file) => file.fileName)
+          .sort()
+        if (files.length) this.error(refuseOutput(options.dir, files))
+      },
       // Vite copies public/ before writing, so this replaces that copy.
-      // Then fails the build if anything in the folder could reach the
-      // installed desktop.
+      // Then fails the build if anything in the folder, including output of
+      // a config without this plugin, could reach the installed desktop.
       writeBundle(options) {
         const manifest = JSON.parse(
           readFileSync(path.join(repoRoot, 'public/manifest.json'), 'utf8')
@@ -126,8 +153,11 @@ export function profilePlugins(profile) {
           JSON.stringify(profileManifest(manifest, profile.name), null, 2) +
             '\n'
         )
-        const files = filesNamingRealHost(options.dir)
-        if (files.length) this.error(realHostError(options.dir, files))
+        try {
+          checkProfileOutput(profile, options.dir)
+        } catch (err) {
+          this.error(err.message)
+        }
       }
     }
   ]
@@ -136,9 +166,7 @@ export function profilePlugins(profile) {
 function main() {
   const profile = readProfile()
   if (!profile) return
-  const dir = path.join(repoRoot, profile.outDir)
-  const files = filesNamingRealHost(dir)
-  if (files.length) throw new Error(realHostError(dir, files))
+  checkProfileOutput(profile)
   console.log(`[profile] ${profile.outDir} does not name the installed host`)
 }
 
