@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import {
   existsSync,
@@ -6,6 +7,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync
 } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -39,6 +41,12 @@ function chromeExtensionId(base64Key) {
     .digest('hex')
     .slice(0, 32)
   return [...hex].map((c) => String.fromCharCode(97 + parseInt(c, 16))).join('')
+}
+
+function publicManifest() {
+  return JSON.parse(
+    readFileSync(path.join(repoRoot, 'public/manifest.json'), 'utf8')
+  )
 }
 
 function pluginContext() {
@@ -173,7 +181,9 @@ describe('profile output check', () => {
       () => plugin.writeBundle.call(pluginContext(), { dir: outDir }),
       /assets\/send\.js, background\.js .*works\.dexterity\.lockwright/
     )
-    assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+    for (const file of ['manifest.json', 'background.js', 'assets/send.js']) {
+      assert.equal(existsSync(path.join(outDir, file)), false, file)
+    }
   })
 
   it('fails when an earlier config built into the folder without the plugin', () => {
@@ -190,6 +200,8 @@ describe('profile output check', () => {
       /background\.js/
     )
     assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+    assert.equal(existsSync(path.join(outDir, 'background.js')), false)
+    assert.equal(existsSync(path.join(outDir, 'inject.js')), true)
   })
 
   it('fails a config whose own chunks name the installed host, before writing', () => {
@@ -214,13 +226,40 @@ describe('profile output check', () => {
 
   it('checkProfileOutput, the step after the last build, fails and removes manifest.json', () => {
     const profile = readProfile({ LOCKWRIGHT_PROFILE: 'qa' })
-    writeOut({ 'manifest.json': '{}', 'inject.js': '(()=>{})()' })
+    writeOut({
+      'manifest.json': JSON.stringify(profileManifest(publicManifest(), 'qa')),
+      'inject.js': '(()=>{})()'
+    })
     checkProfileOutput(profile, outDir)
     assert.equal(existsSync(path.join(outDir, 'manifest.json')), true)
 
     writeOut({ 'background.js': "x='works.dexterity.lockwright'" })
     assert.throws(() => checkProfileOutput(profile, outDir), /background\.js/)
     assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+    assert.equal(existsSync(path.join(outDir, 'background.js')), false)
+  })
+
+  it('fails when the last config left the installed manifest', () => {
+    const profile = readProfile({ LOCKWRIGHT_PROFILE: 'qa' })
+    const { key, ...firefoxManifest } = profileManifest(publicManifest(), 'qa')
+
+    writeOut({ 'manifest.json': JSON.stringify(publicManifest()) })
+    assert.throws(
+      () => checkProfileOutput(profile, outDir),
+      /not the profile qa manifest/
+    )
+    assert.equal(existsSync(path.join(outDir, 'manifest.json')), false)
+
+    // The Firefox package drops the key but keeps the profile gecko id.
+    writeOut({ 'manifest.json': JSON.stringify(firefoxManifest) })
+    assert.throws(() => checkProfileOutput(profile, outDir), /Chrome key/)
+    writeOut({ 'manifest.json': JSON.stringify(firefoxManifest) })
+    checkProfileOutput(profile, outDir, { chromeKey: false })
+    writeOut({ 'manifest.json': JSON.stringify(publicManifest()) })
+    assert.throws(
+      () => checkProfileOutput(profile, outDir, { chromeKey: false }),
+      /gecko id/
+    )
   })
 
   it('pnpm run build ends with the check', () => {
@@ -277,4 +316,68 @@ describe('vite configs', () => {
       })
     })
   }
+})
+
+describe('profile CLIs', () => {
+  // Unique per run, so it never touches a real dist-profile-<name>/.
+  const name = `cli_test_${process.pid}`
+  const distDir = path.join(repoRoot, `dist-profile-${name}`)
+  const firefoxDir = `${distDir}-firefox`
+  let linkDir
+
+  function seed() {
+    rmSync(distDir, { recursive: true, force: true })
+    mkdirSync(distDir, { recursive: true })
+    writeFileSync(
+      path.join(distDir, 'manifest.json'),
+      JSON.stringify(profileManifest(publicManifest(), name))
+    )
+    writeFileSync(
+      path.join(distDir, 'background.js'),
+      'p.connectNative("works.dexterity.lockwright")'
+    )
+  }
+
+  // Through a symlink, as /home -> /var/home does: node runs the real
+  // path, so a plain path.resolve comparison would skip main().
+  function run(script) {
+    const link = path.join(linkDir, script)
+    symlinkSync(path.join(repoRoot, 'scripts', script), link)
+    return spawnSync(process.execPath, [link], {
+      cwd: repoRoot,
+      env: { ...process.env, LOCKWRIGHT_PROFILE: name },
+      encoding: 'utf8'
+    })
+  }
+
+  beforeEach(() => {
+    linkDir = mkdtempSync(path.join(tmpdir(), 'lockwright-cli-'))
+  })
+
+  afterEach(() => {
+    for (const dir of [linkDir, distDir, firefoxDir, `${firefoxDir}.zip`]) {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('profile.mjs fails and unloads a folder that names the installed host', () => {
+    seed()
+    const result = run('profile.mjs')
+
+    assert.equal(result.status, 1, result.stdout + result.stderr)
+    assert.match(result.stderr, /background\.js/)
+    assert.equal(existsSync(path.join(distDir, 'manifest.json')), false)
+    assert.equal(existsSync(path.join(distDir, 'background.js')), false)
+  })
+
+  it('package-firefox.mjs fails and unloads the Firefox package too', () => {
+    seed()
+    const result = run('package-firefox.mjs')
+
+    assert.equal(result.status, 1, result.stdout + result.stderr)
+    assert.match(result.stderr, /background\.js/)
+    assert.equal(existsSync(path.join(firefoxDir, 'manifest.json')), false)
+    assert.equal(existsSync(path.join(firefoxDir, 'background.js')), false)
+    assert.equal(existsSync(`${firefoxDir}.zip`), false)
+  })
 })

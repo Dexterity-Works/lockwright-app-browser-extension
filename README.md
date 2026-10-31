@@ -142,7 +142,7 @@ LOCKWRIGHT_PROFILE=<name> pnpm run build:chrome
 LOCKWRIGHT_PROFILE=<name> pnpm run build:firefox
 ```
 
-`<name>` is 1 to 24 characters of `a-z`, `0-9` and `_`. Any other value fails the build. The build does not touch `dist/`. The build also fails if any `.js` file in `dist-profile-<name>/` names the installed host `works.dexterity.lockwright`, and then removes `manifest.json` from that folder so the browser cannot load or reload it. `pnpm run build:watch` refuses a profile; rerun `pnpm run build` instead.
+`<name>` is 1 to 24 characters of `a-z`, `0-9` and `_`. Any other value fails the build. The build does not touch `dist/`. The build also fails if any `.js` file in `dist-profile-<name>/` names the installed host `works.dexterity.lockwright`, or if its `manifest.json` lacks the profile key and gecko id. It then deletes those `.js` files and `manifest.json`, so the browser cannot load or reload the folder. `pnpm run build:watch` refuses a profile; rerun `pnpm run build` instead.
 
 What changes in the profile build:
 

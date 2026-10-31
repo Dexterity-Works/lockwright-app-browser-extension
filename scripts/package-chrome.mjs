@@ -14,6 +14,7 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { isCli } from './isCli.mjs'
 import { zipDirectory } from './package-firefox.mjs'
 import { readProfile } from './profile.mjs'
 
@@ -45,11 +46,7 @@ function main() {
   console.log(`[package-chrome] wrote ${path.relative(repoRoot, zipPath)}`)
 }
 
-const isCli =
-  process.argv[1] &&
-  path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1])
-
-if (isCli) {
+if (isCli(import.meta.url)) {
   try {
     main()
   } catch (err) {

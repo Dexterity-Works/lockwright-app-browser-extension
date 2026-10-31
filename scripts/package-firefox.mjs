@@ -22,6 +22,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { crc32 } from 'node:zlib'
 
+import { isCli } from './isCli.mjs'
 import { checkProfileOutput, readProfile } from './profile.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -266,7 +267,7 @@ function main() {
   )
   if (profile) {
     try {
-      checkProfileOutput(profile, outDir)
+      checkProfileOutput(profile, outDir, { chromeKey: false })
     } catch (err) {
       rmSync(zipPath, { force: true })
       throw err
@@ -278,11 +279,7 @@ function main() {
   console.log(`[package-firefox] gecko.id=${geckoId}`)
 }
 
-const isCli =
-  process.argv[1] &&
-  path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1])
-
-if (isCli) {
+if (isCli(import.meta.url)) {
   try {
     main()
   } catch (err) {

@@ -17,6 +17,8 @@ import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { isCli } from './isCli.mjs'
+
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
@@ -79,19 +81,49 @@ export function filesNamingRealHost(dir) {
     .sort()
 }
 
-// Removes manifest.json so the browser cannot load or reload the folder,
-// then returns the message to fail with.
-function refuseOutput(dir, files) {
-  rmSync(path.join(dir, 'manifest.json'), { force: true })
-  return `${files.join(', ')} in ${path.relative(repoRoot, dir)} name the installed desktop's native host works.dexterity.lockwright; a profile build must not reach it. Removed its manifest.json`
+// Deletes the offending files, so an extension already loaded from dir
+// cannot run them, and manifest.json, so the browser cannot load or reload
+// dir. files are paths relative to dir. Returns the message to fail with.
+function refuseOutput(dir, files, reason) {
+  const removed = [...new Set([...files, 'manifest.json'])]
+  for (const file of removed) rmSync(path.join(dir, file), { force: true })
+  return `${reason} Removed ${removed.join(', ')} from ${path.relative(repoRoot, dir)}`
 }
 
+function hostError(files) {
+  return `${files.join(', ')} name the installed desktop's native host works.dexterity.lockwright; a profile build must not reach it.`
+}
+
+function readManifest(dir) {
+  try {
+    return JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'))
+  } catch {
+    return null
+  }
+}
+
+// chromeKey: false for the Firefox package, which drops the key.
 export function checkProfileOutput(
   profile,
-  dir = path.join(repoRoot, profile.outDir)
+  dir = path.join(repoRoot, profile.outDir),
+  { chromeKey = true } = {}
 ) {
   const files = filesNamingRealHost(dir)
-  if (files.length) throw new Error(refuseOutput(dir, files))
+  if (files.length) throw new Error(refuseOutput(dir, files, hostError(files)))
+
+  const manifest = readManifest(dir)
+  if (
+    manifest?.browser_specific_settings?.gecko?.id !== PROFILE_GECKO_ID ||
+    (chromeKey && manifest.key !== PROFILE_CHROME_KEY)
+  ) {
+    throw new Error(
+      refuseOutput(
+        dir,
+        [],
+        `manifest.json is not the profile ${profile.name} manifest (gecko id ${PROFILE_GECKO_ID}${chromeKey ? ' and the profile Chrome key' : ''}).`
+      )
+    )
+  }
 }
 
 // Spread into a vite config's plugins: [] for the normal build.
@@ -139,7 +171,9 @@ export function profilePlugins(profile) {
           .filter((file) => file.type === 'chunk' && REAL_HOST.test(file.code))
           .map((file) => file.fileName)
           .sort()
-        if (files.length) this.error(refuseOutput(options.dir, files))
+        if (files.length) {
+          this.error(refuseOutput(options.dir, files, hostError(files)))
+        }
       },
       // Vite copies public/ before writing, so this replaces that copy.
       // Then fails the build if anything in the folder, including output of
@@ -167,14 +201,10 @@ function main() {
   const profile = readProfile()
   if (!profile) return
   checkProfileOutput(profile)
-  console.log(`[profile] ${profile.outDir} does not name the installed host`)
+  console.log(`[profile] ${profile.outDir} passes the profile check`)
 }
 
-const isCli =
-  process.argv[1] &&
-  path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1])
-
-if (isCli) {
+if (isCli(import.meta.url)) {
   try {
     main()
   } catch (err) {
