@@ -27,7 +27,7 @@
     "build:content": "vite build --config vite.config.content.js",
     "build:background": "vite build --config vite.config.background.js",
     "build:inject": "vite build --config vite.config.inject.js",
-    "build": "pnpm run lingui:extract && pnpm run lingui:compile && pnpm run build:main && pnpm run build:content && pnpm run build:background && pnpm run build:inject",
+    "build": "pnpm run lingui:extract && pnpm run lingui:compile && pnpm run build:main && pnpm run build:content && pnpm run build:background && pnpm run build:inject && node scripts/profile.mjs",
     "build:firefox": "pnpm run build && node scripts/package-firefox.mjs",
     "build:chrome": "pnpm run build && node scripts/package-chrome.mjs",
     "build:watch:main": "vite build --watch --config vite.config.main.js --mode development",

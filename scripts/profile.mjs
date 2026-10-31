@@ -7,8 +7,12 @@
 // Writes dist-profile-<name>/. Each vite config calls readProfile(); without
 // LOCKWRIGHT_PROFILE it returns null, the configs add no plugin and keep
 // outDir 'dist', so the normal build is unchanged.
+//
+// `pnpm run build` ends with `node scripts/profile.mjs`, which checks the
+// whole profile output once more after the last config has built. Without
+// LOCKWRIGHT_PROFILE it does nothing.
 
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -24,6 +28,7 @@ const HOST_CONSTANTS_FILE = path.join(
   'src/shared/constants/nativeMessaging.js'
 )
 const HOST_NAME_SOURCE = 'HOST_NAME: MANIFEST_NAME'
+const REAL_HOST = /["'`]works\.dexterity\.lockwright["'`]/
 
 // Public key only. Pins the Chrome extension ID of every profile build to
 // degfjkbgcfkbfhhhecbdllgcokjgcdfb, which the desktop lists in the profile
@@ -61,6 +66,22 @@ export function profileManifest(manifest, name) {
   }
 }
 
+// The .js files under dir that name the installed desktop's native host.
+// Scans the whole folder, so a config built without the plugin is caught
+// by the next one that has it, and by the check after the last build.
+export function filesNamingRealHost(dir) {
+  return readdirSync(dir, { recursive: true })
+    .filter((file) => file.endsWith('.js'))
+    .filter((file) =>
+      REAL_HOST.test(readFileSync(path.join(dir, file), 'utf8'))
+    )
+    .sort()
+}
+
+function realHostError(dir, files) {
+  return `${files.join(', ')} in ${path.relative(repoRoot, dir)} name the installed desktop's native host works.dexterity.lockwright; a profile build must not reach it`
+}
+
 // Spread into a vite config's plugins: [] for the normal build.
 export function profilePlugins(profile) {
   if (!profile) return []
@@ -78,21 +99,6 @@ export function profilePlugins(profile) {
         }
         return code.replace(HOST_NAME_SOURCE, `HOST_NAME: ${hostLiteral}`)
       },
-      // Fails the build rather than ship a profile extension that could
-      // reach the installed desktop's native host.
-      generateBundle(_options, bundle) {
-        for (const chunk of Object.values(bundle)) {
-          if (
-            chunk.type === 'chunk' &&
-            chunk.code.includes('connectNative(') &&
-            !chunk.code.includes(hostLiteral)
-          ) {
-            this.error(
-              `${chunk.fileName} calls connectNative without ${profile.hostName}`
-            )
-          }
-        }
-      },
       transformIndexHtml(_html, ctx) {
         if (path.basename(ctx.filename) !== 'index.html') return
         return [
@@ -109,6 +115,8 @@ export function profilePlugins(profile) {
         ]
       },
       // Vite copies public/ before writing, so this replaces that copy.
+      // Then fails the build if anything in the folder could reach the
+      // installed desktop.
       writeBundle(options) {
         const manifest = JSON.parse(
           readFileSync(path.join(repoRoot, 'public/manifest.json'), 'utf8')
@@ -118,7 +126,31 @@ export function profilePlugins(profile) {
           JSON.stringify(profileManifest(manifest, profile.name), null, 2) +
             '\n'
         )
+        const files = filesNamingRealHost(options.dir)
+        if (files.length) this.error(realHostError(options.dir, files))
       }
     }
   ]
+}
+
+function main() {
+  const profile = readProfile()
+  if (!profile) return
+  const dir = path.join(repoRoot, profile.outDir)
+  const files = filesNamingRealHost(dir)
+  if (files.length) throw new Error(realHostError(dir, files))
+  console.log(`[profile] ${profile.outDir} does not name the installed host`)
+}
+
+const isCli =
+  process.argv[1] &&
+  path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1])
+
+if (isCli) {
+  try {
+    main()
+  } catch (err) {
+    console.error(`[profile] ${err.message}`)
+    process.exit(1)
+  }
 }
