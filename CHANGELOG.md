@@ -11,7 +11,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ### Added
 
-- A test profile build: `LOCKWRIGHT_PROFILE=<name> pnpm run build` writes `dist-profile-<name>/`, an extension named "Lockwright (profile <name>)" with a "profile <name>" badge in the popup. It connects only to a desktop app started with the same `LOCKWRIGHT_PROFILE`, never to the installed one. Builds without `LOCKWRIGHT_PROFILE` are unchanged.
+- A test profile build: `LOCKWRIGHT_PROFILE=<name> pnpm run build` writes `dist-profile-<name>/`, an extension named "Lockwright (profile <name>)" with a "profile <name>" badge in the popup. It connects only to a desktop app started with the same `LOCKWRIGHT_PROFILE`, never to the installed one, and the build fails if its output names the installed host. `build:chrome` and `build:firefox` package it as `dist-profile-<name>-chrome.zip` and `dist-profile-<name>-firefox/`. Builds without `LOCKWRIGHT_PROFILE` are unchanged.
 
 ### Changed
 

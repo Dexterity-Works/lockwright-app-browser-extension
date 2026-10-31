@@ -11,7 +11,8 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, it } from 'node:test'
 
-import { packageChrome } from './package-chrome.mjs'
+import { chromePackagePaths, packageChrome } from './package-chrome.mjs'
+import { readProfile } from './profile.mjs'
 
 function makeFixtureDist(root) {
   const distDir = path.join(root, 'dist')
@@ -74,5 +75,15 @@ describe('packageChrome', () => {
         }),
       /run `pnpm run build` first/i
     )
+  })
+
+  it('zips the profile build, not dist/, when LOCKWRIGHT_PROFILE is set', () => {
+    const repoRoot = path.resolve(import.meta.dirname, '..')
+
+    assert.deepEqual(chromePackagePaths(readProfile({ LOCKWRIGHT_PROFILE: 'qa' })), {
+      distDir: path.join(repoRoot, 'dist-profile-qa'),
+      zipPath: path.join(repoRoot, 'dist-profile-qa-chrome.zip')
+    })
+    assert.equal(chromePackagePaths(null), undefined)
   })
 })
