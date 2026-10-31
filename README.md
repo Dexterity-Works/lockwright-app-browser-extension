@@ -135,11 +135,14 @@ A test profile build connects only to a desktop app started with the same `LOCKW
 # Chrome: dist-profile-<name>/
 LOCKWRIGHT_PROFILE=<name> pnpm run build
 
+# Chrome zip: dist-profile-<name>/ + dist-profile-<name>-chrome.zip
+LOCKWRIGHT_PROFILE=<name> pnpm run build:chrome
+
 # Firefox: dist-profile-<name>-firefox/ + dist-profile-<name>-firefox.zip
 LOCKWRIGHT_PROFILE=<name> pnpm run build:firefox
 ```
 
-`<name>` is 1 to 24 characters of `a-z`, `0-9` and `_`. Any other value fails the build. The build does not touch `dist/`.
+`<name>` is 1 to 24 characters of `a-z`, `0-9` and `_`. Any other value fails the build. The build does not touch `dist/`. The build also fails if any `.js` file in `dist-profile-<name>/` names the installed host `works.dexterity.lockwright`.
 
 What changes in the profile build:
 
@@ -147,7 +150,9 @@ What changes in the profile build:
 - The manifest name is `Lockwright (profile <name>)`. The Chrome extension ID is `degfjkbgcfkbfhhhecbdllgcokjgcdfb`, and the Firefox ID is `lockwright-profile@dexterity.works`.
 - The popup shows a small "profile <name>" badge in the bottom-left corner.
 
-Load it in a separate browser profile, so it does not sit next to your real extension:
+Load it in a separate browser profile, never in the profile that has your real Lockwright extension. The two extensions share the page: each one injects `inject.js` and runs content scripts that answer the page's `source: 'pearpass'` messages. In one browser profile, a passkey request on a real site could be answered from the test vault, or a new passkey saved into it, and the same goes for the real vault while you test.
+
+To load it in the separate browser profile:
 
 - Chrome: open `chrome://extensions` in that profile, enable **Developer mode**, click **Load unpacked** and select `dist-profile-<name>/`.
 - Firefox: open `about:debugging#/runtime/this-firefox` in that profile, click **Load Temporary Add-on…** and select `dist-profile-<name>-firefox/manifest.json`.
