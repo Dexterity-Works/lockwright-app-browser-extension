@@ -125,6 +125,37 @@ describe('NativeMessaging & integration', () => {
     )
   })
 
+  test('connect() opens one port for concurrent callers', async () => {
+    const fakePort = {
+      onMessage: { addListener: jest.fn() },
+      onDisconnect: { addListener: jest.fn() }
+    }
+    runtime.connectNative.mockReturnValue(fakePort)
+
+    await Promise.all([
+      nativeModule.nativeMessaging.connect(),
+      nativeModule.nativeMessaging.connect(),
+      nativeModule.nativeMessaging.connect()
+    ])
+
+    expect(runtime.connectNative).toHaveBeenCalledTimes(1)
+  })
+
+  test('connect() opens a new port after the host disconnects', async () => {
+    const makePort = () => ({
+      onMessage: { addListener: jest.fn() },
+      onDisconnect: { addListener: jest.fn() }
+    })
+    const first = makePort()
+    runtime.connectNative.mockReturnValueOnce(first).mockReturnValue(makePort())
+
+    await nativeModule.nativeMessaging.connect()
+    first.onDisconnect.addListener.mock.calls[0][0]()
+    await nativeModule.nativeMessaging.connect()
+
+    expect(runtime.connectNative).toHaveBeenCalledTimes(2)
+  })
+
   test('connect() must not open the desktop native host on android', async () => {
     runtime.getPlatformInfo = jest.fn((cb) => cb({ os: 'android' }))
 
@@ -461,5 +492,16 @@ describe('NativeMessaging & integration', () => {
     expect(response.error).toContain('Unknown command')
     expect(secureChannel.secureChannel.secureRequest).not.toHaveBeenCalled()
     expect(sendRequestSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('getErrorCode', () => {
+  it.each([
+    'Disconnected from native host',
+    'Native host has exited.',
+    'Specified native messaging host not found.'
+  ])('maps %s to DESKTOP_APP_UNAVAILABLE', (message) => {
+    const { getErrorCode } = require('./nativeMessaging')
+    expect(getErrorCode(message)).toBe('DESKTOP_APP_UNAVAILABLE')
   })
 })

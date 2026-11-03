@@ -125,11 +125,11 @@ export class PearpassVaultClient extends Emitter {
           ? commandTimeoutMs + REQUEST_TIMEOUT.DEFAULT_MS
           : Math.max(REQUEST_TIMEOUT.DEFAULT_MS, commandTimeoutMs)
       const timeoutId = setTimeout(() => {
-        finish(
-          new Error(
-            `${NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT}: ${message?.type || 'runtime'}`
-          )
+        const error = new Error(
+          `${NATIVE_MESSAGING_ERRORS.REQUEST_TIMEOUT}: ${message?.type || 'runtime'}`
         )
+        error.code = ERROR_CODES.REQUEST_TIMEOUT
+        finish(error)
       }, timeoutMs)
 
       const finish = (err, response) => {

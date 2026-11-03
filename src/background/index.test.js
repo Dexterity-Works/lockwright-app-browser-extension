@@ -325,3 +325,24 @@ describe('captured logins', () => {
     expect(sameOrigin).toHaveBeenCalledWith({ type: 'pendingLogin', data })
   })
 })
+
+describe('client keystore unlock', () => {
+  it.each([
+    ['MasterPasswordInvalid', 'AUTHENTICATION_FAILED'],
+    ['Internal error opening backing store for indexedDB.open.', 'UNKNOWN']
+  ])('answers %s with code %s', async (message, code) => {
+    const { ensureClientKeypairUnlocked } = await import('./clientKeyStore')
+    ensureClientKeypairUnlocked.mockRejectedValueOnce(new Error(message))
+
+    const sendResponse = await send(
+      { type: MESSAGE_TYPES.UNLOCK_CLIENT_KEYSTORE, masterPassword: 'pw' },
+      popupSender
+    )
+
+    expect(sendResponse).toHaveBeenCalledWith({
+      success: false,
+      error: message,
+      code
+    })
+  })
+})

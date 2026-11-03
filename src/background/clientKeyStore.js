@@ -10,6 +10,7 @@ const DB_NAME = 'pearpassClientKeyStore'
 const DB_VERSION = 1
 const STORE_NAME = 'clientKeys'
 const KEY_ID = 'client-ed25519'
+const TX_ABORTED = 'IndexedDB transaction aborted'
 const PBKDF2_ITERATIONS = 600000
 // Records written before the `iterations` field existed used this count.
 const LEGACY_PBKDF2_ITERATIONS = 100000
@@ -17,7 +18,7 @@ const LEGACY_PBKDF2_ITERATIONS = 100000
 let inMemoryKeypair = null
 let pendingKeypair = null
 let pendingPersistRecord = null
-let unlocking = false
+let unlockInFlight = null
 
 const textEncoder = new TextEncoder()
 
@@ -58,6 +59,9 @@ const getKeyRecord = (db) =>
       request.onerror = () => {
         reject(request.error)
       }
+      tx.onabort = () => {
+        reject(tx.error || new Error(TX_ABORTED))
+      }
     } catch (error) {
       reject(error)
     }
@@ -75,6 +79,10 @@ const putKeyRecord = (db, record) =>
       }
       tx.onerror = () => {
         reject(tx.error)
+      }
+      // A failed commit (QuotaExceededError) fires only abort.
+      tx.onabort = () => {
+        reject(tx.error || new Error(TX_ABORTED))
       }
       request.onerror = () => {
         reject(request.error)
@@ -209,19 +217,26 @@ export const ensureClientKeypairUnlocked = async (masterPassword) => {
     return inMemoryKeypair
   }
 
-  if (unlocking) {
-    throw new Error('UnlockInProgress')
+  // Wait for an unlock already running. If it failed (another page typed a
+  // wrong password), go on and try this caller's password.
+  while (unlockInFlight) {
+    await unlockInFlight.catch(() => {})
+  }
+
+  if (inMemoryKeypair) {
+    return inMemoryKeypair
   }
 
   if (!masterPassword) {
     throw new Error(AUTH_ERROR_PATTERNS.MASTER_PASSWORD_REQUIRED)
   }
 
-  unlocking = true
+  const attempt = unlockKeypair(masterPassword)
+  unlockInFlight = attempt
   try {
-    return await unlockKeypair(masterPassword)
+    return await attempt
   } finally {
-    unlocking = false
+    if (unlockInFlight === attempt) unlockInFlight = null
   }
 }
 
@@ -397,9 +412,6 @@ export const clearClientKeypair = async () => {
 
   pendingPersistRecord = null
 
-  // Reset unlocking flag to cancel any in-progress unlock
-  unlocking = false
-
   // Delete from IndexedDB
   try {
     const db = await openDb()
@@ -422,6 +434,10 @@ const deleteKeyRecord = (db) =>
       }
       tx.onerror = () => {
         reject(tx.error)
+      }
+      // A failed commit (QuotaExceededError) fires only abort.
+      tx.onabort = () => {
+        reject(tx.error || new Error(TX_ABORTED))
       }
       request.onerror = () => {
         reject(request.error)

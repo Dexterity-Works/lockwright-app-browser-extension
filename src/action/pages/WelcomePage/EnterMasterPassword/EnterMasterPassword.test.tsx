@@ -232,6 +232,89 @@ describe('EnterMasterPassword', () => {
     expect(logIn).not.toHaveBeenCalled()
   })
 
+  it('shows remaining attempts when the desktop rejects the password', async () => {
+    ;(
+      secureChannelMessages.unlockClientKeystore as jest.Mock
+    ).mockResolvedValue(undefined)
+    logIn.mockRejectedValue(
+      Object.assign(
+        new Error(
+          'Error initializing with password: Error: Error decrypting vault key'
+        ),
+        { code: 'UNKNOWN' }
+      )
+    )
+    refreshMasterPasswordStatus.mockResolvedValue({
+      isLocked: false,
+      remainingAttempts: 2
+    })
+
+    render(<EnterMasterPassword />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('submit'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent(
+        'Incorrect password. You have 2 attempts before the app will be temporarily locked.'
+      )
+    })
+  })
+
+  it('shows the desktop error, not "Incorrect password", when the desktop fails', async () => {
+    ;(
+      secureChannelMessages.unlockClientKeystore as jest.Mock
+    ).mockResolvedValue(undefined)
+    logIn.mockRejectedValue(
+      Object.assign(
+        new Error('CLIENT_NOT_PAIRED: No client identity registered'),
+        { code: 'NOT_PAIRED' }
+      )
+    )
+    refreshMasterPasswordStatus.mockResolvedValue({
+      isLocked: false,
+      remainingAttempts: 3
+    })
+
+    render(<EnterMasterPassword />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('submit'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent('NOT_PAIRED')
+    })
+    expect(screen.getByTestId('error')).not.toHaveTextContent(
+      'Incorrect password'
+    )
+  })
+
+  it('stops and names the key store when it fails for another reason', async () => {
+    ;(
+      secureChannelMessages.unlockClientKeystore as jest.Mock
+    ).mockRejectedValue(
+      Object.assign(new Error('Internal error opening backing store'), {
+        code: 'HANDLER_ERROR',
+        originalError: { code: 'UNKNOWN' }
+      })
+    )
+
+    render(<EnterMasterPassword />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('submit'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent(
+        "Couldn't unlock the extension's key store (UNKNOWN): Internal error opening backing store"
+      )
+    })
+    expect(logIn).not.toHaveBeenCalled()
+  })
+
   it('proceeds to logIn when unlock succeeds', async () => {
     ;(
       secureChannelMessages.unlockClientKeystore as jest.Mock

@@ -37,11 +37,26 @@ const makeFakeIndexedDB = (store) => {
         get: (id) => request(() => store.get(id)),
         put: (record) =>
           request(() => {
+            if (store.abortPuts) {
+              queueMicrotask(() => tx.onabort?.())
+              return undefined
+            }
+            if (store.heldPuts) {
+              store.heldPuts.push(() => {
+                store.set(record.id, record)
+                complete()
+              })
+              return undefined
+            }
             store.set(record.id, record)
             complete()
           }),
         delete: (id) =>
           request(() => {
+            if (store.abortDeletes) {
+              queueMicrotask(() => tx.onabort?.())
+              return undefined
+            }
             store.delete(id)
             complete()
           })
@@ -199,5 +214,131 @@ describe('clientKeyStore PBKDF2 iterations', () => {
     const keypair = await mod.ensureClientKeypairUnlocked(PASSWORD)
     expect(bytes(keypair.privateKey)).toEqual(bytes(privateKey))
     expect(store.get(KEY_ID)).toBe(current)
+  })
+})
+
+describe('clientKeyStore concurrent unlocks', () => {
+  it('lets a second unlock wait for the first, then commits the key', async () => {
+    const [a, b] = await Promise.all([
+      mod.ensureClientKeypairUnlocked(PASSWORD),
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ])
+
+    expect(bytes(a.publicKey)).toEqual(bytes(b.publicKey))
+    await mod.commitPendingClientKeystore()
+    expect(store.get(KEY_ID)).toBeDefined()
+  })
+
+  it('tries its own password when the unlock it waited for was wrong', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
+    )
+
+    const [wrong, right] = await Promise.allSettled([
+      mod.ensureClientKeypairUnlocked('wrong password'),
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ])
+
+    expect(wrong.status).toBe('rejected')
+    expect(wrong.reason.message).toContain('MasterPasswordInvalid')
+    expect(right.status).toBe('fulfilled')
+    expect(bytes(right.value.privateKey)).toEqual(bytes(privateKey))
+  })
+
+  it('runs one unlock for several waiters after a wrong password', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, LEGACY_ITERATIONS, false)
+    )
+    const writes = jest.spyOn(store, 'set')
+
+    const results = await Promise.allSettled([
+      mod.ensureClientKeypairUnlocked('wrong password'),
+      mod.ensureClientKeypairUnlocked(PASSWORD),
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ])
+
+    expect(results.map((r) => r.status)).toEqual([
+      'rejected',
+      'fulfilled',
+      'fulfilled'
+    ])
+    expect(writes).toHaveBeenCalledTimes(1)
+  })
+
+  it('finishes an unlock whose iteration upgrade write aborts', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, LEGACY_ITERATIONS, false)
+    )
+    store.abortPuts = true
+
+    await expect(
+      mod.ensureClientKeypairUnlocked(PASSWORD)
+    ).resolves.toBeDefined()
+    await expect(mod.ensureClientKeypairUnlocked()).resolves.toBeDefined()
+  })
+
+  it('lets a caller after a clear wait for the unlock still running', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
+    )
+
+    const reads = jest.spyOn(store, 'get')
+
+    const first = mod.ensureClientKeypairUnlocked(PASSWORD)
+    await mod.clearClientKeypair()
+    const second = mod.ensureClientKeypairUnlocked(PASSWORD)
+    await Promise.allSettled([first, second])
+
+    expect(reads).toHaveBeenCalledTimes(1)
+  })
+
+  it('gives the key to a caller without waiting for its upgrade write', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, LEGACY_ITERATIONS, false)
+    )
+    store.heldPuts = []
+
+    const unlocking = mod.ensureClientKeypairUnlocked(PASSWORD)
+    while (store.heldPuts.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 5))
+    }
+
+    await expect(mod.ensureClientKeypairUnlocked()).resolves.toMatchObject({
+      privateKey: expect.any(Uint8Array)
+    })
+    store.heldPuts.forEach((release) => release())
+    await unlocking
+  })
+
+  it('finishes a clear whose delete aborts', async () => {
+    store.abortDeletes = true
+
+    await expect(mod.clearClientKeypair()).resolves.toBeUndefined()
+  })
+
+  it('lets a caller without a password wait for an unlock in flight', async () => {
+    const privateKey = ed25519.utils.randomPrivateKey()
+    store.set(
+      KEY_ID,
+      await buildRecord(privateKey, PASSWORD, CURRENT_ITERATIONS, true)
+    )
+
+    const unlocking = mod.ensureClientKeypairUnlocked(PASSWORD)
+    const waiting = mod.ensureClientKeypairUnlocked()
+
+    await expect(waiting).resolves.toMatchObject({
+      privateKey: expect.any(Uint8Array)
+    })
+    await unlocking
   })
 })

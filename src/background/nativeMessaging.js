@@ -71,7 +71,17 @@ class NativeMessagingHandler {
       log(NATIVE_MESSAGING_ERRORS.ALREADY_CONNECTED)
       return
     }
+    // Concurrent callers share one attempt, so a host exit that fails every
+    // pending request does not open a port per request.
+    if (!this._connecting) {
+      this._connecting = this._connect().finally(() => {
+        this._connecting = null
+      })
+    }
+    return this._connecting
+  }
 
+  async _connect() {
     const os = await this._platformOs()
     if (isAndroidOs(os)) {
       throw createError(NATIVE_MESSAGING_ERRORS.ANDROID_UNSUPPORTED)
@@ -347,6 +357,8 @@ const getErrorCode = (errorMessage) => {
     errorMessage.includes(
       DISCONNECTION_ERROR_MESSAGES.NATIVE_HOST_DISCONNECTED
     ) ||
+    errorMessage.includes(DISCONNECTION_ERROR_MESSAGES.NATIVE_HOST_EXITED) ||
+    errorMessage.includes(NATIVE_MESSAGING_ERRORS.DISCONNECTED) ||
     errorMessage.includes(DISCONNECTION_ERROR_MESSAGES.CONNECTION_FAILED) ||
     errorMessage.includes(
       DISCONNECTION_ERROR_MESSAGES.DESKTOP_APP_NOT_AVAILABLE
@@ -463,4 +475,4 @@ runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true
 })
 
-export { nativeMessaging }
+export { nativeMessaging, getErrorCode }
