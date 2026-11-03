@@ -30,6 +30,7 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 - A key rotation that finishes after the revoke dialog stops waiting is reported as done when it has landed by the time the dialog checks again. Otherwise the dialog says the result isn't known yet, and the Devices list warns while the vault key still reaches a removed device.
 - A vault revoked from another device is wiped once, without a second switch, "Personal" vault or access-removed dialog.
+- Revoking a device sends it the revoke notice only after it is removed from the vault, so the device can no longer take the notice as a cue to write first. If the removal fails, no notice goes out.
 
 ## [0.0.34] - 2026-10-26
 
