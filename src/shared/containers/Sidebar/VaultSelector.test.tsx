@@ -5,6 +5,7 @@ import '@testing-library/jest-dom'
 
 import { VaultSelector } from './VaultSelector'
 import { CreateOrEditVaultModalContent } from '../CreateOrEditVaultModalContent'
+import { DeleteVaultModalContent } from '../DeleteVaultModalContent'
 import { ShareVaultModalContent } from '../ShareVaultModalContent'
 
 const mockSetIsLoading = jest.fn()
@@ -58,6 +59,10 @@ jest.mock('../CreateOrEditVaultModalContent', () => {
       })
   }
 })
+
+jest.mock('../DeleteVaultModalContent', () => ({
+  DeleteVaultModalContent: () => null
+}))
 
 jest.mock('../ShareVaultModalContent', () => {
   const R = require('react')
@@ -303,5 +308,28 @@ describe('VaultSelector', () => {
     const shareNode = mockSetModal.mock.calls[0][0] as React.ReactElement
     expect(isValidElement(shareNode)).toBe(true)
     expect(shareNode.type).toBe(ShareVaultModalContent)
+  })
+
+  // The delete dialog reads the device count and sends the erase through the
+  // active vault, so that vault has to be the one being deleted.
+  it('switches to the vault before it opens the delete dialog', () => {
+    render(<VaultSelector />)
+
+    fireEvent.click(screen.getByTestId(`vault-row-delete-${vaultBeta.id}`))
+
+    expect(mockSwitchVault).toHaveBeenCalledWith(
+      vaultBeta,
+      expect.any(Function)
+    )
+    expect(mockSetModal).not.toHaveBeenCalled()
+
+    mockSwitchVault.mock.calls[0][1]()
+
+    const modal = mockSetModal.mock.calls[0][0] as React.ReactElement
+    expect(modal.type).toBe(DeleteVaultModalContent)
+    expect(modal.props).toEqual({
+      vaultId: vaultBeta.id,
+      vaultName: vaultBeta.name
+    })
   })
 })

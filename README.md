@@ -44,6 +44,7 @@ Lockwright is also available on [desktop](https://github.com/Dexterity-Works/loc
 - **Autofill.** Detects login and identity fields on any website and fills them from your vault in one click.
 - **Passkey support.** Creates and uses passkeys for websites that support WebAuthn, stored securely in your vault.
 - **Vault management.** Create, unlock, and switch between multiple encrypted vaults directly from the extension popup.
+- **Device revoke.** Revoking a device removes it from the vault and rotates the vault key, so it can't read anything saved or changed after that. It keeps every item it synced before the key rotated: if it was lost or stolen, change the passwords it could see.
 - **Record management.** Stores logins, identities, credit cards, and secure notes.
 - **Password generator.** Generates strong, unique passwords.
 - **Native app bridge.** Connects to the Lockwright desktop app for vault operations.

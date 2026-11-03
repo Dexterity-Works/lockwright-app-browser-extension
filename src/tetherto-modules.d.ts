@@ -326,10 +326,43 @@ declare module 'lockwright-lib-vault' {
     targetDeviceId: string
   }): Promise<{
     results: Array<{ targetDeviceId: string; channel: 'outbox' }>
-    failures: Array<{ targetDeviceId: string; error: Error }>
+    failures: Array<{ targetDeviceId: string; kind?: 'epoch'; error: Error }>
+    epoch: {
+      rotated: boolean
+      id?: string
+      seq?: number
+      members?: string[]
+      reason?:
+        | 'current'
+        | 'pending'
+        | 'legacy'
+        | 'not-writable'
+        | 'self-not-in-roster'
+      uncovered: string[]
+    } | null
   }>
 
   export function getMyDeviceId(): Promise<string | null>
+  export type VaultKeyState = {
+    vaultId: string
+    epoch: string | null
+    legacy: boolean
+    canRead: boolean
+    members: string[]
+    rotatedAt: number | null
+    removed: Array<{ id: string; name: string | null }>
+  }
+  export function getVaultKeyState(): Promise<VaultKeyState | null>
+  export function waitForKeyRotation(params: {
+    vaultId: string
+    deviceId: string
+    timeoutMs: number
+    signal?: AbortSignal
+  }): Promise<VaultKeyState | null>
+}
+
+declare module 'lockwright-lib-vault/src/api/listDevices' {
+  export function listDevices(): Promise<Array<{ id?: string }> | null>
 }
 
 declare module 'lockwright-lib-vault/src/instances' {
@@ -338,6 +371,29 @@ declare module 'lockwright-lib-vault/src/instances' {
     off?: (event: string, handler: (...args: any[]) => void) => void
     activeVaultGet?: (key: string) => Promise<unknown>
     activeVaultAdd?: (key: string, data: unknown) => Promise<void>
+    activeVaultGetEpochStatus: () => Promise<{
+      vaultId: string | null
+      epoch: string | null
+      seq: number
+      legacy: boolean
+      canRead: boolean
+      revoked: boolean
+      members: string[]
+      uncovered: string[]
+    }>
+    activeVaultEnsureEpoch: (options: { start: boolean }) => Promise<{
+      rotated: boolean
+      id?: string
+      seq?: number
+      members?: string[]
+      reason?:
+        | 'current'
+        | 'legacy'
+        | 'pending'
+        | 'not-writable'
+        | 'self-not-in-roster'
+      uncovered: string[]
+    }>
     recordFailedMasterPassword: () => Promise<unknown>
     getMasterPasswordStatus: () => Promise<{
       isLocked: boolean

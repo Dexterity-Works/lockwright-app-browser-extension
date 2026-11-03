@@ -1,4 +1,4 @@
-import { formatDate, isBefore, subtractDateUnits } from './date'
+import { formatDate, formatDateTime, isBefore, subtractDateUnits } from './date'
 
 // Expected values were captured from lockwright-utils-date before it was replaced.
 describe('formatDate', () => {
@@ -19,6 +19,15 @@ describe('formatDate', () => {
     expect(() => formatDate('nope', 'dd-mm-yy', '/')).toThrow(
       'Invalid date input'
     )
+  })
+
+  it('uses the default format and preserves unknown components', () => {
+    expect(formatDate(date)).toBe('2025-05-06')
+    expect(formatDate(date, 'custom', '')).toBe('custom')
+  })
+
+  it('formats a local date and time together', () => {
+    expect(formatDateTime(date)).toBe('06 May 2025 14:07')
   })
 })
 
