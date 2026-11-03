@@ -9,6 +9,8 @@ Starts at 0.0.17, after the Lockwright package rename. Earlier history is git.
 
 ## [Unreleased]
 
+## [0.0.35] - 2026-11-03
+
 ### Added
 
 - After a revoke, a warning when the vault key could not be rotated, or names the devices that cannot read new items until they update.
